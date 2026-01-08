@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Investment Portfolio Dashboard</title>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #f4f6f9;
+  margin: 0;
+  padding: 20px;
+}
+
+h1, h2, h3 {
+  margin: 10px 0;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tabs button {
+  margin-right: 6px;
+  padding: 8px 14px;
+  border: none;
+  background: #ddd;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.tabs button.active {
+  background: #2c3e50;
+  color: #fff;
+}
+
+.panel {
+  display: none;
+  background: #fff;
+  padding: 20px;
+  margin-top: 15px;
+  border-radius: 6px;
+}
+
+.panel.active {
+  display: block;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+  font-size: 13px;
+  color: #555;
+}
+
+input, select {
+  width: 220px;
+  padding: 6px;
+}
+
+button {
+  margin-top: 15px;
+  padding: 10px 16px;
+  border: none;
+  background: #34495e;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.kpi {
+  display: flex;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.card {
+  background: #fff;
+  padding: 12px;
+  border-radius: 6px;
+  width: 160px;
+  text-align: center;
+}
+
+.note {
+  color: #888;
+  font-size: 13px;
+  margin-top: 10px;
+}
+/* 글램핑 테이블 스타일 */
+table.grid {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+table.grid th, table.grid td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+table.grid input {
+  width: 80%;
+  padding: 4px;
+}
+
+.table-large-container {
+  margin-top: 12px;
+  overflow: auto;
+  max-width: 100%;
+  border: 1px solid #eee;
+  padding: 8px;
+  background: #fafafa;
+  min-height: 180px;
+}
+
+.table-large-container .empty {
+  color: #666;
+  text-align: center;
+  padding: 24px 8px;
+}
+
+/* 라디오를 가로로 정렬 */
+.scenario { margin-top: 8px; }
+.scenario label { display: inline-block; margin-right: 14px; font-weight: normal; }
+
+table.large {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table.large th, table.large td {
+  border: 1px solid #ddd;
+  padding: 6px;
+  min-width: 60px;
+  text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>사업 포트폴리오 수지분석 대시보드</h1>
+  <div class="tabs">
+    <button class="active" data-tab="ferry">여객선</button>
+    <button data-tab="glamping">글램핑</button>
+    <button data-tab="venture">신규 벤처</button>
+    <button data-tab="total">통합 분석</button>
+  </div>
+</header>
+
+<!-- KPI -->
+<div class="kpi">
+  <div class="card">매출<br><strong id="kRevenue">-</strong></div>
+  <div class="card">EBITDA<br><strong id="kEbitda">-</strong></div>
+  <div class="card">IRR<br><strong id="kIrr">-</strong></div>
+</div>
+
+<!-- 여객선 -->
+<section id="ferry" class="panel active">
+<h2>여객선 사업 (신조 포함)</h2>
+
+<label>선가 (억원)</label>
+<input id="shipPrice" type="number" value="300">
+
+<label>보조금 (억원)</label>
+<input id="subsidy" type="number" value="60">
+
+<label>연간 운항일수</label>
+<input id="days" type="number" value="330">
+
+<label>일 평균 승객수</label>
+<input id="passengers" type="number" value="800">
+
+<label>객단가 (원)</label>
+<input id="fare" type="number" value="50000">
+
+<label>연간 운영비 (억원)</label>
+<input id="opex" type="number" value="120">
+
+<h3>시나리오</h3>
+<label>객단가 조정</label>
+<input id="fareSlider" type="range" min="0.8" max="1.2" step="0.05" value="1">
+<span id="fareRate">100%</span>
+
+<label>보조금 적용</label>
+<select id="subsidyToggle">
+  <option value="on">ON</option>
+  <option value="off">OFF</option>
+</select>
+
+<button id="ferryAnalyze">여객선 분석 실행</button>
+<div id="ferrySummary" class="note">분석 결과가 여기에 표시됩니다.</div>
+</section>
+
+<!-- 글램핑 -->
+<section id="glamping" class="panel">
+<h2>글램핑 사업</h2>
+
+<label>초기 투자비 (억원)</label>
+<input id="gInvest" type="number" value="80">
+
+<label>객실 수</label>
+<input id="rooms" type="number" value="30">
+
+<label>가동률</label>
+<input id="occ" type="number" step="0.01" value="0.6">
+
+<label>ADR (원)</label>
+<input id="adr" type="number" value="180000">
+
+<label>연간 운영비 (억원)</label>
+<input id="gOpex" type="number" value="15">
+
+<h3>운영 항목 입력표</h3>
+<table id="glampingTable" class="grid">
+  <thead>
+    <tr>
+      <th></th>
+      <th>평일</th>
+      <th>주말</th>
+      <th>공휴일(연휴)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>기준2인</th>
+      <td><input type="number" value="110000"></td>
+      <td><input type="number" value="220000"></td>
+      <td><input type="number" value="220000"></td>
+    </tr>
+    <tr>
+      <th>추가인원(+1)</th>
+      <td><input type="number" value="140000"></td>
+      <td><input type="number" value="250000"></td>
+      <td><input type="number" value="250000"></td>
+    </tr>
+    <tr>
+      <th>추가인원(+2)</th>
+      <td><input type="number" value="170000"></td>
+      <td><input type="number" value="280000"></td>
+      <td><input type="number" value="280000"></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>시나리오별 전개표</h3>
+<div class="scenario">
+  <span><strong>부정안(단일)</strong></span>
+</div>
+
+<!-- 이미지 기반 (3 시나리오): 긍정/중립/부정 표 -->
+
+
+<div id="scenario_neutral" class="scenarioTable" style="display:none">
+  <div><strong>중립안</strong></div>
+  <table class="large" id="scenario_neutral_table">
+    <caption><strong>글램핑 수익 전개표 (중립안 - 이미지 기반)</strong></caption>
+    <thead>
+      <tr>
+        <th colspan="2">구분</th>
+        <th rowspan="2">임대료(원)</th>
+        <th rowspan="2">일수</th>
+        <th rowspan="2">연간 임대수</th>
+        <th rowspan="2">예상 가동율</th>
+        <th rowspan="2">예상수입(원)</th>
+        <th colspan="2">추가인원</th>
+        <th>가중치</th>
+        <th rowspan="2">비고</th>
+      </tr>
+      <tr>
+        <th>시설별</th>
+        <th>시기별</th>
+        <th>추가인원(1)</th>
+        <th>추가인원(2)</th>
+        <th>0.37</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td rowspan="2">총계</td><td>총계</td><td></td><td>365</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td colspan="10" style="background:#f0f0f0"><strong>글램핑 소계</strong> (365)</td></tr>
+
+      <tr><td>(10)</td><td>성수기</td><td>220</td><td>62</td><td></td><td>80%</td><td>109,120</td><td>14,880</td><td>29,760</td><td>16,516</td><td></td></tr>
+      <tr><td></td><td>주말</td><td>220</td><td>88</td><td></td><td>50%</td><td>96,800</td><td>13,200</td><td>26,400</td><td>14,652</td><td></td></tr>
+      <tr><td></td><td>평일</td><td>110</td><td>215</td><td></td><td>18%</td><td>42,570</td><td>11,610</td><td>23,220</td><td>12,887</td><td></td></tr>
+
+      <tr><td>(15)</td><td>성수기</td><td>220</td><td>62</td><td></td><td>80%</td><td>163,680</td><td>22,320</td><td>44,640</td><td>24,775</td><td></td></tr>
+      <tr><td></td><td>주말</td><td>220</td><td>88</td><td></td><td>50%</td><td>145,200</td><td>19,800</td><td>39,600</td><td>21,978</td><td></td></tr>
+      <tr><td></td><td>평일</td><td>110</td><td>215</td><td></td><td>18%</td><td>63,855</td><td>17,415</td><td>34,830</td><td>19,330</td><td></td></tr>
+
+      <tr><td>(30)</td><td>성수기</td><td>220</td><td>62</td><td></td><td>80%</td><td>327,360</td><td>44,640</td><td>89,280</td><td>49,550</td><td></td></tr>
+      <tr><td></td><td>주말</td><td>220</td><td>88</td><td></td><td>50%</td><td>290,400</td><td>39,600</td><td>79,200</td><td>43,956</td><td></td></tr>
+      <tr><td></td><td>평일</td><td>110</td><td>215</td><td></td><td>18%</td><td>127,710</td><td>34,830</td><td>69,660</td><td>38,661</td><td></td></tr>
+
+      <tr><td colspan="11" style="background:#f0f0f0"><strong>카라반 소계</strong> (365)</td></tr>
+
+      <tr><td>(5)</td><td>성수기</td><td>220</td><td>62</td><td></td><td>80%</td><td>54,560</td><td>7,440</td><td>14,880</td><td>8,258</td><td></td></tr>
+      <tr><td></td><td>주말</td><td>220</td><td>88</td><td></td><td>50%</td><td>48,400</td><td>6,600</td><td>13,200</td><td>7,326</td><td></td></tr>
+      <tr><td></td><td>평일</td><td>110</td><td>215</td><td></td><td>27%</td><td>31,927</td><td>8,707</td><td>17,415</td><td>9,665</td><td></td></tr>
+
+      <tr><td colspan="11" style="background:#fff"><strong>합계 / 비고</strong></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div id="scenario_negative" class="scenarioTable" style="display:none">
+  <div><strong>부정안</strong></div>
+  <table class="large" id="scenario_negative_table">
+    <caption><strong>글램핑 수익 전개표 (부정안 - 이미지 기반)</strong></caption>
+    <thead>
+      <tr>
+        <th colspan="2">구분</th>
+        <th rowspan="2">임대료(원)</th>
+        <th rowspan="2">일수</th>
+        <th rowspan="2">연간 임대수</th>
+        <th rowspan="2">예상 가동율</th>
+        <th rowspan="2">예상수입(원)</th>
+        <th colspan="2">추가인원</th>
+        <th>가중치</th>
+        <th rowspan="2">비고</th>
+      </tr>
+      <tr>
+        <th>시설별</th>
+        <th>시기별</th>
+        <th>추가인원(1)</th>
+        <th>추가인원(2)</th>
+        <th>0.37</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td rowspan="2">총계</td><td>총계</td><td></td><td>365</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td colspan="10" style="background:#f0f0f0"><strong>글램핑 소계</strong> (365)</td></tr>
+
+      <tr><td>(10)</td><td>성수기</td><td>220</td><td>62</td><td></td><td>80%</td><td>109,120</td><td>14,880</td><td>29,760</td><td>16,516</td><td></td></tr>
+      <tr><td></td><td>주말</td><td>220</td><td>88</td><td></td><td>50%</td><td>96,800</td><td>13,200</td><td>26,400</td><td>14,652</td><td></td></tr>
+      <tr><td></td><td>평일</td><td>110</td><td>215</td><td></td><td>18%</td><td>42,570</td><td>11,610</td><td>23,220</td><td>12,887</td><td></td></tr>
+
+      <tr><td>(15)</td><td>성수기</td><td>220</td><td>62</td><td></td><td>80%</td><td>163,680</td><td>22,320</td><td>44,640</td><td>24,775</td><td></td></tr>
+      <tr><td></td><td>주말</td><td>220</td><td>88</td><td></td><td>50%</td><td>145,200</td><td>19,800</td><td>39,600</td><td>21,978</td><td></td></tr>
+      <tr><td></td><td>평일</td><td>110</td><td>215</td><td></td><td>18%</td><td>63,855</td><td>17,415</td><td>34,830</td><td>19,330</td><td></td></tr>
+
+      <tr><td>(30)</td><td>성수기</td><td>220</td><td>62</td><td></td><td>80%</td><td>327,360</td><td>44,640</td><td>89,280</td><td>49,550</td><td></td></tr>
+      <tr><td></td><td>주말</td><td>220</td><td>88</td><td></td><td>50%</td><td>290,400</td><td>39,600</td><td>79,200</td><td>43,956</td><td></td></tr>
+      <tr><td></td><td>평일</td><td>110</td><td>215</td><td></td><td>18%</td><td>127,710</td><td>34,830</td><td>69,660</td><td>38,661</td><td></td></tr>
+
+      <tr><td colspan="11" style="background:#f0f0f0"><strong>카라반 소계</strong> (365)</td></tr>
+
+      <tr><td>(5)</td><td>성수기</td><td>220</td><td>62</td><td></td><td>80%</td><td>54,560</td><td>7,440</td><td>14,880</td><td>8,258</td><td></td></tr>
+      <tr><td></td><td>주말</td><td>220</td><td>88</td><td></td><td>50%</td><td>48,400</td><td>6,600</td><td>13,200</td><td>7,326</td><td></td></tr>
+      <tr><td></td><td>평일</td><td>110</td><td>215</td><td></td><td>27%</td><td>31,927</td><td>8,707</td><td>17,415</td><td>9,665</td><td></td></tr>
+
+      <tr><td colspan="11" style="background:#fff"><strong>합계 / 비고</strong></td></tr>
+    </tbody>
+  </table>
+</div>
+        
+
+<button id="glampingAnalyze">글램핑 분석 실행</button>
+<div id="glampingSummary" class="note">분석 결과가 여기에 표시됩니다.</div>
+</section>
+
+<!-- 벤처 -->
+<section id="venture" class="panel">
+<h2>해운·물류 신규 벤처 투자</h2>
+<ul>
+  <li>전략적 시너지 확보 목적</li>
+  <li>소액 지분 투자 검토</li>
+  <li>간단한 IRR 시나리오 입력</li>
+</ul>
+
+<label>초기 투자비 (억원)</label>
+<input id="vInvest" type="number" value="10">
+
+<label>연간 예상 EBITDA (억원)</label>
+<input id="vEbitda" type="number" value="1.2">
+
+<label>분석 기간 (연)</label>
+<input id="vYears" type="number" value="10">
+
+<button id="ventureAnalyze">벤처 분석 실행</button>
+<div id="ventureSummary" class="note">분석 결과가 여기에 표시됩니다.</div>
+</section>
+
+<!-- 통합 -->
+<section id="total" class="panel">
+<h2>통합 수익 분석</h2>
+
+<button id="consolidateBtn">통합 분석 실행</button>
+<button id="downloadPdf">PDF 다운로드</button>
+
+<div id="aggregatedSummary" class="note">통합 분석 결과가 여기에 표시됩니다.</div>
+
+<h3>단독 vs 통합 EBITDA</h3>
+<canvas id="compareChart"></canvas>
+
+<h3>보조금 OFF vs ON IRR 비교 (통합)</h3>
+<canvas id="subsidyChart"></canvas>
+</section>
+
+<script>
+/* 탭 */
+document.querySelectorAll(".tabs button").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab).classList.add("active");
+    // 글램핑 탭을 활성화할 때 11x17 테이블을 다시 생성하여 표시 보장
+    if(btn.dataset.tab === 'glamping') createScenarioTableSingle();
+  }
+});
+
+/* DOM references */
+const fare = document.getElementById('fare');
+const fareSlider = document.getElementById('fareSlider');
+const fareRate = document.getElementById('fareRate');
+const days = document.getElementById('days');
+const passengers = document.getElementById('passengers');
+const shipPrice = document.getElementById('shipPrice');
+const subsidy = document.getElementById('subsidy');
+const subsidyToggle = document.getElementById('subsidyToggle');
+const opex = document.getElementById('opex');
+
+const gInvest = document.getElementById('gInvest');
+const rooms = document.getElementById('rooms');
+const occ = document.getElementById('occ');
+const adr = document.getElementById('adr');
+const gOpex = document.getElementById('gOpex');
+
+const vInvest = document.getElementById('vInvest');
+const vEbitda = document.getElementById('vEbitda');
+const vYears = document.getElementById('vYears');
+
+const ferryAnalyze = document.getElementById('ferryAnalyze');
+const glampingAnalyze = document.getElementById('glampingAnalyze');
+const ventureAnalyze = document.getElementById('ventureAnalyze');
+const consolidateBtn = document.getElementById('consolidateBtn');
+const downloadPdf = document.getElementById('downloadPdf');
+
+const kRevenue = document.getElementById('kRevenue');
+const kEbitda = document.getElementById('kEbitda');
+const kIrr = document.getElementById('kIrr');
+
+const compareChartEl = document.getElementById('compareChart');
+const subsidyChartEl = document.getElementById('subsidyChart');
+
+const ferrySummary = document.getElementById('ferrySummary');
+const glampingSummary = document.getElementById('glampingSummary');
+const ventureSummary = document.getElementById('ventureSummary');
+const aggregatedSummary = document.getElementById('aggregatedSummary');
+
+let compareChart, subsidyChart;
+let projects = {ferry:null, glamping:null, venture:null};
+
+/* 개선된 IRR (binary search) */
+function irr(cfs){
+  let low=-0.9999, high=2, mid=0;
+  for(let i=0;i<80;i++){
+    mid=(low+high)/2;
+    let npv=0;
+    cfs.forEach((c,t)=>npv+=c/Math.pow(1+mid,t));
+    if(npv>0) low=mid; else high=mid;
+  }
+  return mid;
+}
+
+/* 개별 계산 */
+function computeFerry(){
+  const fareAdj = Number(fare.value) * Number(fareSlider.value);
+  fareRate.innerText = Math.round(Number(fareSlider.value)*100)+"%";
+  const revenue = Number(days.value) * Number(passengers.value) * fareAdj / 1e8;
+  const ebitda = revenue - Number(opex.value);
+  const investWith = Number(shipPrice.value) - Number(subsidy.value);
+  const investWithout = Number(shipPrice.value);
+  const years = 20;
+  const cfsWith = [-investWith].concat(Array(years).fill(ebitda));
+  const cfsWithout = [-investWithout].concat(Array(years).fill(ebitda));
+  const irrWith = irr(cfsWith);
+  const irrWithout = irr(cfsWithout);
+  const res = {revenue, ebitda, investWith, investWithout, irrWith, irrWithout, years};
+  projects.ferry = res;
+  ferrySummary.innerHTML = `연간 매출: ${revenue.toFixed(1)} 억원<br>연간 EBITDA: ${ebitda.toFixed(1)} 억원<br>IRR(보조금 ON): ${(irrWith*100).toFixed(2)}% / OFF: ${(irrWithout*100).toFixed(2)}%`;
+  return res;
+}
+
+function computeGlamping(){
+  const revenue = Number(rooms.value)*365*Number(occ.value)*Number(adr.value)/1e8;
+  const ebitda = revenue - Number(gOpex.value);
+  const invest = Number(gInvest.value);
+  const years = 10;
+  const cfs = [-invest].concat(Array(years).fill(ebitda));
+  const irrVal = irr(cfs);
+  const res = {revenue, ebitda, invest, irr: irrVal, years};
+  projects.glamping = res;
+  glampingSummary.innerHTML = `연간 매출: ${revenue.toFixed(1)} 억원<br>연간 EBITDA: ${ebitda.toFixed(1)} 억원<br>IRR: ${(irrVal*100).toFixed(2)}%`;
+  return res;
+}
+
+function computeVenture(){
+  const invest = Number(vInvest.value);
+  const ebitda = Number(vEbitda.value);
+  const years = Number(vYears.value)||10;
+  const cfs = [-invest].concat(Array(years).fill(ebitda));
+  const irrVal = irr(cfs);
+  const res = {revenue: ebitda, ebitda, invest, irr: irrVal, years};
+  projects.venture = res;
+  ventureSummary.innerHTML = `연간 EBITDA: ${ebitda.toFixed(2)} 억원<br>IRR: ${(irrVal*100).toFixed(2)}%`;
+  return res;
+}
+
+/* 통합 분석 */
+function consolidateAnalysis(){
+  if(!projects.ferry) computeFerry();
+  if(!projects.glamping) computeGlamping();
+  if(!projects.venture) computeVenture();
+
+  const f = projects.ferry, g = projects.glamping, v = projects.venture;
+  const totalRevenue = (f.revenue||0) + (g.revenue||0) + (v.revenue||0);
+  const totalEbitda = (f.ebitda||0) + (g.ebitda||0) + (v.ebitda||0);
+
+  const years = 10;
+  const investOn = (f.investWith||0) + (g.invest||0) + (v.invest||0);
+  const investOff = (f.investWithout||0) + (g.invest||0) + (v.invest||0);
+
+  const cfsOn = [-investOn].concat(Array(years).fill(totalEbitda));
+  const cfsOff = [-investOff].concat(Array(years).fill(totalEbitda));
+
+  const irrOn = irr(cfsOn);
+  const irrOff = irr(cfsOff);
+
+  kRevenue.innerText = totalRevenue.toFixed(1)+" 억원";
+  kEbitda.innerText = totalEbitda.toFixed(1)+" 억원";
+  kIrr.innerText = (irrOn*100).toFixed(2)+" %";
+
+  aggregatedSummary.innerHTML = `총 매출(연간 합계): ${totalRevenue.toFixed(1)} 억원<br>총 EBITDA(연간 합계): ${totalEbitda.toFixed(1)} 억원<br>통합 IRR(보조금 ON): ${(irrOn*100).toFixed(2)}% / OFF: ${(irrOff*100).toFixed(2)}%`;
+
+  if(compareChart) compareChart.destroy();
+  const labels=["여객선","글램핑","벤처","통합"];
+  const data=[(f.ebitda||0),(g.ebitda||0),(v.ebitda||0), totalEbitda];
+  compareChart = new Chart(compareChartEl,{type:"bar",data:{labels, datasets:[{data}]}});
+
+  if(subsidyChart) subsidyChart.destroy();
+  subsidyChart = new Chart(subsidyChartEl,{type:"line",data:{labels:["OFF","ON"], datasets:[{data:[irrOff*100, irrOn*100]}]}});
+}
+
+/* 이벤트 바인딩 */
+fareSlider.oninput = ()=> fareRate.innerText = Math.round(Number(fareSlider.value)*100)+"%";
+ferryAnalyze.onclick = computeFerry;
+glampingAnalyze.onclick = computeGlamping;
+ventureAnalyze.onclick = computeVenture;
+consolidateBtn.onclick = consolidateAnalysis;
+
+// Show/hide the static scenario tables
+function showScenarioTable(id){
+  ['positive','neutral','negative'].forEach(k=>{
+    const el = document.getElementById('scenario_'+k);
+    if(el) el.style.display = (k===id)?'':'none';
+  });
+}
+
+// bind radios
+document.querySelectorAll('input[name="scenario"]').forEach(r=>{
+  r.addEventListener('change', ()=>{
+    const sel = document.querySelector('input[name="scenario"]:checked')?.value || 'neutral';
+    showScenarioTable(sel);
+  });
+});
+// init visibility on load
+window.addEventListener('load', ()=>{
+  // populate tables (if template exists)
+  createScenarioTableSingle();
+  syncTablesFromPositive();
+  // show only negative table by default
+  showScenarioTable('negative');
+  // initial update of 임대료 values from 운영 항목 입력표
+  updateNegativeRentFromGlamping();
+});
+
+// ensure tab activation also shows the selected scenario
+document.querySelectorAll('.tabs button').forEach(btn=>{
+  const original = btn.onclick;
+  btn.onclick = ()=>{
+    original();
+    if(btn.dataset.tab === 'glamping'){
+      // refresh scenario tables when tab activated
+      createScenarioTableSingle();
+      // ensure parity if a positive template exists
+      syncTablesFromPositive();
+      // show only the negative scenario (single table)
+      showScenarioTable('negative');
+      // update 임대료 values from 운영 항목 입력표
+      updateNegativeRentFromGlamping();
+    }
+  }
+});
+
+/* create 긍정/부정 variant tables by adjusting numeric cells (+/-10%) */
+function formatNumberWithCommas(n){ return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+
+function adjustTableNumbers(tableEl, factor){
+  const t = tableEl.cloneNode(true);
+  t.querySelectorAll('td').forEach(td=>{
+    const txt = td.textContent.trim();
+    if(!txt) return;
+    if(txt.indexOf('%')>=0) return;
+    // remove commas and non-numeric chars
+    const num = Number(txt.replace(/,/g,'').replace(/[^\d.-]/g,''));
+    if(!isFinite(num)) return;
+    const adjusted = Math.round(num * factor);
+    td.textContent = formatNumberWithCommas(adjusted);
+  });
+  return t;
+}
+
+// --- Scenario table parsing helpers (tables are in '천원' units) ---
+function parseTableNumberToWon(s){
+  if(!s) return null;
+  const cleaned = s.toString().replace(/,/g,'').replace(/[^\d.-]/g,'').trim();
+  if(cleaned === '') return null;
+  const asNum = Number(cleaned);
+  if(!isFinite(asNum)) return null;
+  // table numbers are in 천원 단위, convert to 원
+  return asNum * 1000;
+}
+
+function parsePercent(s){
+  if(!s) return null;
+  const m = s.toString().match(/-?\d+(?:\.\d+)?/);
+  return m ? Number(m[0]) : null;
+}
+
+function extractScenarioTable(id){
+  const table = document.getElementById(id);
+  if(!table) return [];
+  const rows = Array.from(table.querySelectorAll('tbody tr'));
+  return rows.map(tr=>{
+    const cells = Array.from(tr.children);
+    const getText = i => cells[i]?.textContent.trim() ?? '';
+    return {
+      raw: tr.textContent.trim(),
+      col0: getText(0),
+      facility: getText(1),
+      rent_thousand: (function(n){ if(!n) return null; const v=Number(n.replace(/,/g,'')); return isFinite(v)? v : null; })(getText(2)),
+      rent_won: parseTableNumberToWon(getText(2)),
+      days: (function(n){ const v=parseInt(n); return isNaN(v)?null:v; })(getText(3)),
+      annual_count: (function(n){ const v=parseInt(n); return isNaN(v)?null:v; })(getText(4)),
+      occupancy_pct: parsePercent(getText(5)),
+      revenue_won: parseTableNumberToWon(getText(6)),
+      add1_won: parseTableNumberToWon(getText(7)),
+      add2_won: parseTableNumberToWon(getText(8)),
+      weight_raw: getText(9),
+      weight: (function(n){ if(!n) return null; const p = parsePercent(n); if(p!==null) return p; const w = Number(n.replace(/,/g,'')); return isFinite(w)? w : null; })(getText(9)),
+      note: getText(10)
+    };
+  });
+}
+
+window.extractScenarioTable = extractScenarioTable;
+window.extractAllScenarios = ()=>({
+  positive: extractScenarioTable('scenario_positive_table'),
+  neutral: extractScenarioTable('scenario_neutral_table'),
+  negative: extractScenarioTable('scenario_negative_table')
+});
+
+function createScenarioTableSingle(){
+  // Copy HTML-only between scenario tables (no numeric adjustments)
+  const pos = document.getElementById('scenario_positive_table');
+  const neutral = document.getElementById('scenario_neutral_table');
+  const neg = document.getElementById('scenario_negative_table');
+
+  if(pos){
+    if(neutral) neutral.innerHTML = pos.innerHTML.replace(/id="scenario_positive_table"/g, 'id="scenario_neutral_table"');
+    if(neg) neg.innerHTML = pos.innerHTML.replace(/id="scenario_positive_table"/g, 'id="scenario_negative_table"');
+    return;
+  }
+
+  if(neutral){
+    // fallback: copy neutral into others
+    if(pos) pos.innerHTML = neutral.innerHTML.replace(/id="scenario_neutral_table"/g, 'id="scenario_positive_table"');
+    if(neg) neg.innerHTML = neutral.innerHTML.replace(/id="scenario_neutral_table"/g, 'id="scenario_negative_table"');
+  }
+}
+
+// Sync neutral and negative tables to use the same structure as the positive table
+function syncTablesFromPositive(){
+  const pos = document.getElementById('scenario_positive_table');
+  if(!pos) return;
+  ['neutral','negative'].forEach(k=>{
+    const dstId = 'scenario_'+k+'_table';
+    const dst = document.getElementById(dstId);
+    if(dst){
+      // Clone the positive table structure into the destination table while keeping its id
+      dst.innerHTML = pos.innerHTML.replace(/id="scenario_positive_table"/g, `id="${dstId}"`);
+    }
+  });
+}
+
+// Update the 부정안 '임대료(원)' column (in 천원 단위) from the 운영 항목 입력표 (#glampingTable)
+function updateNegativeRentFromGlamping(){
+  const gtable = document.getElementById('glampingTable');
+  if(!gtable) return;
+  const grows = Array.from(gtable.querySelectorAll('tbody tr'));
+  if(grows.length < 1) return;
+  // assume first row is '기준2인'
+  const baseInputs = Array.from(grows[0].querySelectorAll('td input'));
+  const weekday = Number(baseInputs[0]?.value) || 0; // 평일
+  const weekend = Number(baseInputs[1]?.value) || 0; // 주말
+  const holiday = Number(baseInputs[2]?.value) || 0; // 공휴일(연휴)
+
+  const neg = document.getElementById('scenario_negative_table');
+  if(!neg) return;
+  Array.from(neg.querySelectorAll('tbody tr')).forEach(tr=>{
+    const cells = tr.children;
+    if(cells.length < 3) return;
+    const period = (cells[1].textContent || '').trim();
+    if(!period) return;
+    let sourceVal = null;
+    if(period.indexOf('성수기')>=0 || period.indexOf('공휴일')>=0){
+      sourceVal = holiday; // per spec, 공휴일 == 성수기
+    } else if(period.indexOf('주말')>=0){
+      sourceVal = weekend;
+    } else if(period.indexOf('평일')>=0){
+      sourceVal = weekday;
+    }
+    if(sourceVal===null) return;
+    if(!isFinite(sourceVal)) return;
+    const thousand = Math.round(sourceVal / 1000);
+    cells[2].textContent = thousand;
+  });
+}
+
+// Wire inputs to updater
+(function(){
+  const inputs = document.querySelectorAll('#glampingTable tbody input[type="number"]');
+  inputs.forEach(inp=>inp.addEventListener('input', updateNegativeRentFromGlamping));
+  // initial fill on load
+  updateNegativeRentFromGlamping();
+})();
+
+/* PDF */
+downloadPdf.onclick=async()=>{
+  consolidateAnalysis();
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF();
+  const canvas=await html2canvas(document.body,{scale:2});
+  const img=canvas.toDataURL("image/png");
+  pdf.addImage(img,"PNG",0,0,210,canvas.height*210/canvas.width);
+  pdf.save("Investment_Portfolio_Summary.pdf");
+};
+</script>
+
+</body>
+</html>
