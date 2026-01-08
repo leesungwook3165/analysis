@@ -143,6 +143,15 @@ table.large th, table.large td {
   min-width: 60px;
   text-align: center;
 }
+
+/* Toast notifications */
+#toastContainer{position:fixed;top:20px;right:20px;z-index:9999;}
+.toast{background:#333;color:#fff;padding:10px 14px;border-radius:6px;margin-top:8px;box-shadow:0 2px 8px rgba(0,0,0,0.15);opacity:0.95}
+.toast.error{background:#b00020}
+.toast.success{background:#2e7d32}
+
+/* occupancy settings small tweaks */
+#occSettings input[type="number"]{width:70px;text-align:right;padding-right:6px}
 </style>
 </head>
 
@@ -157,6 +166,9 @@ table.large th, table.large td {
     <button data-tab="total">통합 분석</button>
   </div>
 </header>
+
+<!-- Toast container for user messages -->
+<div id="toastContainer"></div>
 
 <!-- KPI -->
 <div class="kpi">
@@ -221,6 +233,10 @@ table.large th, table.large td {
 <label>연간 운영비 (억원)</label>
 <input id="gOpex" type="number" value="15">
 
+<label>가중치</label>
+<input id="gWeight" type="number" step="0.01" min="0" value="0.37">
+<div class="note">가중치는 기본값 0.37이며, 추가인원 합계에 곱해져 천원 단위로 표의 가중치 칼럼에 반영됩니다.</div>
+
 <h3>운영 항목 입력표</h3>
 <table id="glampingTable" class="grid">
   <thead>
@@ -253,15 +269,100 @@ table.large th, table.large td {
   </tbody>
 </table>
 
+<!-- 예상 가동률 설정 표 -->
+<h3>가동률 설정</h3>
+<table id="occSettings" class="grid">
+  <thead>
+    <tr><th colspan="4">가동률 설정</th></tr>
+    <tr>
+      <th></th>
+      <th>긍정안</th>
+      <th>중립안</th>
+      <th>부정안</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>성수기</th>
+      <td><input type="number" id="occ_pos_high" value="80" step="0.1" min="0" max="100">%</td>
+      <td><input type="number" id="occ_neu_high" value="80" step="0.1" min="0" max="100">%</td>
+      <td><input type="number" id="occ_neg_high" value="70" step="0.1" min="0" max="100">%</td>
+    </tr>
+    <tr>
+      <th>주말</th>
+      <td><input type="number" id="occ_pos_weekend" value="50" step="0.1" min="0" max="100">%</td>
+      <td><input type="number" id="occ_neu_weekend" value="50" step="0.1" min="0" max="100">%</td>
+      <td><input type="number" id="occ_neg_weekend" value="45" step="0.1" min="0" max="100">%</td>
+    </tr>
+    <tr>
+      <th>평일</th>
+      <td><input type="number" id="occ_pos_weekday" value="18" step="0.1" min="0" max="100">%</td>
+      <td><input type="number" id="occ_neu_weekday" value="18" step="0.1" min="0" max="100">%</td>
+      <td><input type="number" id="occ_neg_weekday" value="15" step="0.1" min="0" max="100">%</td>
+    </tr>
+  </tbody>
+</table>
+
 <h3>시나리오별 전개표</h3>
 <div class="scenario">
-  <span><strong>부정안(단일)</strong></span>
+  <label><input type="radio" name="scenario" value="positive"> 긍정안</label>
+  <label><input type="radio" name="scenario" value="neutral" checked> 중립안</label>
+  <label><input type="radio" name="scenario" value="negative"> 부정안</label>
 </div>
 
 <!-- 이미지 기반 (3 시나리오): 긍정/중립/부정 표 -->
+<div id="scenario_positive" class="scenarioTable" style="display:none">
+  <div><strong>긍정안</strong></div>
+  <table class="large" id="scenario_positive_table">
+    <caption><strong>글램핑 수익 전개표 (긍정안 - 이미지 기반)</strong></caption>
+    <thead>
+      <tr>
+        <th colspan="2">구분</th>
+        <th rowspan="2">임대료(원)</th>
+        <th rowspan="2">일수</th>
+        <th rowspan="2">연간 임대수</th>
+        <th rowspan="2">예상 가동율</th>
+        <th rowspan="2">예상수입(원)</th>
+        <th colspan="2">추가인원</th>
+        <th>가중치</th>
+        <th rowspan="2">비고</th>
+      </tr>
+      <tr>
+        <th>시설별</th>
+        <th>시기별</th>
+        <th>추가인원(1)</th>
+        <th>추가인원(2)</th>
+        <th class="weightHeader">0.37</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td colspan="2">총계</td><td></td><td>365</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr style="background:#f0f0f0"><td>글램핑</td><td>소계</td><td></td><td>365</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 
+      <tr><td>(10)</td><td>성수기</td><td>220</td><td>62</td><td></td><td>80%</td><td>109,120</td><td>14,880</td><td>29,760</td><td>16,516</td><td></td></tr>
+      <tr><td></td><td>주말</td><td>220</td><td>88</td><td></td><td>50%</td><td>96,800</td><td>13,200</td><td>26,400</td><td>14,652</td><td></td></tr>
+      <tr><td></td><td>평일</td><td>110</td><td>215</td><td></td><td>18%</td><td>42,570</td><td>11,610</td><td>23,220</td><td>12,887</td><td></td></tr>
 
-<div id="scenario_neutral" class="scenarioTable" style="display:none">
+      <tr><td>(15)</td><td>성수기</td><td>220</td><td>62</td><td></td><td>80%</td><td>163,680</td><td>22,320</td><td>44,640</td><td>24,775</td><td></td></tr>
+      <tr><td></td><td>주말</td><td>220</td><td>88</td><td></td><td>50%</td><td>145,200</td><td>19,800</td><td>39,600</td><td>21,978</td><td></td></tr>
+      <tr><td></td><td>평일</td><td>110</td><td>215</td><td></td><td>18%</td><td>63,855</td><td>17,415</td><td>34,830</td><td>19,330</td><td></td></tr>
+
+      <tr><td>(30)</td><td>성수기</td><td>220</td><td>62</td><td></td><td>80%</td><td>327,360</td><td>44,640</td><td>89,280</td><td>49,550</td><td></td></tr>
+      <tr><td></td><td>주말</td><td>220</td><td>88</td><td></td><td>50%</td><td>290,400</td><td>39,600</td><td>79,200</td><td>43,956</td><td></td></tr>
+      <tr><td></td><td>평일</td><td>110</td><td>215</td><td></td><td>18%</td><td>127,710</td><td>34,830</td><td>69,660</td><td>38,661</td><td></td></tr>
+
+      <tr style="background:#f0f0f0"><td>카라반</td><td>소계</td><td></td><td>365</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+
+      <tr><td>(5)</td><td>성수기</td><td>220</td><td>62</td><td></td><td>80%</td><td>54,560</td><td>7,440</td><td>14,880</td><td>8,258</td><td></td></tr>
+      <tr><td></td><td>주말</td><td>220</td><td>88</td><td></td><td>50%</td><td>48,400</td><td>6,600</td><td>13,200</td><td>7,326</td><td></td></tr>
+      <tr><td></td><td>평일</td><td>110</td><td>215</td><td></td><td>27%</td><td>31,927</td><td>8,707</td><td>17,415</td><td>9,665</td><td></td></tr>
+
+      <tr><td colspan="11" style="background:#fff"><strong>합계 / 비고</strong></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div id="scenario_neutral" class="scenarioTable">
   <div><strong>중립안</strong></div>
   <table class="large" id="scenario_neutral_table">
     <caption><strong>글램핑 수익 전개표 (중립안 - 이미지 기반)</strong></caption>
@@ -282,7 +383,7 @@ table.large th, table.large td {
         <th>시기별</th>
         <th>추가인원(1)</th>
         <th>추가인원(2)</th>
-        <th>0.37</th>
+        <th class="weightHeader">0.37</th>
       </tr>
     </thead>
     <tbody>
@@ -333,7 +434,7 @@ table.large th, table.large td {
         <th>시기별</th>
         <th>추가인원(1)</th>
         <th>추가인원(2)</th>
-        <th>0.37</th>
+        <th class="weightHeader">0.37</th>
       </tr>
     </thead>
     <tbody>
@@ -362,7 +463,43 @@ table.large th, table.large td {
     </tbody>
   </table>
 </div>
-        
+
+<!-- Scenario summary: per-scenario compact tables -->
+<div id="scenarioSummaries" style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap">
+  <div style="flex:1; min-width:220px">
+    <h4>긍정안 요약</h4>
+    <table class="grid" id="summary_positive">
+      <thead><tr><th>대수</th><th>글램핑 단독(천원)</th><th>글램핑+카라반5대(천원)</th></tr></thead>
+      <tbody>
+        <tr><td>10대</td><td class="sp_10">-</td><td class="sp_10_p">-</td></tr>
+        <tr><td>15대</td><td class="sp_15">-</td><td class="sp_15_p">-</td></tr>
+        <tr><td>30대</td><td class="sp_30">-</td><td class="sp_30_p">-</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="flex:1; min-width:220px">
+    <h4>중립안 요약</h4>
+    <table class="grid" id="summary_neutral">
+      <thead><tr><th>대수</th><th>글램핑 단독(천원)</th><th>글램핑+카라반5대(천원)</th></tr></thead>
+      <tbody>
+        <tr><td>10대</td><td class="sn_10">-</td><td class="sn_10_p">-</td></tr>
+        <tr><td>15대</td><td class="sn_15">-</td><td class="sn_15_p">-</td></tr>
+        <tr><td>30대</td><td class="sn_30">-</td><td class="sn_30_p">-</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="flex:1; min-width:220px">
+    <h4>부정안 요약</h4>
+    <table class="grid" id="summary_negative">
+      <thead><tr><th>대수</th><th>글램핑 단독(천원)</th><th>글램핑+카라반5대(천원)</th></tr></thead>
+      <tbody>
+        <tr><td>10대</td><td class="sg_10">-</td><td class="sg_10_p">-</td></tr>
+        <tr><td>15대</td><td class="sg_15">-</td><td class="sg_15_p">-</td></tr>
+        <tr><td>30대</td><td class="sg_30">-</td><td class="sg_30_p">-</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 
 <button id="glampingAnalyze">글램핑 분석 실행</button>
 <div id="glampingSummary" class="note">분석 결과가 여기에 표시됩니다.</div>
@@ -576,13 +713,18 @@ document.querySelectorAll('input[name="scenario"]').forEach(r=>{
 });
 // init visibility on load
 window.addEventListener('load', ()=>{
-  // populate tables (if template exists)
+  // populate 긍정/부정 표 from 중립안
   createScenarioTableSingle();
+  // ensure neutral/negative follow the positive table structure
   syncTablesFromPositive();
-  // show only negative table by default
-  showScenarioTable('negative');
-  // initial update of 임대료 values from 운영 항목 입력표
-  updateNegativeRentFromGlamping();
+  // Per user request: show only the 부정안 table by default
+  setOnlyNegativeScenarioVisible();
+  // bind input events and initialize the 임대료 column in all scenario tables
+  bindGlampingInputsToRentUpdate();
+  updateAllScenariosRentFromInputs();
+  // bind occupancy settings and apply them to all scenarios
+  bindOccupancyInputs();
+  updateScenarioOccupancyFromSettings();
 });
 
 // ensure tab activation also shows the selected scenario
@@ -593,14 +735,316 @@ document.querySelectorAll('.tabs button').forEach(btn=>{
     if(btn.dataset.tab === 'glamping'){
       // refresh scenario tables when tab activated
       createScenarioTableSingle();
-      // ensure parity if a positive template exists
+      // make sure neutral/negative use same header structure as positive
       syncTablesFromPositive();
-      // show only the negative scenario (single table)
-      showScenarioTable('negative');
-      // update 임대료 values from 운영 항목 입력표
-      updateNegativeRentFromGlamping();
+      // keep only 부정안 visible and refresh 임대료 values after structural sync
+      setOnlyNegativeScenarioVisible();
+      bindGlampingInputsToRentUpdate();
+      updateAllScenariosRentFromInputs();
+      // bind occupancy settings and apply them to all scenarios
+      bindOccupancyInputs();
+      updateScenarioOccupancyFromSettings();
     }
   }
+});
+
+// --- Helpers: keep only 부정안 visible and update 임대료 from 운영 입력표 ---
+let _glampingInputsBound = false;
+function setOnlyNegativeScenarioVisible(){
+  // hide positive and neutral scenario containers but do not alter table structure
+  const pos = document.getElementById('scenario_positive'); if(pos) pos.style.display = 'none';
+  const neu = document.getElementById('scenario_neutral'); if(neu) neu.style.display = 'none';
+  const neg = document.getElementById('scenario_negative'); if(neg) neg.style.display = '';
+  // select the negative radio so UI reflects the change
+  const negRadio = document.querySelector('input[name="scenario"][value="negative"]');
+  if(negRadio) negRadio.checked = true;
+}
+
+function getGlampingPrices(){
+  const rows = Array.from(document.querySelectorAll('#glampingTable tbody tr'));
+  // Expect rows: [기준2인, 추가인원(+1), 추가인원(+2)] and columns: 평일, 주말, 공휴일
+  const values = {weekday:null, weekend:null, holiday:null};
+  if(rows.length>=1){
+    const cells = rows[0].querySelectorAll('input');
+    values.weekday = Number(cells[0]?.value || 0);
+    values.weekend = Number(cells[1]?.value || 0);
+    values.holiday = Number(cells[2]?.value || 0);
+  }
+  // Return values in 원
+  return values;
+}
+
+function updateAllScenariosRentFromInputs(){
+  const prices = getGlampingPrices();
+  if(prices.weekday==null) return;
+  // convert to 천원 단위 (round)
+  const p_weekday = Math.round(prices.weekday/1000);
+  const p_weekend = Math.round(prices.weekend/1000);
+  const p_holiday = Math.round(prices.holiday/1000);
+
+  const tableIds = ['scenario_positive_table','scenario_neutral_table','scenario_negative_table'];
+  tableIds.forEach(tblId=>{
+    const tbl = document.getElementById(tblId);
+    if(!tbl) return;
+    const rows = Array.from(tbl.querySelectorAll('tbody tr'));
+    rows.forEach(tr=>{
+      const cells = Array.from(tr.children);
+      // skip rows that don't have at least 3 cells (e.g., total rows with colspan)
+      if(cells.length < 3) return;
+      const period = (cells[1]?.textContent || '').trim();
+      // Update the 임대료(원) column (index 2) for known periods
+      if(period === '성수기'){
+        // 공휴일을 성수기와 동일하게 처리
+        cells[2].textContent = p_holiday;
+      }else if(period === '주말'){
+        cells[2].textContent = p_weekend;
+      }else if(period === '평일'){
+        cells[2].textContent = p_weekday;
+      }
+    });
+  });
+}
+
+// backward-compatible wrapper
+function updateNegativeRentFromInputs(){
+  updateAllScenariosRentFromInputs();
+}
+
+function bindGlampingInputsToRentUpdate(){
+  if(_glampingInputsBound) return;
+  const inputs = document.querySelectorAll('#glampingTable input[type="number"]');
+  inputs.forEach(inp=>inp.addEventListener('input', ()=>{
+    updateAllScenariosRentFromInputs();
+  }));
+  _glampingInputsBound = true;
+}
+
+// --- 예상 가동률 설정 helpers ---
+let _occInputsBound = false;
+function getOccupancySettings(){
+  return {
+    positive: { high: Number(document.getElementById('occ_pos_high')?.value||0), weekend: Number(document.getElementById('occ_pos_weekend')?.value||0), weekday: Number(document.getElementById('occ_pos_weekday')?.value||0) },
+    neutral:  { high: Number(document.getElementById('occ_neu_high')?.value||0), weekend: Number(document.getElementById('occ_neu_weekend')?.value||0), weekday: Number(document.getElementById('occ_neu_weekday')?.value||0) },
+    negative: { high: Number(document.getElementById('occ_neg_high')?.value||0), weekend: Number(document.getElementById('occ_neg_weekend')?.value||0), weekday: Number(document.getElementById('occ_neg_weekday')?.value||0) }
+  };
+}
+
+function updateScenarioOccupancyFromSettings(){
+  const occ = getOccupancySettings();
+  const mapping = { '성수기': 'high', '주말': 'weekend', '평일': 'weekday' };
+  const tableMap = { positive: 'scenario_positive_table', neutral: 'scenario_neutral_table', negative: 'scenario_negative_table' };
+
+  function formatPercentValue(v){
+    const n = Number(v);
+    if(!isFinite(n)) return '';
+    // Preserve integers (e.g., 70 -> "70"), but trim unnecessary decimal zeros (e.g., 18.0 -> "18", 18.50 -> "18.5")
+    let s = String(n);
+    if(s.indexOf('.') >= 0){
+      s = s.replace(/\.0+$|(?<=(?:\d)\d)0+$/,'');
+      s = s.replace(/\.$/, '');
+    }
+    return s;
+  }
+
+  Object.keys(tableMap).forEach(scn=>{
+    const tbl = document.getElementById(tableMap[scn]);
+    if(!tbl) return;
+    const rows = Array.from(tbl.querySelectorAll('tbody tr'));
+    rows.forEach(tr=>{
+      const cells = Array.from(tr.children);
+      if(cells.length < 6) return; // skip subtotal/total rows
+      const period = (cells[1]?.textContent || '').trim();
+      const key = mapping[period];
+      if(!key) return;
+      const val = occ[scn][key];
+      if(val===null || val===undefined) return;
+      const formatted = formatPercentValue(val);
+      if(formatted !== '') cells[5].textContent = formatted + "%";
+    });
+  });
+}
+
+function bindOccupancyInputs(){
+  if(_occInputsBound) return;
+  const inputs = document.querySelectorAll('#occSettings input[type="number"]');
+  inputs.forEach(inp=>inp.addEventListener('input', ()=>{
+    if(!validateOccupancyInputs()) return;
+    updateScenarioOccupancyFromSettings();
+    updateAllScenarioCalculations();
+  }));
+  _occInputsBound = true;
+}
+
+/* --- Toast helpers --- */
+function showToast(message, type='error', timeout=3500){
+  const container = document.getElementById('toastContainer');
+  if(!container) return;
+  const el = document.createElement('div');
+  el.className = 'toast '+(type==='error'?'error':'success');
+  el.textContent = message;
+  container.appendChild(el);
+  setTimeout(()=>{ el.style.opacity = '0'; setTimeout(()=>el.remove(),300); }, timeout);
+}
+
+/* --- Input validation --- */
+function validateWeightInput(){
+  const el = document.getElementById('gWeight');
+  if(!el) return true;
+  const v = Number(el.value);
+  if(!isFinite(v) || v < 0){
+    showToast('가중치는 0 이상의 숫자여야 합니다.', 'error');
+    return false;
+  }
+  return true;
+}
+
+function formatWeightValue(v){
+  const n = Number(v);
+  if(!isFinite(n)) return '';
+  let s = String(n);
+  if(s.indexOf('.') >= 0){
+    s = s.replace(/\.0+$/,'');
+    s = s.replace(/(\.\d*?)0+$/,'$1');
+    s = s.replace(/\.$/, '');
+  }
+  return s;
+}
+
+function updateWeightHeader(){
+  const el = document.getElementById('gWeight');
+  const s = formatWeightValue(el?.value);
+  document.querySelectorAll('.weightHeader').forEach(th=>th.textContent = s);
+} 
+
+function validateGlampingInputs(){
+  const inputs = document.querySelectorAll('#glampingTable input[type="number"]');
+  for(const inp of inputs){
+    const v = Number(inp.value);
+    if(!isFinite(v) || v < 0){
+      showToast('글램핑 운영 입력값은 0 이상의 숫자여야 합니다.', 'error');
+      return false;
+    }
+  }
+  // validate weight as well
+  if(!validateWeightInput()) return false;
+  return true;
+} 
+
+function validateOccupancyInputs(){
+  const inputs = document.querySelectorAll('#occSettings input[type="number"]');
+  for(const inp of inputs){
+    const v = Number(inp.value);
+    if(!isFinite(v) || v < 0 || v > 100){
+      showToast('가동률은 0~100 사이의 숫자여야 합니다.', 'error');
+      return false;
+    }
+  }
+  return true;
+}
+
+/* --- Core: calculate revenue / add-on columns for a scenario table --- */
+function updateAllScenarioCalculations(){
+  if(!validateGlampingInputs()) return;
+  const prices = getGlampingPrices(); // in 원
+  // convert to 천원
+  const base = { weekday: Math.round(prices.weekday/1000), weekend: Math.round(prices.weekend/1000), holiday: Math.round(prices.holiday/1000) };
+  // add-on prices total (full price for +1 and +2)
+  const glRows = Array.from(document.querySelectorAll('#glampingTable tbody tr'));
+  if(glRows.length < 3) return; // need base, +1, +2 rows
+  const baseRowInputs = glRows[0].querySelectorAll('input');
+  const add1RowInputs = glRows[1].querySelectorAll('input');
+  const add2RowInputs = glRows[2].querySelectorAll('input');
+  const addon = {
+    weekday: { add1: Math.round((Number(add1RowInputs[0]?.value||0) - Number(baseRowInputs[0]?.value||0)) / 1000), add2: Math.round((Number(add2RowInputs[0]?.value||0) - Number(baseRowInputs[0]?.value||0)) / 1000) },
+    weekend: { add1: Math.round((Number(add1RowInputs[1]?.value||0) - Number(baseRowInputs[1]?.value||0)) / 1000), add2: Math.round((Number(add2RowInputs[1]?.value||0) - Number(baseRowInputs[1]?.value||0)) / 1000) },
+    holiday: { add1: Math.round((Number(add1RowInputs[2]?.value||0) - Number(baseRowInputs[2]?.value||0)) / 1000), add2: Math.round((Number(add2RowInputs[2]?.value||0) - Number(baseRowInputs[2]?.value||0)) / 1000) }
+  };
+
+  const mapping = { '성수기': 'holiday', '주말': 'weekend', '평일': 'weekday' };
+  ['scenario_positive_table','scenario_neutral_table','scenario_negative_table'].forEach(tblId=>{
+    const tbl = document.getElementById(tblId);
+    if(!tbl) return;
+    const rows = Array.from(tbl.querySelectorAll('tbody tr'));
+    let currentUnits = null;
+    // determine scenario key from table id
+    const scnKey = tblId.includes('positive')? 'positive' : tblId.includes('neutral')? 'neutral' : 'negative';
+    const occSettings = getOccupancySettings()[scnKey];
+    rows.forEach(tr=>{
+      const cells = Array.from(tr.children);
+      if(cells.length < 6) return; // skip subtotal/total rows
+      const first = (cells[0]?.textContent || '').trim();
+      const m = first.match(/\((\d+)\)/);
+      if(m) currentUnits = Number(m[1]);
+      if(currentUnits==null) return; // skip rows until we know units
+      const period = (cells[1]?.textContent || '').trim();
+      const key = mapping[period];
+      if(!key) return;
+      const daysVal = parseInt((cells[3]?.textContent||'').replace(/[^0-9]/g,'')) || 0;
+      const occText = (cells[5]?.textContent||'').trim();
+      let occNum = parsePercent(occText);
+      if(occNum == null) occNum = occSettings[key];
+      // normalize to decimal (0-1): if value appears as 0-100 percentage, divide by 100
+      let occDecimal = (typeof occNum === 'number') ? (occNum > 1 ? occNum/100 : occNum) : 0;
+      // rent in 천원
+      const rent_th = base[key];
+      const rev = Math.round(currentUnits * rent_th * daysVal * occDecimal);
+      cells[6].textContent = formatNumberWithCommas(rev);
+      // add1/add2 totals
+      const add1_total = Math.round(currentUnits * addon[key].add1 * daysVal * occDecimal);
+      const add2_total = Math.round(currentUnits * addon[key].add2 * daysVal * occDecimal);
+      cells[7].textContent = formatNumberWithCommas(add1_total);
+      cells[8].textContent = formatNumberWithCommas(add2_total);
+      // 가중치 계산: (추가인원(1) + 추가인원(2)) * 가중치 (gWeight), 결과는 천원 단위
+      const weightFactor = Number(document.getElementById('gWeight')?.value) || 0;
+      const weightVal = Math.round((add1_total + add2_total) * weightFactor);
+      cells[9].textContent = formatNumberWithCommas(weightVal);
+    });
+  });
+  // update scenario summaries after table calculations
+  updateScenarioSummaries();
+}
+
+// Bind existing input listeners to also recompute derived columns
+(function bindAdditionalListeners(){
+  // extend existing bindings
+  const glInputs = document.querySelectorAll('#glampingTable input[type="number"]');
+  glInputs.forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      if(!validateGlampingInputs()) return;
+      updateAllScenariosRentFromInputs();
+      updateAllScenarioCalculations();
+    });
+  });
+
+  const occInputs = document.querySelectorAll('#occSettings input[type="number"]');
+  occInputs.forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      if(!validateOccupancyInputs()) return;
+      updateScenarioOccupancyFromSettings();
+      updateAllScenarioCalculations();
+    });
+  });
+
+  const weightEl = document.getElementById('gWeight');
+  if(weightEl){
+    weightEl.addEventListener('input', ()=>{
+      if(!validateWeightInput()) return;
+      updateWeightHeader();
+      updateAllScenarioCalculations();
+    });
+    // initialize header to current value
+    updateWeightHeader();
+  }
+})();
+
+// Run initial calculation after page load if tables exist
+window.addEventListener('load', ()=>{
+  setTimeout(()=>{
+    updateAllScenariosRentFromInputs();
+    updateScenarioOccupancyFromSettings();
+    updateAllScenarioCalculations();
+    updateWeightHeader();
+  }, 50);
 });
 
 /* create 긍정/부정 variant tables by adjusting numeric cells (+/-10%) */
@@ -671,6 +1115,79 @@ window.extractAllScenarios = ()=>({
   negative: extractScenarioTable('scenario_negative_table')
 });
 
+// --- Scenario summary helpers ---
+function parseThousandNumber(s){
+  if(!s) return 0;
+  const cleaned = s.toString().replace(/,/g,'').replace(/[^0-9.-]/g,'').trim();
+  if(cleaned === '') return 0;
+  const n = Number(cleaned);
+  return isFinite(n)? n : 0;
+}
+
+function sumRevenueForUnits(tblId, units){
+  const tbl = document.getElementById(tblId);
+  if(!tbl) return 0;
+  const rows = Array.from(tbl.querySelectorAll('tbody tr'));
+  return rows.reduce((acc,tr)=>{
+    const cells = Array.from(tr.children);
+    const first = (cells[0]?.textContent||'').trim();
+    if(first.indexOf('('+units+')')>=0){
+      const revText = cells[6]?.textContent || '';
+      return acc + parseThousandNumber(revText);
+    }
+    return acc;
+  }, 0);
+}
+
+function sumCaravan5(tblId){
+  const tbl = document.getElementById(tblId);
+  if(!tbl) return 0;
+  const rows = Array.from(tbl.querySelectorAll('tbody tr'));
+  return rows.reduce((acc,tr)=>{
+    const cells = Array.from(tr.children);
+    const first = (cells[0]?.textContent||'').trim();
+    if(first.indexOf('(5)')>=0){
+      const revText = cells[6]?.textContent || '';
+      return acc + parseThousandNumber(revText);
+    }
+    return acc;
+  }, 0);
+}
+
+function updateScenarioSummaries(){
+  ['positive','neutral','negative'].forEach(scn=>{
+    const tblId = 'scenario_'+scn+'_table';
+    const gl10 = sumRevenueForUnits(tblId, 10);
+    const gl15 = sumRevenueForUnits(tblId, 15);
+    const gl30 = sumRevenueForUnits(tblId, 30);
+    const cv5 = sumCaravan5(tblId);
+    // set cells safely
+    const setText = (sel, val)=>{ const el = document.querySelector(sel); if(el) el.textContent = val; };
+    if(scn==='positive'){
+      setText('.sp_10', formatNumberWithCommas(gl10));
+      setText('.sp_10_p', formatNumberWithCommas(gl10 + cv5));
+      setText('.sp_15', formatNumberWithCommas(gl15));
+      setText('.sp_15_p', formatNumberWithCommas(gl15 + cv5));
+      setText('.sp_30', formatNumberWithCommas(gl30));
+      setText('.sp_30_p', formatNumberWithCommas(gl30 + cv5));
+    }else if(scn==='neutral'){
+      setText('.sn_10', formatNumberWithCommas(gl10));
+      setText('.sn_10_p', formatNumberWithCommas(gl10 + cv5));
+      setText('.sn_15', formatNumberWithCommas(gl15));
+      setText('.sn_15_p', formatNumberWithCommas(gl15 + cv5));
+      setText('.sn_30', formatNumberWithCommas(gl30));
+      setText('.sn_30_p', formatNumberWithCommas(gl30 + cv5));
+    }else{
+      setText('.sg_10', formatNumberWithCommas(gl10));
+      setText('.sg_10_p', formatNumberWithCommas(gl10 + cv5));
+      setText('.sg_15', formatNumberWithCommas(gl15));
+      setText('.sg_15_p', formatNumberWithCommas(gl15 + cv5));
+      setText('.sg_30', formatNumberWithCommas(gl30));
+      setText('.sg_30_p', formatNumberWithCommas(gl30 + cv5));
+    }
+  });
+}
+
 function createScenarioTableSingle(){
   // Copy HTML-only between scenario tables (no numeric adjustments)
   const pos = document.getElementById('scenario_positive_table');
@@ -703,48 +1220,6 @@ function syncTablesFromPositive(){
     }
   });
 }
-
-// Update the 부정안 '임대료(원)' column (in 천원 단위) from the 운영 항목 입력표 (#glampingTable)
-function updateNegativeRentFromGlamping(){
-  const gtable = document.getElementById('glampingTable');
-  if(!gtable) return;
-  const grows = Array.from(gtable.querySelectorAll('tbody tr'));
-  if(grows.length < 1) return;
-  // assume first row is '기준2인'
-  const baseInputs = Array.from(grows[0].querySelectorAll('td input'));
-  const weekday = Number(baseInputs[0]?.value) || 0; // 평일
-  const weekend = Number(baseInputs[1]?.value) || 0; // 주말
-  const holiday = Number(baseInputs[2]?.value) || 0; // 공휴일(연휴)
-
-  const neg = document.getElementById('scenario_negative_table');
-  if(!neg) return;
-  Array.from(neg.querySelectorAll('tbody tr')).forEach(tr=>{
-    const cells = tr.children;
-    if(cells.length < 3) return;
-    const period = (cells[1].textContent || '').trim();
-    if(!period) return;
-    let sourceVal = null;
-    if(period.indexOf('성수기')>=0 || period.indexOf('공휴일')>=0){
-      sourceVal = holiday; // per spec, 공휴일 == 성수기
-    } else if(period.indexOf('주말')>=0){
-      sourceVal = weekend;
-    } else if(period.indexOf('평일')>=0){
-      sourceVal = weekday;
-    }
-    if(sourceVal===null) return;
-    if(!isFinite(sourceVal)) return;
-    const thousand = Math.round(sourceVal / 1000);
-    cells[2].textContent = thousand;
-  });
-}
-
-// Wire inputs to updater
-(function(){
-  const inputs = document.querySelectorAll('#glampingTable tbody input[type="number"]');
-  inputs.forEach(inp=>inp.addEventListener('input', updateNegativeRentFromGlamping));
-  // initial fill on load
-  updateNegativeRentFromGlamping();
-})();
 
 /* PDF */
 downloadPdf.onclick=async()=>{
