@@ -129,8 +129,39 @@ table.grid input {
 }
 
 /* 라디오를 가로로 정렬 */
-.scenario { margin-top: 8px; }
-.scenario label { display: inline-block; margin-right: 14px; font-weight: normal; }
+.scenario { 
+  margin-top: 12px; 
+  display: flex;
+  gap: 8px;
+}
+.scenario label { 
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 18px;
+  background: #f5f5f5;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 14px;
+}
+.scenario label:hover {
+  background: #e8e8e8;
+  border-color: #bbb;
+}
+.scenario input[type="radio"] {
+  margin-right: 8px;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+.scenario input[type="radio"]:checked + span,
+.scenario label:has(input[type="radio"]:checked) {
+  background: #2c3e50;
+  color: white;
+  border-color: #2c3e50;
+}
 
 table.large {
   border-collapse: collapse;
@@ -305,9 +336,9 @@ table.large th, table.large td {
 
 <h3>시나리오별 전개표</h3>
 <div class="scenario">
-  <label><input type="radio" name="scenario" value="positive"> 긍정안</label>
-  <label><input type="radio" name="scenario" value="neutral" checked> 중립안</label>
-  <label><input type="radio" name="scenario" value="negative"> 부정안</label>
+  <label><input type="radio" name="scenario" value="positive"><span>긍정안</span></label>
+  <label><input type="radio" name="scenario" value="neutral" checked><span>중립안</span></label>
+  <label><input type="radio" name="scenario" value="negative"><span>부정안</span></label>
 </div>
 
 <!-- 이미지 기반 (3 시나리오): 긍정/중립/부정 표 -->
@@ -466,36 +497,36 @@ table.large th, table.large td {
 
 <!-- Scenario summary: per-scenario compact tables -->
 <div id="scenarioSummaries" style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap">
-  <div style="flex:1; min-width:220px">
+  <div style="flex:1; min-width:300px">
     <h4>긍정안 요약</h4>
-    <table class="grid" id="summary_positive">
-      <thead><tr><th>대수</th><th>글램핑 단독(천원)</th><th>글램핑+카라반5대(천원)</th></tr></thead>
+    <table class="grid" id="summary_positive" style="font-size:12px">
+      <thead><tr><th>대수</th><th>글램핑 단독</th><th>+가중치</th><th>+카라반5대</th><th>+카라반+가중치</th></tr></thead>
       <tbody>
-        <tr><td>10대</td><td class="sp_10">-</td><td class="sp_10_p">-</td></tr>
-        <tr><td>15대</td><td class="sp_15">-</td><td class="sp_15_p">-</td></tr>
-        <tr><td>30대</td><td class="sp_30">-</td><td class="sp_30_p">-</td></tr>
+        <tr><td>10대</td><td class="sp_10">-</td><td class="sp_10_w">-</td><td class="sp_10_p">-</td><td class="sp_10_pw">-</td></tr>
+        <tr><td>15대</td><td class="sp_15">-</td><td class="sp_15_w">-</td><td class="sp_15_p">-</td><td class="sp_15_pw">-</td></tr>
+        <tr><td>30대</td><td class="sp_30">-</td><td class="sp_30_w">-</td><td class="sp_30_p">-</td><td class="sp_30_pw">-</td></tr>
       </tbody>
     </table>
   </div>
-  <div style="flex:1; min-width:220px">
+  <div style="flex:1; min-width:300px">
     <h4>중립안 요약</h4>
-    <table class="grid" id="summary_neutral">
-      <thead><tr><th>대수</th><th>글램핑 단독(천원)</th><th>글램핑+카라반5대(천원)</th></tr></thead>
+    <table class="grid" id="summary_neutral" style="font-size:12px">
+      <thead><tr><th>대수</th><th>글램핑 단독</th><th>+가중치</th><th>+카라반5대</th><th>+카라반+가중치</th></tr></thead>
       <tbody>
-        <tr><td>10대</td><td class="sn_10">-</td><td class="sn_10_p">-</td></tr>
-        <tr><td>15대</td><td class="sn_15">-</td><td class="sn_15_p">-</td></tr>
-        <tr><td>30대</td><td class="sn_30">-</td><td class="sn_30_p">-</td></tr>
+        <tr><td>10대</td><td class="sn_10">-</td><td class="sn_10_w">-</td><td class="sn_10_p">-</td><td class="sn_10_pw">-</td></tr>
+        <tr><td>15대</td><td class="sn_15">-</td><td class="sn_15_w">-</td><td class="sn_15_p">-</td><td class="sn_15_pw">-</td></tr>
+        <tr><td>30대</td><td class="sn_30">-</td><td class="sn_30_w">-</td><td class="sn_30_p">-</td><td class="sn_30_pw">-</td></tr>
       </tbody>
     </table>
   </div>
-  <div style="flex:1; min-width:220px">
+  <div style="flex:1; min-width:300px">
     <h4>부정안 요약</h4>
-    <table class="grid" id="summary_negative">
-      <thead><tr><th>대수</th><th>글램핑 단독(천원)</th><th>글램핑+카라반5대(천원)</th></tr></thead>
+    <table class="grid" id="summary_negative" style="font-size:12px">
+      <thead><tr><th>대수</th><th>글램핑 단독</th><th>+가중치</th><th>+카라반5대</th><th>+카라반+가중치</th></tr></thead>
       <tbody>
-        <tr><td>10대</td><td class="sg_10">-</td><td class="sg_10_p">-</td></tr>
-        <tr><td>15대</td><td class="sg_15">-</td><td class="sg_15_p">-</td></tr>
-        <tr><td>30대</td><td class="sg_30">-</td><td class="sg_30_p">-</td></tr>
+        <tr><td>10대</td><td class="sg_10">-</td><td class="sg_10_w">-</td><td class="sg_10_p">-</td><td class="sg_10_pw">-</td></tr>
+        <tr><td>15대</td><td class="sg_15">-</td><td class="sg_15_w">-</td><td class="sg_15_p">-</td><td class="sg_15_pw">-</td></tr>
+        <tr><td>30대</td><td class="sg_30">-</td><td class="sg_30_w">-</td><td class="sg_30_p">-</td><td class="sg_30_pw">-</td></tr>
       </tbody>
     </table>
   </div>
@@ -503,6 +534,16 @@ table.large th, table.large td {
 
 <button id="glampingAnalyze">글램핑 분석 실행</button>
 <div id="glampingSummary" class="note">분석 결과가 여기에 표시됩니다.</div>
+
+<h3 style="margin-top:30px">글램핑 대수별 합산금액 분석</h3>
+<div style="margin:10px 0; padding:10px; background:#f9f9f9; border-radius:6px">
+  <label style="display:inline-flex; align-items:center; cursor:pointer; font-size:14px">
+    <input type="checkbox" id="includeCaravanChart" style="width:18px; height:18px; margin-right:8px">
+    <span>카라반 5대 포함</span>
+  </label>
+  <span style="margin-left:20px; color:#666; font-size:13px">* 가중치는 모두 포함된 금액입니다</span>
+</div>
+<canvas id="glampingUnitsChart" style="max-height:400px"></canvas>
 </section>
 
 <!-- 벤처 -->
@@ -589,13 +630,16 @@ const kIrr = document.getElementById('kIrr');
 
 const compareChartEl = document.getElementById('compareChart');
 const subsidyChartEl = document.getElementById('subsidyChart');
+const glampingUnitsChartEl = document.getElementById('glampingUnitsChart');
 
 const ferrySummary = document.getElementById('ferrySummary');
 const glampingSummary = document.getElementById('glampingSummary');
 const ventureSummary = document.getElementById('ventureSummary');
 const aggregatedSummary = document.getElementById('aggregatedSummary');
 
-let compareChart, subsidyChart;
+const includeCaravanChart = document.getElementById('includeCaravanChart');
+
+let compareChart, subsidyChart, glampingUnitsChart;
 let projects = {ferry:null, glamping:null, venture:null};
 
 /* 개선된 IRR (binary search) */
@@ -725,6 +769,13 @@ window.addEventListener('load', ()=>{
   // bind occupancy settings and apply them to all scenarios
   bindOccupancyInputs();
   updateScenarioOccupancyFromSettings();
+  
+  // Initialize calculations and chart after all tables are set up
+  setTimeout(()=>{
+    updateAllScenarioCalculations();
+    updateWeightHeader();
+    updateGlampingUnitsChart();
+  }, 100);
 });
 
 // ensure tab activation also shows the selected scenario
@@ -1037,15 +1088,12 @@ function updateAllScenarioCalculations(){
   }
 })();
 
-// Run initial calculation after page load if tables exist
-window.addEventListener('load', ()=>{
-  setTimeout(()=>{
-    updateAllScenariosRentFromInputs();
-    updateScenarioOccupancyFromSettings();
-    updateAllScenarioCalculations();
-    updateWeightHeader();
-  }, 50);
-});
+// Bind caravan checkbox to chart update
+if(includeCaravanChart){
+  includeCaravanChart.addEventListener('change', ()=>{
+    updateGlampingUnitsChart();
+  });
+}
 
 /* create 긍정/부정 variant tables by adjusting numeric cells (+/-10%) */
 function formatNumberWithCommas(n){ return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
@@ -1124,66 +1172,269 @@ function parseThousandNumber(s){
   return isFinite(n)? n : 0;
 }
 
-function sumRevenueForUnits(tblId, units){
+function sumRevenueForUnits(tblId, units, includeWeight = false){
   const tbl = document.getElementById(tblId);
   if(!tbl) return 0;
   const rows = Array.from(tbl.querySelectorAll('tbody tr'));
-  return rows.reduce((acc,tr)=>{
+  let sum = 0;
+  let inTargetUnit = false;
+  
+  rows.forEach(tr=>{
     const cells = Array.from(tr.children);
     const first = (cells[0]?.textContent||'').trim();
+    const second = (cells[1]?.textContent||'').trim();
+    
+    // Check if this row starts a new unit section
     if(first.indexOf('('+units+')')>=0){
-      const revText = cells[6]?.textContent || '';
-      return acc + parseThousandNumber(revText);
+      inTargetUnit = true;
+    } else if(first.indexOf('(')>=0 && first.indexOf(')')>=0){
+      // This is a different unit section, stop accumulating
+      inTargetUnit = false;
     }
-    return acc;
-  }, 0);
+    
+    // If we're in the target unit section and this is a period row (성수기, 주말, 평일)
+    if(inTargetUnit && (second === '성수기' || second === '주말' || second === '평일')){
+      const revText = cells[6]?.textContent || '';
+      sum += parseThousandNumber(revText);
+      if(includeWeight){
+        const weightText = cells[9]?.textContent || '';
+        sum += parseThousandNumber(weightText);
+      }
+    }
+  });
+  
+  return sum;
 }
 
-function sumCaravan5(tblId){
+function sumCaravan5(tblId, includeWeight = false){
   const tbl = document.getElementById(tblId);
   if(!tbl) return 0;
   const rows = Array.from(tbl.querySelectorAll('tbody tr'));
-  return rows.reduce((acc,tr)=>{
+  let sum = 0;
+  let inCaravan5 = false;
+  
+  rows.forEach(tr=>{
     const cells = Array.from(tr.children);
     const first = (cells[0]?.textContent||'').trim();
+    const second = (cells[1]?.textContent||'').trim();
+    
+    // Check if this row starts the caravan 5 section
     if(first.indexOf('(5)')>=0){
-      const revText = cells[6]?.textContent || '';
-      return acc + parseThousandNumber(revText);
+      inCaravan5 = true;
+    } else if(first.indexOf('(')>=0 && first.indexOf(')')>=0 && first.indexOf('(5)')<0){
+      // This is a different section, stop accumulating
+      inCaravan5 = false;
     }
-    return acc;
-  }, 0);
+    
+    // If we're in the caravan 5 section and this is a period row
+    if(inCaravan5 && (second === '성수기' || second === '주말' || second === '평일')){
+      const revText = cells[6]?.textContent || '';
+      sum += parseThousandNumber(revText);
+      if(includeWeight){
+        const weightText = cells[9]?.textContent || '';
+        sum += parseThousandNumber(weightText);
+      }
+    }
+  });
+  
+  return sum;
 }
 
 function updateScenarioSummaries(){
   ['positive','neutral','negative'].forEach(scn=>{
     const tblId = 'scenario_'+scn+'_table';
-    const gl10 = sumRevenueForUnits(tblId, 10);
-    const gl15 = sumRevenueForUnits(tblId, 15);
-    const gl30 = sumRevenueForUnits(tblId, 30);
-    const cv5 = sumCaravan5(tblId);
+    const gl10 = sumRevenueForUnits(tblId, 10, false);
+    const gl10_w = sumRevenueForUnits(tblId, 10, true);
+    const gl15 = sumRevenueForUnits(tblId, 15, false);
+    const gl15_w = sumRevenueForUnits(tblId, 15, true);
+    const gl30 = sumRevenueForUnits(tblId, 30, false);
+    const gl30_w = sumRevenueForUnits(tblId, 30, true);
+    const cv5 = sumCaravan5(tblId, false);
+    const cv5_w = sumCaravan5(tblId, true);
     // set cells safely
     const setText = (sel, val)=>{ const el = document.querySelector(sel); if(el) el.textContent = val; };
     if(scn==='positive'){
       setText('.sp_10', formatNumberWithCommas(gl10));
+      setText('.sp_10_w', formatNumberWithCommas(gl10_w));
       setText('.sp_10_p', formatNumberWithCommas(gl10 + cv5));
+      setText('.sp_10_pw', formatNumberWithCommas(gl10_w + cv5_w));
       setText('.sp_15', formatNumberWithCommas(gl15));
+      setText('.sp_15_w', formatNumberWithCommas(gl15_w));
       setText('.sp_15_p', formatNumberWithCommas(gl15 + cv5));
+      setText('.sp_15_pw', formatNumberWithCommas(gl15_w + cv5_w));
       setText('.sp_30', formatNumberWithCommas(gl30));
+      setText('.sp_30_w', formatNumberWithCommas(gl30_w));
       setText('.sp_30_p', formatNumberWithCommas(gl30 + cv5));
+      setText('.sp_30_pw', formatNumberWithCommas(gl30_w + cv5_w));
     }else if(scn==='neutral'){
       setText('.sn_10', formatNumberWithCommas(gl10));
+      setText('.sn_10_w', formatNumberWithCommas(gl10_w));
       setText('.sn_10_p', formatNumberWithCommas(gl10 + cv5));
+      setText('.sn_10_pw', formatNumberWithCommas(gl10_w + cv5_w));
       setText('.sn_15', formatNumberWithCommas(gl15));
+      setText('.sn_15_w', formatNumberWithCommas(gl15_w));
       setText('.sn_15_p', formatNumberWithCommas(gl15 + cv5));
+      setText('.sn_15_pw', formatNumberWithCommas(gl15_w + cv5_w));
       setText('.sn_30', formatNumberWithCommas(gl30));
+      setText('.sn_30_w', formatNumberWithCommas(gl30_w));
       setText('.sn_30_p', formatNumberWithCommas(gl30 + cv5));
+      setText('.sn_30_pw', formatNumberWithCommas(gl30_w + cv5_w));
     }else{
       setText('.sg_10', formatNumberWithCommas(gl10));
+      setText('.sg_10_w', formatNumberWithCommas(gl10_w));
       setText('.sg_10_p', formatNumberWithCommas(gl10 + cv5));
+      setText('.sg_10_pw', formatNumberWithCommas(gl10_w + cv5_w));
       setText('.sg_15', formatNumberWithCommas(gl15));
+      setText('.sg_15_w', formatNumberWithCommas(gl15_w));
       setText('.sg_15_p', formatNumberWithCommas(gl15 + cv5));
+      setText('.sg_15_pw', formatNumberWithCommas(gl15_w + cv5_w));
       setText('.sg_30', formatNumberWithCommas(gl30));
+      setText('.sg_30_w', formatNumberWithCommas(gl30_w));
       setText('.sg_30_p', formatNumberWithCommas(gl30 + cv5));
+      setText('.sg_30_pw', formatNumberWithCommas(gl30_w + cv5_w));
+    }
+  });
+  // Update glamping units chart after summaries are calculated
+  updateGlampingUnitsChart();
+}
+
+function updateGlampingUnitsChart(){
+  if(!glampingUnitsChartEl) return;
+  
+  const includeCaravan = includeCaravanChart?.checked || false;
+  
+  // Collect data for all scenarios
+  const scenarios = ['positive', 'neutral', 'negative'];
+  const units = [10, 15, 30];
+  const datasets = [];
+  
+  const colors = {
+    positive: { border: 'rgb(46, 125, 50)', bg: 'rgba(46, 125, 50, 0.2)' },
+    neutral: { border: 'rgb(66, 133, 244)', bg: 'rgba(66, 133, 244, 0.2)' },
+    negative: { border: 'rgb(176, 0, 32)', bg: 'rgba(176, 0, 32, 0.2)' }
+  };
+  
+  const lineStyles = {
+    positive: [],
+    neutral: [5, 5],
+    negative: [10, 5]
+  };
+  
+  const labels = { positive: '긍정안', neutral: '중립안', negative: '부정안' };
+  
+  // Build datasets for each scenario
+  scenarios.forEach(scn => {
+    const tblId = 'scenario_' + scn + '_table';
+    const tbl = document.getElementById(tblId);
+    
+    // Check if table exists before processing
+    if(!tbl) {
+      console.warn('Table not found:', tblId);
+      return;
+    }
+    
+    const data = [];
+    units.forEach(u => {
+      let glampingWithWeight = sumRevenueForUnits(tblId, u, true);
+      if(includeCaravan){
+        const caravanWithWeight = sumCaravan5(tblId, true);
+        glampingWithWeight += caravanWithWeight;
+      }
+      data.push(glampingWithWeight);
+    });
+    
+    console.log(scn + ' data:', data); // Debug log
+    
+    datasets.push({
+      label: labels[scn],
+      data: data,
+      borderColor: colors[scn].border,
+      backgroundColor: colors[scn].bg,
+      borderWidth: 3,
+      borderDash: lineStyles[scn],
+      tension: 0.3,
+      fill: false,
+      pointRadius: 6,
+      pointHoverRadius: 8,
+      pointBackgroundColor: colors[scn].border,
+      pointBorderColor: '#fff',
+      pointBorderWidth: 2
+    });
+  });
+  
+  console.log('Total datasets:', datasets.length); // Debug log
+  
+  if(glampingUnitsChart){
+    glampingUnitsChart.destroy();
+  }
+  
+  glampingUnitsChart = new Chart(glampingUnitsChartEl, {
+    type: 'line',
+    data: {
+      labels: ['10대', '15대', '30대'],
+      datasets: datasets
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+      plugins: {
+        title: {
+          display: true,
+          text: '글램핑 대수별 합산금액 비교' + (includeCaravan ? ' (카라반 5대 포함)' : '') + ' - 가중치 포함 (천원)',
+          font: { size: 16, weight: 'bold' }
+        },
+        legend: {
+          display: true,
+          position: 'top',
+          labels: {
+            usePointStyle: true,
+            padding: 15,
+            font: { size: 13 }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              let label = context.dataset.label || '';
+              if (label) {
+                label += ': ';
+              }
+              if (context.parsed.y !== null) {
+                label += formatNumberWithCommas(context.parsed.y) + ' 천원';
+              }
+              return label;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: false,
+          grace: '5%',
+          ticks: {
+            callback: function(value) {
+              return formatNumberWithCommas(value);
+            },
+            maxTicksLimit: 8
+          },
+          title: {
+            display: true,
+            text: '합산금액 (천원)',
+            font: { size: 13, weight: 'bold' }
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: '글램핑 대수',
+            font: { size: 13, weight: 'bold' }
+          }
+        }
+      }
     }
   });
 }
