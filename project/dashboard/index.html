@@ -65,6 +65,7 @@ label {
 input, select {
   width: 220px;
   padding: 6px;
+  color: #000;
 }
 
 button {
@@ -360,6 +361,10 @@ table.large th, table.large td {
   padding: 4px 6px;
   border: 1px solid #ccc;
   border-radius: 3px;
+  color: #333 !important;
+  background-color: #fff !important;
+  font-size: 13px !important;
+  font-family: inherit;
 }
 .financial-table input[type="text"]:focus,
 .financial-table input[type="number"]:focus {
@@ -565,37 +570,37 @@ table.large th, table.large td {
     <tbody>
       <tr>
         <td><input type="text" value="토지 매입비/임차보증금"></td>
-        <td><input type="number" value="300000" step="1"></td>
+        <td><input type="text" value="300,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
       <tr>
         <td><input type="text" value="부지 조성비(토목)"></td>
-        <td><input type="number" value="150000" step="1"></td>
+        <td><input type="text" value="150,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
       <tr>
         <td><input type="text" value="글램핑 시설 설치비"></td>
-        <td><input type="number" value="200000" step="1"></td>
+        <td><input type="text" value="200,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
       <tr>
         <td><input type="text" value="공용시설(관리동, 화장실 등)"></td>
-        <td><input type="number" value="80000" step="1"></td>
+        <td><input type="text" value="80,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
       <tr>
         <td><input type="text" value="설계·인허가 비용"></td>
-        <td><input type="number" value="20000" step="1"></td>
+        <td><input type="text" value="20,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
       <tr>
         <td><input type="text" value="집기·비품비"></td>
-        <td><input type="number" value="30000" step="1"></td>
+        <td><input type="text" value="30,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
       <tr>
         <td><input type="text" value="예비비"></td>
-        <td><input type="number" value="20000" step="1"></td>
+        <td><input type="text" value="20,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
     </tbody>
@@ -617,27 +622,27 @@ table.large th, table.large td {
     <tbody>
       <tr>
         <td><input type="text" value="오픈 준비 인건비"></td>
-        <td><input type="number" value="5000" step="1"></td>
+        <td><input type="text" value="5,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
       <tr>
         <td><input type="text" value="초기 마케팅 비용"></td>
-        <td><input type="number" value="10000" step="1"></td>
+        <td><input type="text" value="10,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
       <tr>
         <td><input type="text" value="시운영 비용"></td>
-        <td><input type="number" value="3000" step="1"></td>
+        <td><input type="text" value="3,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
       <tr>
         <td><input type="text" value="교육비"></td>
-        <td><input type="number" value="2000" step="1"></td>
+        <td><input type="text" value="2,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
       <tr>
         <td><input type="text" value="초기 소모품 비용"></td>
-        <td><input type="number" value="5000" step="1"></td>
+        <td><input type="text" value="5,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
     </tbody>
@@ -659,32 +664,32 @@ table.large th, table.large td {
     <tbody>
       <tr>
         <td><input type="text" value="인건비"></td>
-        <td><input type="number" value="12000" step="1"></td>
+        <td><input type="text" value="12,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
       <tr>
         <td><input type="text" value="임차료"></td>
-        <td><input type="number" value="6000" step="1"></td>
+        <td><input type="text" value="6,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
       <tr>
         <td><input type="text" value="보험료"></td>
-        <td><input type="number" value="3000" step="1"></td>
+        <td><input type="text" value="3,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
       <tr>
         <td><input type="text" value="감가상각비"></td>
-        <td><input type="number" value="5000" step="1"></td>
+        <td><input type="text" value="5,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
       <tr>
         <td><input type="text" value="공과금 기본요금"></td>
-        <td><input type="number" value="2000" step="1"></td>
+        <td><input type="text" value="2,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
       <tr>
         <td><input type="text" value="관리비(통신, 시스템 등)"></td>
-        <td><input type="number" value="3000" step="1"></td>
+        <td><input type="text" value="3,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
     </tbody>
@@ -706,22 +711,22 @@ table.large th, table.large td {
     <tbody>
       <tr>
         <td><input type="text" value="객실 운영비(세탁·청소)"></td>
-        <td><input type="number" value="8000" step="1"></td>
+        <td><input type="text" value="8,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
       <tr>
         <td><input type="text" value="소모품 비용"></td>
-        <td><input type="number" value="4000" step="1"></td>
+        <td><input type="text" value="4,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
       <tr>
         <td><input type="text" value="에너지 비용"></td>
-        <td><input type="number" value="6000" step="1"></td>
+        <td><input type="text" value="6,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
       <tr>
         <td><input type="text" value="OTA 수수료"></td>
-        <td><input type="number" value="5000" step="1"></td>
+        <td><input type="text" value="5,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
     </tbody>
@@ -743,17 +748,17 @@ table.large th, table.large td {
     <tbody>
       <tr>
         <td><input type="text" value="차입금 규모 (만원)"></td>
-        <td><input type="number" value="400000" step="1"></td>
+        <td><input type="text" value="400,000"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
       <tr>
         <td><input type="text" value="연이자율 (%)"></td>
-        <td><input type="number" value="4.5" step="0.01"></td>
+        <td><input type="text" value="4.5"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
       <tr>
         <td><input type="text" value="법인세율 (%)"></td>
-        <td><input type="number" value="22" step="0.1"></td>
+        <td><input type="text" value="22"></td>
         <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
       </tr>
     </tbody>
@@ -1636,8 +1641,17 @@ window.addEventListener('load', ()=>{
   // Load saved data first
   const dataLoaded = loadAllFinancialData();
   
-  // populate 긍정/부정 표 from 중립안
-  createScenarioTableSingle();
+  // populate 긍정/부정 표 from 중립안 (only do this once on initial load, not on tab switches)
+  // This should only be called at startup to ensure scenario tables have proper structure
+  const posTable = document.getElementById('scenario_positive_table');
+  const neuTable = document.getElementById('scenario_neutral_table');
+  const negTable = document.getElementById('scenario_negative_table');
+  
+  // Only create/sync if tables appear to be empty
+  if(neuTable && neuTable.querySelectorAll('tbody tr').length === 0){
+    createScenarioTableSingle();
+  }
+  
   // ensure neutral/negative follow the positive table structure
   syncTablesFromPositive();
   // Per user request: show only the 부정안 table by default
@@ -1684,8 +1698,8 @@ document.querySelectorAll('.tabs button').forEach(btn=>{
     original();
     if(btn.dataset.tab === 'glamping'){
       // refresh scenario tables when tab activated
-      createScenarioTableSingle();
-      // make sure neutral/negative use same header structure as positive
+      // Note: createScenarioTableSingle() should NOT be called here as it will reset values
+      // Just ensure proper visibility and binding
       syncTablesFromPositive();
       // keep only 부정안 visible and refresh 임대료 values after structural sync
       setOnlyNegativeScenarioVisible();
@@ -1696,6 +1710,27 @@ document.querySelectorAll('.tabs button').forEach(btn=>{
       updateScenarioOccupancyFromSettings();
     }
   }
+});
+
+// Handle details (collapsible) open/close to preserve financial input values
+document.querySelectorAll('.collapsible-section').forEach(details=>{
+  // When a details element is toggled open, ensure all inputs are properly formatted
+  details.addEventListener('toggle', ()=>{
+    if(details.open){
+      // Ensure financial inputs are visible and properly formatted
+      setTimeout(()=>{
+        const financialInputs = details.querySelectorAll('.financial-table tbody td:nth-child(2) input[type="number"]');
+        financialInputs.forEach(inp=>{
+          if(inp.value && inp.value.length > 0){
+            // Value is already set - just ensure it's visible by triggering focus/blur
+            const val = inp.value;
+            inp.style.color = '#333';
+            inp.style.backgroundColor = '#fff';
+          }
+        });
+      }, 0);
+    }
+  });
 });
 
 // --- Helpers: keep only 부정안 visible and update 임대료 from 운영 입력표 ---
@@ -2044,7 +2079,13 @@ function formatNumberInput(input) {
   if (val === '' || val === '-') return;
   const num = parseFloat(val);
   if (!isNaN(num)) {
-    input.value = formatNumberWithCommas(Math.round(num));
+    // For input[type="number"], don't add commas (they don't support comma-formatted values)
+    // For input[type="text"], add commas for readability
+    if (input.type === 'number') {
+      input.value = Math.round(num);
+    } else {
+      input.value = formatNumberWithCommas(Math.round(num));
+    }
   }
 }
 
