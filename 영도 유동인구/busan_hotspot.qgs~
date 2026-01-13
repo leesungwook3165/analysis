@@ -1,5 +1,5 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis saveUserFull="user" projectname="" saveUser="user" saveDateTime="2026-01-07T17:51:53" version="3.40.10-Bratislava">
+<qgis saveUserFull="user" projectname="" saveUser="user" saveDateTime="2026-01-07T17:53:34" version="3.40.10-Bratislava">
   <homePath path=""/>
   <title></title>
   <transaction mode="Disabled"/>
@@ -35,6 +35,11 @@
     <customproperties>
       <Option/>
     </customproperties>
+    <layer-tree-layer source="./영도_운영중인 숙박업체 포인트.shp" id="_________________4feaba4a_af52_4af8_bc07_575637c97a05" checked="Qt::Unchecked" patch_size="-1,-1" providerKey="ogr" legend_exp="" name="영도_운영중인 숙박업체 포인트" legend_split_behavior="0" expanded="1">
+      <customproperties>
+        <Option/>
+      </customproperties>
+    </layer-tree-layer>
     <layer-tree-layer source="../../../이성욱/글램핑장_등기부(다대포)/영도 유동인구/영도 운영중인 숙박업체 클러스터링.shp" id="___________________9297c139_226a_4643_9173_2111d0e59bd5" checked="Qt::Checked" patch_size="-1,-1" providerKey="ogr" legend_exp="" name="영도 운영중인 숙박업체 클러스터링" legend_split_behavior="0" expanded="1">
       <customproperties>
         <Option/>
@@ -140,6 +145,7 @@
       <item>6260000_______03_11_03_P_____6ebcd710_562c_4b5c_8858_074d1d5206bb</item>
       <item>_____________1dadef93_7f22_49c7_bbfa_180e8827f861</item>
       <item>___________________9297c139_226a_4643_9173_2111d0e59bd5</item>
+      <item>_________________4feaba4a_af52_4af8_bc07_575637c97a05</item>
     </custom-order>
   </layer-tree-group>
   <snapping-settings mode="2" unit="1" maxScale="0" minScale="0" self-snapping="0" scaleDependencyMode="0" enabled="0" type="1" tolerance="12" intersection-snapping="0">
@@ -150,6 +156,7 @@
       <layer-setting id="______6534dfe9_88fc_42ee_a9c1_e8a3028ef0fc" units="1" maxScale="0" minScale="0" enabled="0" type="1" tolerance="12"/>
       <layer-setting id="6260000_______03_11_03_P_____820a3e29_a91a_4ce4_a50c_2b3457465168" units="1" maxScale="0" minScale="0" enabled="0" type="1" tolerance="12"/>
       <layer-setting id="6260000_______03_11_03_P________08932113_bbf1_40a5_acc3_e10156bf7e72" units="1" maxScale="0" minScale="0" enabled="0" type="1" tolerance="12"/>
+      <layer-setting id="_________________4feaba4a_af52_4af8_bc07_575637c97a05" units="1" maxScale="0" minScale="0" enabled="0" type="1" tolerance="12"/>
       <layer-setting id="6260000_______03_11_03_P_____6ebcd710_562c_4b5c_8858_074d1d5206bb" units="1" maxScale="0" minScale="0" enabled="0" type="1" tolerance="12"/>
       <layer-setting id="lsmd_adm_sect_umd_26_202512_7c1e2f6d_7c11_4d2a_ac8c_f7a2764ccf32" units="1" maxScale="0" minScale="0" enabled="0" type="1" tolerance="12"/>
       <layer-setting id="20251223212456___________0dc3a0ec_04d6_4e7a_9651_10de144e917b" units="1" maxScale="0" minScale="0" enabled="0" type="1" tolerance="12"/>
@@ -164,10 +171,10 @@
   <mapcanvas annotationsVisible="1" name="theMapCanvas">
     <units>meters</units>
     <extent>
-      <xmin>14364411.78301488049328327</xmin>
-      <ymin>4172322.27415310265496373</ymin>
-      <xmax>14372203.16593204624950886</xmax>
-      <ymax>4179276.42610757471993566</ymax>
+      <xmin>14365499.13503068126738071</xmin>
+      <ymin>4175374.00710699521005154</ymin>
+      <xmax>14369394.82648926414549351</xmax>
+      <ymax>4178851.0830842312425375</ymax>
     </extent>
     <rotation>0</rotation>
     <destinationsrs>
@@ -188,6 +195,11 @@
   </mapcanvas>
   <projectModels/>
   <legend updateDrawingOrder="true">
+    <legendlayer showFeatureCount="0" checked="Qt::Unchecked" open="true" name="영도_운영중인 숙박업체 포인트" drawingOrder="-1">
+      <filegroup hidden="false" open="true">
+        <legendlayerfile layerid="_________________4feaba4a_af52_4af8_bc07_575637c97a05" visible="0" isInOverview="0"/>
+      </filegroup>
+    </legendlayer>
     <legendlayer showFeatureCount="0" checked="Qt::Checked" open="true" name="영도 운영중인 숙박업체 클러스터링" drawingOrder="-1">
       <filegroup hidden="false" open="true">
         <legendlayerfile layerid="___________________9297c139_226a_4643_9173_2111d0e59bd5" visible="1" isInOverview="0"/>
@@ -11645,6 +11657,917 @@ def my_form_open(dialog, layer, feature):
       <previewExpression>"기초지�"</previewExpression>
       <mapTip enabled="1"></mapTip>
     </maplayer>
+    <maplayer hasScaleBasedVisibilityFlag="0" autoRefreshMode="Disabled" refreshOnNotifyEnabled="0" type="vector" labelsEnabled="0" simplifyMaxScale="1" simplifyDrawingHints="1" minScale="100000000" legendPlaceholderImage="" simplifyLocal="1" wkbType="Point" simplifyDrawingTol="1" readOnly="0" maxScale="0" refreshOnNotifyMessage="" symbologyReferenceScale="-1" geometry="Point" styleCategories="AllStyleCategories" simplifyAlgorithm="0" autoRefreshTime="0">
+      <extent>
+        <xmin>366778.83710000000428408</xmin>
+        <ymin>173942.69260000000940636</ymin>
+        <xmax>406755.32069999998202547</xmax>
+        <ymax>207205.26780000000144355</ymax>
+      </extent>
+      <wgs84extent>
+        <xmin>128.8287711054646536</xmin>
+        <ymin>35.04334113768710068</ymin>
+        <xmax>129.27498880151256344</xmax>
+        <ymax>35.35038742589074445</ymax>
+      </wgs84extent>
+      <id>_________________4feaba4a_af52_4af8_bc07_575637c97a05</id>
+      <datasource>./영도_운영중인 숙박업체 포인트.shp</datasource>
+      <keywordList>
+        <value></value>
+      </keywordList>
+      <layername>영도_운영중인 숙박업체 포인트</layername>
+      <srs>
+        <spatialrefsys nativeFormat="Wkt">
+          <wkt>PROJCRS["Korean 1985 / Modified Central Belt",BASEGEOGCRS["Korean 1985",DATUM["Korean Datum 1985",ELLIPSOID["Bessel 1841",6377397.155,299.1528128,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4162]],CONVERSION["Korea Modified Central Belt",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",38,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",127.002890277778,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",1,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",200000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",500000,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["northing (X)",north,ORDER[1],LENGTHUNIT["metre",1]],AXIS["easting (Y)",east,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["Cadastre, engineering survey, topographic mapping (large and medium scale)."],AREA["Republic of Korea (South Korea) - between 126°E and 128°E - mainland and nearshore."],BBOX[33.96,126,38.33,128]],ID["EPSG",5174]]</wkt>
+          <proj4>+proj=tmerc +lat_0=38 +lon_0=127.002890277778 +k=1 +x_0=200000 +y_0=500000 +ellps=bessel +units=m +no_defs</proj4>
+          <srsid>28038</srsid>
+          <srid>5174</srid>
+          <authid>EPSG:5174</authid>
+          <description>Korean 1985 / Modified Central Belt</description>
+          <projectionacronym>tmerc</projectionacronym>
+          <ellipsoidacronym>EPSG:7004</ellipsoidacronym>
+          <geographicflag>false</geographicflag>
+        </spatialrefsys>
+      </srs>
+      <resourceMetadata>
+        <identifier></identifier>
+        <parentidentifier></parentidentifier>
+        <language></language>
+        <type></type>
+        <title></title>
+        <abstract></abstract>
+        <contact>
+          <name></name>
+          <organization></organization>
+          <position></position>
+          <voice></voice>
+          <fax></fax>
+          <email></email>
+          <role></role>
+        </contact>
+        <links/>
+        <dates/>
+        <fees></fees>
+        <encoding></encoding>
+        <crs>
+          <spatialrefsys nativeFormat="Wkt">
+            <wkt>PROJCRS["Korean 1985 / Modified Central Belt",BASEGEOGCRS["Korean 1985",DATUM["Korean Datum 1985",ELLIPSOID["Bessel 1841",6377397.155,299.1528128,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4162]],CONVERSION["Korea Modified Central Belt",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",38,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",127.002890277778,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",1,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",200000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",500000,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["northing (X)",north,ORDER[1],LENGTHUNIT["metre",1]],AXIS["easting (Y)",east,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["Cadastre, engineering survey, topographic mapping (large and medium scale)."],AREA["Republic of Korea (South Korea) - between 126°E and 128°E - mainland and nearshore."],BBOX[33.96,126,38.33,128]],ID["EPSG",5174]]</wkt>
+            <proj4>+proj=tmerc +lat_0=38 +lon_0=127.002890277778 +k=1 +x_0=200000 +y_0=500000 +ellps=bessel +units=m +no_defs</proj4>
+            <srsid>28038</srsid>
+            <srid>5174</srid>
+            <authid>EPSG:5174</authid>
+            <description>Korean 1985 / Modified Central Belt</description>
+            <projectionacronym>tmerc</projectionacronym>
+            <ellipsoidacronym>EPSG:7004</ellipsoidacronym>
+            <geographicflag>false</geographicflag>
+          </spatialrefsys>
+        </crs>
+        <extent>
+          <spatial maxz="0" minz="0" dimensions="2" crs="" maxx="-179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368" miny="179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368" maxy="-179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368" minx="179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368"/>
+          <temporal>
+            <period>
+              <start></start>
+              <end></end>
+            </period>
+          </temporal>
+        </extent>
+      </resourceMetadata>
+      <provider encoding="UTF-8">ogr</provider>
+      <vectorjoins/>
+      <layerDependencies/>
+      <dataDependencies/>
+      <expressionfields/>
+      <map-layer-style-manager current="기본값">
+        <map-layer-style name="기본값"/>
+      </map-layer-style-manager>
+      <auxiliaryLayer/>
+      <metadataUrls/>
+      <flags>
+        <Identifiable>1</Identifiable>
+        <Removable>1</Removable>
+        <Searchable>1</Searchable>
+        <Private>0</Private>
+      </flags>
+      <temporal durationField="" mode="0" endExpression="" fixedDuration="0" startExpression="" durationUnit="min" limitMode="0" startField="" accumulate="0" enabled="0" endField="">
+        <fixedRange>
+          <start></start>
+          <end></end>
+        </fixedRange>
+      </temporal>
+      <elevation zscale="1" clamping="Terrain" respectLayerSymbol="1" symbology="Line" extrusion="0" binding="Centroid" type="IndividualFeatures" showMarkerSymbolInSurfacePlots="0" extrusionEnabled="0" zoffset="0">
+        <data-defined-properties>
+          <Option type="Map">
+            <Option value="" type="QString" name="name"/>
+            <Option name="properties"/>
+            <Option value="collection" type="QString" name="type"/>
+          </Option>
+        </data-defined-properties>
+        <profileLineSymbol>
+          <symbol force_rhr="0" frame_rate="10" clip_to_extent="1" alpha="1" type="line" is_animated="0" name="">
+            <data_defined_properties>
+              <Option type="Map">
+                <Option value="" type="QString" name="name"/>
+                <Option name="properties"/>
+                <Option value="collection" type="QString" name="type"/>
+              </Option>
+            </data_defined_properties>
+            <layer id="{7b2d3fae-0764-455a-bced-370d421fce42}" locked="0" class="SimpleLine" enabled="1" pass="0">
+              <Option type="Map">
+                <Option value="0" type="QString" name="align_dash_pattern"/>
+                <Option value="square" type="QString" name="capstyle"/>
+                <Option value="5;2" type="QString" name="customdash"/>
+                <Option value="3x:0,0,0,0,0,0" type="QString" name="customdash_map_unit_scale"/>
+                <Option value="MM" type="QString" name="customdash_unit"/>
+                <Option value="0" type="QString" name="dash_pattern_offset"/>
+                <Option value="3x:0,0,0,0,0,0" type="QString" name="dash_pattern_offset_map_unit_scale"/>
+                <Option value="MM" type="QString" name="dash_pattern_offset_unit"/>
+                <Option value="0" type="QString" name="draw_inside_polygon"/>
+                <Option value="bevel" type="QString" name="joinstyle"/>
+                <Option value="225,89,137,255,rgb:0.88235294117647056,0.34901960784313724,0.53725490196078429,1" type="QString" name="line_color"/>
+                <Option value="solid" type="QString" name="line_style"/>
+                <Option value="0.6" type="QString" name="line_width"/>
+                <Option value="MM" type="QString" name="line_width_unit"/>
+                <Option value="0" type="QString" name="offset"/>
+                <Option value="3x:0,0,0,0,0,0" type="QString" name="offset_map_unit_scale"/>
+                <Option value="MM" type="QString" name="offset_unit"/>
+                <Option value="0" type="QString" name="ring_filter"/>
+                <Option value="0" type="QString" name="trim_distance_end"/>
+                <Option value="3x:0,0,0,0,0,0" type="QString" name="trim_distance_end_map_unit_scale"/>
+                <Option value="MM" type="QString" name="trim_distance_end_unit"/>
+                <Option value="0" type="QString" name="trim_distance_start"/>
+                <Option value="3x:0,0,0,0,0,0" type="QString" name="trim_distance_start_map_unit_scale"/>
+                <Option value="MM" type="QString" name="trim_distance_start_unit"/>
+                <Option value="0" type="QString" name="tweak_dash_pattern_on_corners"/>
+                <Option value="0" type="QString" name="use_custom_dash"/>
+                <Option value="3x:0,0,0,0,0,0" type="QString" name="width_map_unit_scale"/>
+              </Option>
+              <data_defined_properties>
+                <Option type="Map">
+                  <Option value="" type="QString" name="name"/>
+                  <Option name="properties"/>
+                  <Option value="collection" type="QString" name="type"/>
+                </Option>
+              </data_defined_properties>
+            </layer>
+          </symbol>
+        </profileLineSymbol>
+        <profileFillSymbol>
+          <symbol force_rhr="0" frame_rate="10" clip_to_extent="1" alpha="1" type="fill" is_animated="0" name="">
+            <data_defined_properties>
+              <Option type="Map">
+                <Option value="" type="QString" name="name"/>
+                <Option name="properties"/>
+                <Option value="collection" type="QString" name="type"/>
+              </Option>
+            </data_defined_properties>
+            <layer id="{c9e6631a-95ae-4642-9766-baab9d316516}" locked="0" class="SimpleFill" enabled="1" pass="0">
+              <Option type="Map">
+                <Option value="3x:0,0,0,0,0,0" type="QString" name="border_width_map_unit_scale"/>
+                <Option value="225,89,137,255,rgb:0.88235294117647056,0.34901960784313724,0.53725490196078429,1" type="QString" name="color"/>
+                <Option value="bevel" type="QString" name="joinstyle"/>
+                <Option value="0,0" type="QString" name="offset"/>
+                <Option value="3x:0,0,0,0,0,0" type="QString" name="offset_map_unit_scale"/>
+                <Option value="MM" type="QString" name="offset_unit"/>
+                <Option value="161,64,98,255,rgb:0.63024338139925229,0.24930189974822614,0.38377965972381173,1" type="QString" name="outline_color"/>
+                <Option value="solid" type="QString" name="outline_style"/>
+                <Option value="0.2" type="QString" name="outline_width"/>
+                <Option value="MM" type="QString" name="outline_width_unit"/>
+                <Option value="solid" type="QString" name="style"/>
+              </Option>
+              <data_defined_properties>
+                <Option type="Map">
+                  <Option value="" type="QString" name="name"/>
+                  <Option name="properties"/>
+                  <Option value="collection" type="QString" name="type"/>
+                </Option>
+              </data_defined_properties>
+            </layer>
+          </symbol>
+        </profileFillSymbol>
+        <profileMarkerSymbol>
+          <symbol force_rhr="0" frame_rate="10" clip_to_extent="1" alpha="1" type="marker" is_animated="0" name="">
+            <data_defined_properties>
+              <Option type="Map">
+                <Option value="" type="QString" name="name"/>
+                <Option name="properties"/>
+                <Option value="collection" type="QString" name="type"/>
+              </Option>
+            </data_defined_properties>
+            <layer id="{ac5cafeb-fd43-430d-bc82-29dbb5ac4057}" locked="0" class="SimpleMarker" enabled="1" pass="0">
+              <Option type="Map">
+                <Option value="0" type="QString" name="angle"/>
+                <Option value="square" type="QString" name="cap_style"/>
+                <Option value="225,89,137,255,rgb:0.88235294117647056,0.34901960784313724,0.53725490196078429,1" type="QString" name="color"/>
+                <Option value="1" type="QString" name="horizontal_anchor_point"/>
+                <Option value="bevel" type="QString" name="joinstyle"/>
+                <Option value="diamond" type="QString" name="name"/>
+                <Option value="0,0" type="QString" name="offset"/>
+                <Option value="3x:0,0,0,0,0,0" type="QString" name="offset_map_unit_scale"/>
+                <Option value="MM" type="QString" name="offset_unit"/>
+                <Option value="161,64,98,255,rgb:0.63024338139925229,0.24930189974822614,0.38377965972381173,1" type="QString" name="outline_color"/>
+                <Option value="solid" type="QString" name="outline_style"/>
+                <Option value="0.2" type="QString" name="outline_width"/>
+                <Option value="3x:0,0,0,0,0,0" type="QString" name="outline_width_map_unit_scale"/>
+                <Option value="MM" type="QString" name="outline_width_unit"/>
+                <Option value="diameter" type="QString" name="scale_method"/>
+                <Option value="3" type="QString" name="size"/>
+                <Option value="3x:0,0,0,0,0,0" type="QString" name="size_map_unit_scale"/>
+                <Option value="MM" type="QString" name="size_unit"/>
+                <Option value="1" type="QString" name="vertical_anchor_point"/>
+              </Option>
+              <data_defined_properties>
+                <Option type="Map">
+                  <Option value="" type="QString" name="name"/>
+                  <Option name="properties"/>
+                  <Option value="collection" type="QString" name="type"/>
+                </Option>
+              </data_defined_properties>
+            </layer>
+          </symbol>
+        </profileMarkerSymbol>
+      </elevation>
+      <renderer-v2 symbollevels="0" forceraster="0" enableorderby="0" type="singleSymbol" referencescale="-1">
+        <symbols>
+          <symbol force_rhr="0" frame_rate="10" clip_to_extent="1" alpha="1" type="marker" is_animated="0" name="0">
+            <data_defined_properties>
+              <Option type="Map">
+                <Option value="" type="QString" name="name"/>
+                <Option name="properties"/>
+                <Option value="collection" type="QString" name="type"/>
+              </Option>
+            </data_defined_properties>
+            <layer id="{87c763e6-579c-407f-892e-9bebeb19d0af}" locked="0" class="SimpleMarker" enabled="1" pass="0">
+              <Option type="Map">
+                <Option value="0" type="QString" name="angle"/>
+                <Option value="square" type="QString" name="cap_style"/>
+                <Option value="229,182,54,255,rgb:0.89803921568627454,0.71372549019607845,0.21176470588235294,1" type="QString" name="color"/>
+                <Option value="1" type="QString" name="horizontal_anchor_point"/>
+                <Option value="bevel" type="QString" name="joinstyle"/>
+                <Option value="circle" type="QString" name="name"/>
+                <Option value="0,0" type="QString" name="offset"/>
+                <Option value="3x:0,0,0,0,0,0" type="QString" name="offset_map_unit_scale"/>
+                <Option value="MM" type="QString" name="offset_unit"/>
+                <Option value="35,35,35,255,rgb:0.13725490196078433,0.13725490196078433,0.13725490196078433,1" type="QString" name="outline_color"/>
+                <Option value="solid" type="QString" name="outline_style"/>
+                <Option value="0" type="QString" name="outline_width"/>
+                <Option value="3x:0,0,0,0,0,0" type="QString" name="outline_width_map_unit_scale"/>
+                <Option value="MM" type="QString" name="outline_width_unit"/>
+                <Option value="diameter" type="QString" name="scale_method"/>
+                <Option value="2" type="QString" name="size"/>
+                <Option value="3x:0,0,0,0,0,0" type="QString" name="size_map_unit_scale"/>
+                <Option value="MM" type="QString" name="size_unit"/>
+                <Option value="1" type="QString" name="vertical_anchor_point"/>
+              </Option>
+              <data_defined_properties>
+                <Option type="Map">
+                  <Option value="" type="QString" name="name"/>
+                  <Option name="properties"/>
+                  <Option value="collection" type="QString" name="type"/>
+                </Option>
+              </data_defined_properties>
+            </layer>
+          </symbol>
+        </symbols>
+        <rotation/>
+        <sizescale/>
+        <data-defined-properties>
+          <Option type="Map">
+            <Option value="" type="QString" name="name"/>
+            <Option name="properties"/>
+            <Option value="collection" type="QString" name="type"/>
+          </Option>
+        </data-defined-properties>
+      </renderer-v2>
+      <selection mode="Default">
+        <selectionColor invalid="1"/>
+      </selection>
+      <customproperties>
+        <Option/>
+      </customproperties>
+      <blendMode>0</blendMode>
+      <featureBlendMode>0</featureBlendMode>
+      <layerOpacity>1</layerOpacity>
+      <geometryOptions geometryPrecision="0" removeDuplicateNodes="0">
+        <activeChecks type="StringList">
+          <Option value="" type="QString"/>
+        </activeChecks>
+        <checkConfiguration/>
+      </geometryOptions>
+      <legend showLabelLegend="0" type="default-vector"/>
+      <referencedLayers/>
+      <fieldConfiguration>
+        <field configurationFlags="NoFlag" name="번호">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="개방서�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="개방��">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="개방자�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="관리번�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="인허가�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="인허��">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="영업상�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="영업��">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="상세영�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="상세��">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="폐업일�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="휴업시�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="휴업종�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="재개업�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="소재지�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="소재��">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="소재��_1">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="소재��_2">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="도로명�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="도로��">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="사업장�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="최종수�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="데이터�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="데이��">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="업태구�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="좌표정�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="좌표��">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="위생업�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="건물지�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="건물��">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="사용시�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="사용끝�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="사용��">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="사용��_1">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="한실수">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="양실수">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="조건부�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="조건��">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="조건��_1">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="건물소�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="여성종�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="남성종�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+        <field configurationFlags="NoFlag" name="다중이�">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+      </fieldConfiguration>
+      <aliases>
+        <alias index="0" field="번호" name=""/>
+        <alias index="1" field="개방서�" name=""/>
+        <alias index="2" field="개방��" name=""/>
+        <alias index="3" field="개방자�" name=""/>
+        <alias index="4" field="관리번�" name=""/>
+        <alias index="5" field="인허가�" name=""/>
+        <alias index="6" field="인허��" name=""/>
+        <alias index="7" field="영업상�" name=""/>
+        <alias index="8" field="영업��" name=""/>
+        <alias index="9" field="상세영�" name=""/>
+        <alias index="10" field="상세��" name=""/>
+        <alias index="11" field="폐업일�" name=""/>
+        <alias index="12" field="휴업시�" name=""/>
+        <alias index="13" field="휴업종�" name=""/>
+        <alias index="14" field="재개업�" name=""/>
+        <alias index="15" field="소재지�" name=""/>
+        <alias index="16" field="소재��" name=""/>
+        <alias index="17" field="소재��_1" name=""/>
+        <alias index="18" field="소재��_2" name=""/>
+        <alias index="19" field="도로명�" name=""/>
+        <alias index="20" field="도로��" name=""/>
+        <alias index="21" field="사업장�" name=""/>
+        <alias index="22" field="최종수�" name=""/>
+        <alias index="23" field="데이터�" name=""/>
+        <alias index="24" field="데이��" name=""/>
+        <alias index="25" field="업태구�" name=""/>
+        <alias index="26" field="좌표정�" name=""/>
+        <alias index="27" field="좌표��" name=""/>
+        <alias index="28" field="위생업�" name=""/>
+        <alias index="29" field="건물지�" name=""/>
+        <alias index="30" field="건물��" name=""/>
+        <alias index="31" field="사용시�" name=""/>
+        <alias index="32" field="사용끝�" name=""/>
+        <alias index="33" field="사용��" name=""/>
+        <alias index="34" field="사용��_1" name=""/>
+        <alias index="35" field="한실수" name=""/>
+        <alias index="36" field="양실수" name=""/>
+        <alias index="37" field="조건부�" name=""/>
+        <alias index="38" field="조건��" name=""/>
+        <alias index="39" field="조건��_1" name=""/>
+        <alias index="40" field="건물소�" name=""/>
+        <alias index="41" field="여성종�" name=""/>
+        <alias index="42" field="남성종�" name=""/>
+        <alias index="43" field="다중이�" name=""/>
+      </aliases>
+      <splitPolicies>
+        <policy policy="Duplicate" field="번호"/>
+        <policy policy="Duplicate" field="개방서�"/>
+        <policy policy="Duplicate" field="개방��"/>
+        <policy policy="Duplicate" field="개방자�"/>
+        <policy policy="Duplicate" field="관리번�"/>
+        <policy policy="Duplicate" field="인허가�"/>
+        <policy policy="Duplicate" field="인허��"/>
+        <policy policy="Duplicate" field="영업상�"/>
+        <policy policy="Duplicate" field="영업��"/>
+        <policy policy="Duplicate" field="상세영�"/>
+        <policy policy="Duplicate" field="상세��"/>
+        <policy policy="Duplicate" field="폐업일�"/>
+        <policy policy="Duplicate" field="휴업시�"/>
+        <policy policy="Duplicate" field="휴업종�"/>
+        <policy policy="Duplicate" field="재개업�"/>
+        <policy policy="Duplicate" field="소재지�"/>
+        <policy policy="Duplicate" field="소재��"/>
+        <policy policy="Duplicate" field="소재��_1"/>
+        <policy policy="Duplicate" field="소재��_2"/>
+        <policy policy="Duplicate" field="도로명�"/>
+        <policy policy="Duplicate" field="도로��"/>
+        <policy policy="Duplicate" field="사업장�"/>
+        <policy policy="Duplicate" field="최종수�"/>
+        <policy policy="Duplicate" field="데이터�"/>
+        <policy policy="Duplicate" field="데이��"/>
+        <policy policy="Duplicate" field="업태구�"/>
+        <policy policy="Duplicate" field="좌표정�"/>
+        <policy policy="Duplicate" field="좌표��"/>
+        <policy policy="Duplicate" field="위생업�"/>
+        <policy policy="Duplicate" field="건물지�"/>
+        <policy policy="Duplicate" field="건물��"/>
+        <policy policy="Duplicate" field="사용시�"/>
+        <policy policy="Duplicate" field="사용끝�"/>
+        <policy policy="Duplicate" field="사용��"/>
+        <policy policy="Duplicate" field="사용��_1"/>
+        <policy policy="Duplicate" field="한실수"/>
+        <policy policy="Duplicate" field="양실수"/>
+        <policy policy="Duplicate" field="조건부�"/>
+        <policy policy="Duplicate" field="조건��"/>
+        <policy policy="Duplicate" field="조건��_1"/>
+        <policy policy="Duplicate" field="건물소�"/>
+        <policy policy="Duplicate" field="여성종�"/>
+        <policy policy="Duplicate" field="남성종�"/>
+        <policy policy="Duplicate" field="다중이�"/>
+      </splitPolicies>
+      <duplicatePolicies>
+        <policy policy="Duplicate" field="번호"/>
+        <policy policy="Duplicate" field="개방서�"/>
+        <policy policy="Duplicate" field="개방��"/>
+        <policy policy="Duplicate" field="개방자�"/>
+        <policy policy="Duplicate" field="관리번�"/>
+        <policy policy="Duplicate" field="인허가�"/>
+        <policy policy="Duplicate" field="인허��"/>
+        <policy policy="Duplicate" field="영업상�"/>
+        <policy policy="Duplicate" field="영업��"/>
+        <policy policy="Duplicate" field="상세영�"/>
+        <policy policy="Duplicate" field="상세��"/>
+        <policy policy="Duplicate" field="폐업일�"/>
+        <policy policy="Duplicate" field="휴업시�"/>
+        <policy policy="Duplicate" field="휴업종�"/>
+        <policy policy="Duplicate" field="재개업�"/>
+        <policy policy="Duplicate" field="소재지�"/>
+        <policy policy="Duplicate" field="소재��"/>
+        <policy policy="Duplicate" field="소재��_1"/>
+        <policy policy="Duplicate" field="소재��_2"/>
+        <policy policy="Duplicate" field="도로명�"/>
+        <policy policy="Duplicate" field="도로��"/>
+        <policy policy="Duplicate" field="사업장�"/>
+        <policy policy="Duplicate" field="최종수�"/>
+        <policy policy="Duplicate" field="데이터�"/>
+        <policy policy="Duplicate" field="데이��"/>
+        <policy policy="Duplicate" field="업태구�"/>
+        <policy policy="Duplicate" field="좌표정�"/>
+        <policy policy="Duplicate" field="좌표��"/>
+        <policy policy="Duplicate" field="위생업�"/>
+        <policy policy="Duplicate" field="건물지�"/>
+        <policy policy="Duplicate" field="건물��"/>
+        <policy policy="Duplicate" field="사용시�"/>
+        <policy policy="Duplicate" field="사용끝�"/>
+        <policy policy="Duplicate" field="사용��"/>
+        <policy policy="Duplicate" field="사용��_1"/>
+        <policy policy="Duplicate" field="한실수"/>
+        <policy policy="Duplicate" field="양실수"/>
+        <policy policy="Duplicate" field="조건부�"/>
+        <policy policy="Duplicate" field="조건��"/>
+        <policy policy="Duplicate" field="조건��_1"/>
+        <policy policy="Duplicate" field="건물소�"/>
+        <policy policy="Duplicate" field="여성종�"/>
+        <policy policy="Duplicate" field="남성종�"/>
+        <policy policy="Duplicate" field="다중이�"/>
+      </duplicatePolicies>
+      <defaults>
+        <default applyOnUpdate="0" field="번호" expression=""/>
+        <default applyOnUpdate="0" field="개방서�" expression=""/>
+        <default applyOnUpdate="0" field="개방��" expression=""/>
+        <default applyOnUpdate="0" field="개방자�" expression=""/>
+        <default applyOnUpdate="0" field="관리번�" expression=""/>
+        <default applyOnUpdate="0" field="인허가�" expression=""/>
+        <default applyOnUpdate="0" field="인허��" expression=""/>
+        <default applyOnUpdate="0" field="영업상�" expression=""/>
+        <default applyOnUpdate="0" field="영업��" expression=""/>
+        <default applyOnUpdate="0" field="상세영�" expression=""/>
+        <default applyOnUpdate="0" field="상세��" expression=""/>
+        <default applyOnUpdate="0" field="폐업일�" expression=""/>
+        <default applyOnUpdate="0" field="휴업시�" expression=""/>
+        <default applyOnUpdate="0" field="휴업종�" expression=""/>
+        <default applyOnUpdate="0" field="재개업�" expression=""/>
+        <default applyOnUpdate="0" field="소재지�" expression=""/>
+        <default applyOnUpdate="0" field="소재��" expression=""/>
+        <default applyOnUpdate="0" field="소재��_1" expression=""/>
+        <default applyOnUpdate="0" field="소재��_2" expression=""/>
+        <default applyOnUpdate="0" field="도로명�" expression=""/>
+        <default applyOnUpdate="0" field="도로��" expression=""/>
+        <default applyOnUpdate="0" field="사업장�" expression=""/>
+        <default applyOnUpdate="0" field="최종수�" expression=""/>
+        <default applyOnUpdate="0" field="데이터�" expression=""/>
+        <default applyOnUpdate="0" field="데이��" expression=""/>
+        <default applyOnUpdate="0" field="업태구�" expression=""/>
+        <default applyOnUpdate="0" field="좌표정�" expression=""/>
+        <default applyOnUpdate="0" field="좌표��" expression=""/>
+        <default applyOnUpdate="0" field="위생업�" expression=""/>
+        <default applyOnUpdate="0" field="건물지�" expression=""/>
+        <default applyOnUpdate="0" field="건물��" expression=""/>
+        <default applyOnUpdate="0" field="사용시�" expression=""/>
+        <default applyOnUpdate="0" field="사용끝�" expression=""/>
+        <default applyOnUpdate="0" field="사용��" expression=""/>
+        <default applyOnUpdate="0" field="사용��_1" expression=""/>
+        <default applyOnUpdate="0" field="한실수" expression=""/>
+        <default applyOnUpdate="0" field="양실수" expression=""/>
+        <default applyOnUpdate="0" field="조건부�" expression=""/>
+        <default applyOnUpdate="0" field="조건��" expression=""/>
+        <default applyOnUpdate="0" field="조건��_1" expression=""/>
+        <default applyOnUpdate="0" field="건물소�" expression=""/>
+        <default applyOnUpdate="0" field="여성종�" expression=""/>
+        <default applyOnUpdate="0" field="남성종�" expression=""/>
+        <default applyOnUpdate="0" field="다중이�" expression=""/>
+      </defaults>
+      <constraints>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="번호"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="개방서�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="개방��"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="개방자�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="관리번�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="인허가�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="인허��"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="영업상�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="영업��"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="상세영�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="상세��"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="폐업일�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="휴업시�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="휴업종�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="재개업�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="소재지�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="소재��"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="소재��_1"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="소재��_2"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="도로명�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="도로��"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="사업장�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="최종수�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="데이터�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="데이��"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="업태구�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="좌표정�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="좌표��"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="위생업�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="건물지�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="건물��"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="사용시�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="사용끝�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="사용��"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="사용��_1"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="한실수"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="양실수"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="조건부�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="조건��"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="조건��_1"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="건물소�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="여성종�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="남성종�"/>
+        <constraint exp_strength="0" constraints="0" notnull_strength="0" unique_strength="0" field="다중이�"/>
+      </constraints>
+      <constraintExpressions>
+        <constraint field="번호" desc="" exp=""/>
+        <constraint field="개방서�" desc="" exp=""/>
+        <constraint field="개방��" desc="" exp=""/>
+        <constraint field="개방자�" desc="" exp=""/>
+        <constraint field="관리번�" desc="" exp=""/>
+        <constraint field="인허가�" desc="" exp=""/>
+        <constraint field="인허��" desc="" exp=""/>
+        <constraint field="영업상�" desc="" exp=""/>
+        <constraint field="영업��" desc="" exp=""/>
+        <constraint field="상세영�" desc="" exp=""/>
+        <constraint field="상세��" desc="" exp=""/>
+        <constraint field="폐업일�" desc="" exp=""/>
+        <constraint field="휴업시�" desc="" exp=""/>
+        <constraint field="휴업종�" desc="" exp=""/>
+        <constraint field="재개업�" desc="" exp=""/>
+        <constraint field="소재지�" desc="" exp=""/>
+        <constraint field="소재��" desc="" exp=""/>
+        <constraint field="소재��_1" desc="" exp=""/>
+        <constraint field="소재��_2" desc="" exp=""/>
+        <constraint field="도로명�" desc="" exp=""/>
+        <constraint field="도로��" desc="" exp=""/>
+        <constraint field="사업장�" desc="" exp=""/>
+        <constraint field="최종수�" desc="" exp=""/>
+        <constraint field="데이터�" desc="" exp=""/>
+        <constraint field="데이��" desc="" exp=""/>
+        <constraint field="업태구�" desc="" exp=""/>
+        <constraint field="좌표정�" desc="" exp=""/>
+        <constraint field="좌표��" desc="" exp=""/>
+        <constraint field="위생업�" desc="" exp=""/>
+        <constraint field="건물지�" desc="" exp=""/>
+        <constraint field="건물��" desc="" exp=""/>
+        <constraint field="사용시�" desc="" exp=""/>
+        <constraint field="사용끝�" desc="" exp=""/>
+        <constraint field="사용��" desc="" exp=""/>
+        <constraint field="사용��_1" desc="" exp=""/>
+        <constraint field="한실수" desc="" exp=""/>
+        <constraint field="양실수" desc="" exp=""/>
+        <constraint field="조건부�" desc="" exp=""/>
+        <constraint field="조건��" desc="" exp=""/>
+        <constraint field="조건��_1" desc="" exp=""/>
+        <constraint field="건물소�" desc="" exp=""/>
+        <constraint field="여성종�" desc="" exp=""/>
+        <constraint field="남성종�" desc="" exp=""/>
+        <constraint field="다중이�" desc="" exp=""/>
+      </constraintExpressions>
+      <expressionfields/>
+      <attributeactions>
+        <defaultAction key="Canvas" value="{00000000-0000-0000-0000-000000000000}"/>
+      </attributeactions>
+      <attributetableconfig sortOrder="0" actionWidgetStyle="dropDown" sortExpression="">
+        <columns/>
+      </attributetableconfig>
+      <conditionalstyles>
+        <rowstyles/>
+        <fieldstyles/>
+      </conditionalstyles>
+      <storedexpressions/>
+      <editform tolerant="1"></editform>
+      <editforminit/>
+      <editforminitcodesource>0</editforminitcodesource>
+      <editforminitfilepath></editforminitfilepath>
+      <editforminitcode><![CDATA[]]></editforminitcode>
+      <featformsuppress>0</featformsuppress>
+      <editorlayout>generatedlayout</editorlayout>
+      <editable/>
+      <labelOnTop/>
+      <reuseLastValue/>
+      <dataDefinedFieldProperties/>
+      <widgets/>
+      <previewExpression></previewExpression>
+      <mapTip enabled="1"></mapTip>
+    </maplayer>
     <maplayer hasScaleBasedVisibilityFlag="1" autoRefreshMode="Disabled" refreshOnNotifyEnabled="0" type="vector" labelsEnabled="0" simplifyMaxScale="1" simplifyDrawingHints="0" minScale="25000" legendPlaceholderImage="" simplifyLocal="1" wkbType="Point" simplifyDrawingTol="1" readOnly="0" maxScale="500" refreshOnNotifyMessage="" symbologyReferenceScale="-1" geometry="Point" styleCategories="AllStyleCategories" simplifyAlgorithm="0" autoRefreshTime="0">
       <extent>
         <xmin>366778.83710000000428408</xmin>
@@ -13806,6 +14729,7 @@ def my_form_open(dialog, layer, feature):
     <layer id="6260000_______03_11_03_P_____6ebcd710_562c_4b5c_8858_074d1d5206bb"/>
     <layer id="_____________1dadef93_7f22_49c7_bbfa_180e8827f861"/>
     <layer id="___________________9297c139_226a_4643_9173_2111d0e59bd5"/>
+    <layer id="_________________4feaba4a_af52_4af8_bc07_575637c97a05"/>
   </layerorder>
   <labelEngineSettings/>
   <properties>
@@ -14442,7 +15366,7 @@ def my_form_open(dialog, layer, feature):
   <Sensors/>
   <ProjectViewSettings UseProjectScales="0" rotation="0">
     <Scales/>
-    <DefaultViewExtent xmin="14362914.2901192232966423" ymin="4172322.27415310265496373" ymax="4179276.42610757471993566" xmax="14373700.65882770344614983">
+    <DefaultViewExtent xmin="14364750.38858285173773766" ymin="4175374.00710699521005154" ymax="4178851.0830842312425375" xmax="14370143.57293709367513657">
       <spatialrefsys nativeFormat="Wkt">
         <wkt>PROJCRS["WGS 84 / Pseudo-Mercator",BASEGEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],MEMBER["World Geodetic System 1984 (G2296)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["Popular Visualisation Pseudo-Mercator",METHOD["Popular Visualisation Pseudo Mercator",ID["EPSG",1024]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["False easting",0,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["easting (X)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["northing (Y)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["Web mapping and visualisation."],AREA["World between 85.06°S and 85.06°N."],BBOX[-85.06,-180,85.06,180]],ID["EPSG",3857]]</wkt>
         <proj4>+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs</proj4>
@@ -14507,7 +15431,7 @@ def my_form_open(dialog, layer, feature):
       </spatialrefsys>
     </CoordinateCustomCrs>
   </ProjectDisplaySettings>
-  <ProjectGpsSettings autoCommitFeatures="0" destinationLayerProvider="delimitedtext" destinationLayer="6260000_______03_11_03_P_____33699190_1067_49e9_897c_581cd8258610" autoAddTrackVertices="0" destinationFollowsActiveLayer="1" destinationLayerName="6260000_부산광역시_03_11_03_P_숙박업" destinationLayerSource="file:///C:/Users/user/Desktop/test/analysis/%EC%98%81%EB%8F%84%20%EC%9C%A0%EB%8F%99%EC%9D%B8%EA%B5%AC/6260000_%EB%B6%80%EC%82%B0%EA%B4%91%EC%97%AD%EC%8B%9C_03_11_03_P_%EC%88%99%EB%B0%95%EC%97%85.csv?encoding=EUC-KR&amp;type=csv&amp;maxFields=10000&amp;detectTypes=yes&amp;xField=%EC%A2%8C%ED%91%9C%EC%A0%95%EB%B3%B4x(epsg5174)&amp;yField=%EC%A2%8C%ED%91%9C%EC%A0%95%EB%B3%B4y(epsg5174)&amp;crs=EPSG:5174&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no">
+  <ProjectGpsSettings autoCommitFeatures="0" destinationLayerProvider="ogr" destinationLayer="_________________4feaba4a_af52_4af8_bc07_575637c97a05" autoAddTrackVertices="0" destinationFollowsActiveLayer="1" destinationLayerName="영도_운영중인 숙박업체 포인트" destinationLayerSource="영도_운영중인 숙박업체 포인트.shp">
     <timeStampFields/>
   </ProjectGpsSettings>
 </qgis>
