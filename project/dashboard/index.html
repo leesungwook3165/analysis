@@ -502,7 +502,7 @@ table.large th, table.large td {
 <div id="toastContainer"></div>
 
 <!-- 시나리오 및 매출 구성 선택 -->
-<div style="margin: 20px 0 15px 0; padding: 12px 15px; background: #f8f9fa; border-radius: 6px; border: 2px solid #e0e0e0; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+<div id="scenarioSection" style="margin: 20px 0 15px 0; padding: 12px 15px; background: #f8f9fa; border-radius: 6px; border: 2px solid #e0e0e0; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
   <div style="display: flex; gap: 8px; align-items: center;">
     <span style="font-weight: 600; font-size: 13px; color: #555;">시나리오:</span>
     <label style="display: inline-flex; align-items: center; cursor: pointer; padding: 4px 10px; background: #fff; border-radius: 4px; border: 1px solid #667eea; transition: all 0.2s; font-size: 12px;">
@@ -540,14 +540,17 @@ table.large th, table.large td {
   <div style="height: 20px; width: 1px; background: #ddd;"></div>
   
   <div style="display: flex; gap: 8px; align-items: center;">
+    <button onclick="openOverviewPopup()" style="padding: 6px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 4px; font-weight: 600; font-size: 13px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)'">
+      📋 개요
+    </button>
     <button onclick="openMapPopup()" style="padding: 6px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 4px; font-weight: 600; font-size: 13px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)'">
       🗺️ MAP
     </button>
   </div>
 </div>
 
-<!-- 핵심 재무 성과 지표 (상단) -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 0 0 20px 0;">
+<!-- 핵심 재무 성과 지표 (상단) - 글램핑 전용 -->
+<div id="kpiSection" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 0 0 20px 0;">
   <!-- 1. 총 초기 투자비 -->
   <div class="kpi-card kpi-card-1">
     <div class="kpi-tooltip">초기 투자비(CAPEX) 합계
@@ -676,7 +679,7 @@ IRR = 23.6%</div>
 
 <!-- 재무 입력 섹션: 분할된 두 개의 접이식 영역 -->
 <details class="collapsible-section">
-  <summary>� 초기 투자비용 (CAPEX &amp; 개업준비)</summary>
+  <summary>📊 초기 투자비용 (CAPEX &amp; 개업준비)</summary>
   <div class="collapsible-content">
 
 <div class="financial-section">
@@ -694,35 +697,48 @@ IRR = 23.6%</div>
       <tr class="land-cost-row" style="background: #e8f8f0; cursor: pointer;" onclick="toggleLandCalcDetails()" title="클릭하여 상세 계산 보기/숨기기">
         <td style="position: relative;">
           <span id="landCalcToggleIcon" style="display: inline-block; margin-right: 8px; transition: transform 0.3s; transform: rotate(-90deg);">▶</span>
-          <input type="text" value="토지 매입비" readonly="" style="background-color: transparent; cursor: pointer; border: none; font-weight: 600; display: inline; width: auto;">
+          <input type="text" value="토지 매입비" readonly style="background-color: transparent; cursor: pointer; border: none; font-weight: 600; display: inline; width: auto;">
         </td>
-        <td><input type="text" id="landCostInput" value="71,400" readonly="" style="background-color: transparent; cursor: pointer; font-weight: 700; color: #27ae60; border: none; font-size: 15px;"></td>
+        <td><input type="text" id="landCostInput" value="71,400" readonly style="background-color: transparent; cursor: pointer; font-weight: 700; color: #27ae60; border: none; font-size: 15px;"></td>
         <td><span style="color: #27ae60; font-size: 11px; font-weight: 600;">✓ 자동계산</span></td>
       </tr>
       <!-- 토지비용 자동 계산 상세 영역 (토글 가능) -->
       <tr class="land-calc-header" id="landCalcDetails" style="background: linear-gradient(135deg, rgb(232, 244, 248) 0%, rgb(212, 233, 247) 100%); display: none;">
-        <td colspan="3" style="padding: 12px;">
-          <div style="font-weight: 700; color: #2c3e50; font-size: 14px; margin-bottom: 8px;">🏞️ 토지비용 상세 계산 (수정불가)</div>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px;">
-            <div>
-              <label style="font-size: 11px; color: #555; font-weight: 600; display: block; margin-bottom: 3px;">공시지가 (원/m²)</label>
-              <input type="number" id="landPrice" value="255000" style="width: 100%; padding: 6px; border: 2px solid #3498db; border-radius: 4px; font-weight: 500; font-size: 13px;" onchange="calculateLandCost()">
-            </div>
-            <div>
-              <label style="font-size: 11px; color: #555; font-weight: 600; display: block; margin-bottom: 3px;">면적 (m²)</label>
-              <input type="number" id="landArea" value="2000" style="width: 100%; padding: 6px; border: 2px solid #3498db; border-radius: 4px; font-weight: 500; font-size: 13px;" onchange="calculateLandCost()">
-            </div>
-            <div>
-              <label style="font-size: 11px; color: #555; font-weight: 600; display: block; margin-bottom: 3px;">실거래비율</label>
-              <input type="number" id="landRatio" value="1.4" step="0.1" style="width: 100%; padding: 6px; border: 2px solid #3498db; border-radius: 4px; font-weight: 500; font-size: 13px;" onchange="calculateLandCost()">
-            </div>
-            <div>
-              <label style="font-size: 11px; color: #555; font-weight: 600; display: block; margin-bottom: 3px;">계산결과 (만원)</label>
-              <input type="text" id="calculatedLandCost" value="71,400" readonly="" style="width: 100%; padding: 6px; border: 2px solid #27ae60; border-radius: 4px; font-weight: 700; background: #fff; color: #27ae60; font-size: 14px; cursor: not-allowed;">
-            </div>
+        <td colspan="3" style="padding: 15px;">
+          <div style="font-weight: 700; color: #2c3e50; font-size: 14px; margin-bottom: 12px;">🏞️ 토지 매입비 상세 계산</div>
+          
+          <!-- 토지 항목 테이블 -->
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px; background: white; border-radius: 4px; overflow: hidden;">
+            <thead>
+              <tr style="background: #f5f5f5;">
+                <th style="padding: 8px; text-align: left; border: 1px solid #ddd; font-size: 12px;">토지명</th>
+                <th style="padding: 8px; text-align: center; border: 1px solid #ddd; font-size: 12px;">공시지가<br>(원/m²)</th>
+                <th style="padding: 8px; text-align: center; border: 1px solid #ddd; font-size: 12px;">면적<br>(m²)</th>
+                <th style="padding: 8px; text-align: center; border: 1px solid #ddd; font-size: 12px;">실거래비율</th>
+                <th style="padding: 8px; text-align: center; border: 1px solid #ddd; font-size: 12px;">매입비<br>(만원)</th>
+                <th style="padding: 8px; text-align: center; border: 1px solid #ddd; font-size: 12px; width: 80px;">작업</th>
+              </tr>
+            </thead>
+            <tbody id="landPurchaseTable">
+              <tr>
+                <td style="padding: 6px; border: 1px solid #ddd;"><input type="text" value="글램핑 부지" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px;"></td>
+                <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="255000" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; text-align: right;" oninput="calculateLandCost()"></td>
+                <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="2000" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; text-align: center;" oninput="calculateLandCost()"></td>
+                <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="1.4" step="0.1" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; text-align: center;" oninput="calculateLandCost()"></td>
+                <td style="padding: 6px; border: 1px solid #ddd; text-align: right; font-weight: 600; color: #27ae60;" class="land-cost-amount">71,400</td>
+                <td style="padding: 6px; border: 1px solid #ddd; text-align: center;"><button class="btn-small btn-delete" onclick="deleteLandPurchase(this)" style="font-size: 11px; padding: 3px 8px;">삭제</button></td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <button class="btn-small btn-add" onclick="addLandPurchase()" style="margin-top: 8px;">+ 토지 항목 추가</button>
+          
+          <div style="margin-top: 10px; padding: 8px; background: white; border-radius: 4px; font-weight: 600; color: #27ae60; text-align: right; border: 2px solid #27ae60;">
+            총 토지 매입비: <span id="totalLandCost">71,400</span> 만원
           </div>
-          <div style="margin-top: 6px; color: #555; font-size: 11px;">
-            💡 계산식: 공시지가 × 면적 × 실거래비율 ÷ 10,000
+          
+          <div style="margin-top: 8px; color: #555; font-size: 11px;">
+            💡 <strong>계산식:</strong> 공시지가 × 면적 × 실거래비율 ÷ 10,000
           </div>
         </td>
       </tr>
@@ -839,8 +855,8 @@ IRR = 23.6%</div>
             <tbody id="depreciationAssetsTable">
               <tr>
                 <td style="padding: 6px; border: 1px solid #ddd;"><input type="text" value="글램핑 시설" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px;"></td>
-                <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="20000" style="width: 100%; padding: 4px; border: 1px solid rgb(204, 204, 204); border-radius: 3px; font-size: 12px; text-align: right; color: rgb(51, 51, 51); background-color: rgb(255, 255, 255);" onchange="calculateDepreciation()"></td>
-                <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="10" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; text-align: center;" onchange="calculateDepreciation()"></td>
+                <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="20000" style="width: 100%; padding: 4px; border: 1px solid rgb(204, 204, 204); border-radius: 3px; font-size: 12px; text-align: right; color: rgb(51, 51, 51); background-color: rgb(255, 255, 255);" oninput="calculateDepreciation()"></td>
+                <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="10" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; text-align: center;" oninput="calculateDepreciation()"></td>
                 <td style="padding: 6px; border: 1px solid #ddd;">
                   <select style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px;" onchange="calculateDepreciation()">
                     <option value="straight" selected="selected">정액법</option>
@@ -853,8 +869,8 @@ IRR = 23.6%</div>
               
               <tr>
                 <td style="padding: 6px; border: 1px solid #ddd;"><input type="text" value="공용시설" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px;"></td>
-                <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="10000" style="width: 100%; padding: 4px; border: 1px solid rgb(204, 204, 204); border-radius: 3px; font-size: 12px; text-align: right; color: rgb(51, 51, 51); background-color: rgb(255, 255, 255);" onchange="calculateDepreciation()"></td>
-                <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="10" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; text-align: center;" onchange="calculateDepreciation()"></td>
+                <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="10000" style="width: 100%; padding: 4px; border: 1px solid rgb(204, 204, 204); border-radius: 3px; font-size: 12px; text-align: right; color: rgb(51, 51, 51); background-color: rgb(255, 255, 255);" oninput="calculateDepreciation()"></td>
+                <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="10" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; text-align: center;" oninput="calculateDepreciation()"></td>
                 <td style="padding: 6px; border: 1px solid #ddd;">
                   <select style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px;" onchange="calculateDepreciation()">
                     <option value="straight" selected="selected">정액법</option>
@@ -975,21 +991,34 @@ IRR = 23.6%</div>
       <!-- 차입금 이자 자동 계산 상세 영역 (토글 가능) -->
       <tr class="loan-interest-header" id="loanInterestDetails" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); display: none;">
         <td colspan="3" style="padding: 15px;">
-          <div style="font-weight: 700; color: #1565c0; font-size: 14px; margin-bottom: 12px;">💰 차입금 이자 계산</div>
+          <div style="font-weight: 700; color: #1565c0; font-size: 14px; margin-bottom: 12px;">💰 차입금 이자 상세 계산</div>
           
-          <div style="background: white; padding: 12px; border-radius: 6px; margin-bottom: 10px;">
-            <div style="margin-bottom: 8px;">
-              <label style="font-weight: 600; color: #333; font-size: 13px; display: inline-block; width: 120px;">차입금 (만원):</label>
-              <input type="number" id="loanAmount" value="0" style="width: 150px; padding: 6px; border: 2px solid #42a5f5; border-radius: 4px; font-size: 13px; text-align: right;" onchange="calculateLoanInterest()">
-            </div>
-            <div style="margin-bottom: 8px;">
-              <label style="font-weight: 600; color: #333; font-size: 13px; display: inline-block; width: 120px;">이자율 (%):</label>
-              <input type="number" id="loanInterestRate" value="4.5" step="0.1" style="width: 150px; padding: 6px; border: 2px solid #42a5f5; border-radius: 4px; font-size: 13px; text-align: right;" onchange="calculateLoanInterest()">
-            </div>
-          </div>
+          <!-- 차입금 항목 테이블 -->
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px; background: white; border-radius: 4px; overflow: hidden;">
+            <thead>
+              <tr style="background: #f5f5f5;">
+                <th style="padding: 8px; text-align: left; border: 1px solid #ddd; font-size: 12px;">차입금명</th>
+                <th style="padding: 8px; text-align: center; border: 1px solid #ddd; font-size: 12px;">차입금액<br>(만원)</th>
+                <th style="padding: 8px; text-align: center; border: 1px solid #ddd; font-size: 12px;">이자율<br>(%)</th>
+                <th style="padding: 8px; text-align: center; border: 1px solid #ddd; font-size: 12px;">연간 이자비용<br>(만원)</th>
+                <th style="padding: 8px; text-align: center; border: 1px solid #ddd; font-size: 12px; width: 80px;">작업</th>
+              </tr>
+            </thead>
+            <tbody id="loanInterestTable">
+              <tr>
+                <td style="padding: 6px; border: 1px solid #ddd;"><input type="text" value="사업비 대출" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px;"></td>
+                <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="0" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; text-align: right;" oninput="calculateLoanInterest()"></td>
+                <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="4.5" step="0.1" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; text-align: center;" oninput="calculateLoanInterest()"></td>
+                <td style="padding: 6px; border: 1px solid #ddd; text-align: right; font-weight: 600; color: #1976d2;" class="loan-interest-amount">0</td>
+                <td style="padding: 6px; border: 1px solid #ddd; text-align: center;"><button class="btn-small btn-delete" onclick="deleteLoanInterest(this)" style="font-size: 11px; padding: 3px 8px;">삭제</button></td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <button class="btn-small btn-add" onclick="addLoanInterest()" style="margin-top: 8px;">+ 차입금 항목 추가</button>
           
           <div style="margin-top: 10px; padding: 8px; background: white; border-radius: 4px; font-weight: 600; color: #1565c0; text-align: right; border: 2px solid #1976d2;">
-            연간 이자비용: <span id="totalLoanInterest">0</span> 만원/년
+            총 연간 이자비용: <span id="totalLoanInterest">0</span> 만원/년
           </div>
           
           <div style="margin-top: 8px; color: #555; font-size: 11px;">
@@ -1349,6 +1378,38 @@ IRR = 23.6%</div>
   </div>
 </details>
 
+<details class="collapsible-section">
+  <summary>💰 보조금</summary>
+  <div class="collapsible-content">
+    
+    <h3>[8] 보조금</h3>
+    <table class="financial-table" id="subsidyTable">
+      <thead>
+        <tr>
+          <th class="item-name">항목</th>
+          <th class="item-value">금액 (만원)</th>
+          <th class="item-actions">작업</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input type="text" value="보조금"></td>
+          <td><input type="text" value="0" oninput="calculateSubsidy(this)"></td>
+          <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <button class="btn-small btn-add" onclick="addSubsidyRow()">+ 항목 추가</button>
+    
+    <div style="margin-top: 15px; padding: 12px; background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%); border-radius: 8px; border: 2px solid #fbc02d;">
+      <div style="font-size: 16px; font-weight: 700; color: #f57f17; text-align: right;">
+        총 보조금: <span id="subsidySum">0</span> 만원 
+        (<span id="subsidySumBillion">0.00</span> 억원)
+      </div>
+    </div>
+  </div>
+</details>
+
 </section>
 
 <!-- 벤처 -->
@@ -1397,6 +1458,27 @@ document.querySelectorAll(".tabs button").forEach(btn=>{
     document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
     btn.classList.add("active");
     document.getElementById(btn.dataset.tab).classList.add("active");
+    
+    // KPI 섹션 표시 제어: 글램핑과 통합 탭에서만 표시
+    const kpiSection = document.getElementById('kpiSection');
+    if (kpiSection) {
+      if (btn.dataset.tab === 'glamping' || btn.dataset.tab === 'total') {
+        kpiSection.style.display = 'grid';
+      } else {
+        kpiSection.style.display = 'none';
+      }
+    }
+    
+    // 시나리오 선택 영역 표시 제어: 글램핑 탭에서만 표시
+    const scenarioSection = document.getElementById('scenarioSection');
+    if (scenarioSection) {
+      if (btn.dataset.tab === 'glamping') {
+        scenarioSection.style.display = 'flex';
+      } else {
+        scenarioSection.style.display = 'none';
+      }
+    }
+    
     // 글램핑 탭을 활성화할 때 11x17 테이블을 다시 생성하여 표시 보장
     if(btn.dataset.tab === 'glamping') createScenarioTableSingle();
   }
@@ -1570,10 +1652,11 @@ function updateFinancialSummaries() {
     if(sumBillionEl) sumBillionEl.textContent = formatNumberWithCommas((sum / 10000).toFixed(2));
   });
   
-  // Update gInvest field with total CAPEX + Pre-opening
+  // Update gInvest field with total CAPEX + Pre-opening - Subsidy
   const totalCapex = getTableSum('capexTable');
   const totalPreopening = getTableSum('preopeningTable');
-  const totalInitial = (totalCapex + totalPreopening) / 10000; // Convert to 억원
+  const subsidy = getSubsidy(); // 억원
+  const totalInitial = (totalCapex + totalPreopening) / 10000 - subsidy; // Convert to 억원 and subtract subsidy
   const gInvestEl = document.getElementById('gInvest');
   if(gInvestEl) {
     gInvestEl.value = totalInitial.toFixed(2);
@@ -1596,7 +1679,11 @@ function updateKPIIndicators() {
   // 총 초기 투자비 (CAPEX + Pre-opening)
   const totalCapex = getTableSum('capexTable');
   const totalPreopening = getTableSum('preopeningTable');
-  const totalInvest = (totalCapex + totalPreopening) / 10000; // 억원
+  const totalInvestGross = (totalCapex + totalPreopening) / 10000; // 억원
+  
+  // 보조금 차감
+  const subsidy = getSubsidy(); // 억원
+  const totalInvest = totalInvestGross - subsidy; // 실제 투자비 = 총 투자비 - 보조금
   
   // 연간 운영비 (Fixed + Variable)
   const totalFixed = getTableSum('fixedCostTable');
@@ -1660,7 +1747,7 @@ function updateKPIIndicators() {
   document.getElementById('kpi_irr').textContent = irr.toFixed(1);
   
   // Update tooltips with actual values
-  updateKPITooltip('kpi-card-1', `초기 투자비(CAPEX) 합계\n= ${formatNumberWithCommas((totalCapex/10000).toFixed(1))}억 + ${formatNumberWithCommas((totalPreopening/10000).toFixed(1))}억\n= ${formatNumberWithCommas(totalInvest.toFixed(1))}억원`);
+  updateKPITooltip('kpi-card-1', `초기 투자비(CAPEX) 합계 - 보조금\n= ${formatNumberWithCommas((totalCapex/10000).toFixed(1))}억 + ${formatNumberWithCommas((totalPreopening/10000).toFixed(1))}억 - ${formatNumberWithCommas(subsidy.toFixed(1))}억\n= ${formatNumberWithCommas(totalInvest.toFixed(1))}억원`);
   
   updateKPITooltip('kpi-card-2', `고정 운영비 + 변동 운영비\n= ${formatNumberWithCommas((totalFixed/10000).toFixed(1))}억 + ${formatNumberWithCommas((totalVariable/10000).toFixed(1))}억\n= ${formatNumberWithCommas(opex.toFixed(1))}억원/년`);
   
@@ -1705,25 +1792,41 @@ function toggleLandCalcDetails() {
 window.toggleLandCalcDetails = toggleLandCalcDetails;
 
 function calculateLandCost() {
-  const landPrice = parseFloat(document.getElementById('landPrice').value) || 0;
-  const landArea = parseFloat(document.getElementById('landArea').value) || 0;
-  const landRatio = parseFloat(document.getElementById('landRatio').value) || 0;
+  const tbody = document.getElementById('landPurchaseTable');
+  if (!tbody) return;
   
-  // 토지비용 = 공시지가 × 면적 × 실거래비율 (원 단위)
-  const landCostWon = landPrice * landArea * landRatio;
-  // 만원 단위로 변환
-  const landCostManWon = landCostWon / 10000;
+  const rows = tbody.querySelectorAll('tr');
+  let totalCost = 0;
   
-  // 계산된 토지비용 표시 (콤마 포맷)
-  const calculatedLandCostEl = document.getElementById('calculatedLandCost');
-  if (calculatedLandCostEl) {
-    calculatedLandCostEl.value = formatNumberWithCommas(Math.round(landCostManWon));
+  rows.forEach(row => {
+    const priceInput = row.querySelector('td:nth-child(2) input');
+    const areaInput = row.querySelector('td:nth-child(3) input');
+    const ratioInput = row.querySelector('td:nth-child(4) input');
+    const amountCell = row.querySelector('.land-cost-amount');
+    
+    if (priceInput && areaInput && ratioInput && amountCell) {
+      const price = parseFloat(priceInput.value) || 0;
+      const area = parseFloat(areaInput.value) || 0;
+      const ratio = parseFloat(ratioInput.value) || 0;
+      
+      // 토지비용 = 공시지가 × 면적 × 실거래비율 ÷ 10,000 (만원)
+      const landCost = (price * area * ratio) / 10000;
+      
+      amountCell.textContent = formatNumberWithCommas(Math.round(landCost));
+      totalCost += landCost;
+    }
+  });
+  
+  // 총 토지 매입비 업데이트
+  const totalEl = document.getElementById('totalLandCost');
+  if (totalEl) {
+    totalEl.textContent = formatNumberWithCommas(Math.round(totalCost));
   }
   
   // CAPEX 테이블의 토지 매입비 업데이트
   const landCostInput = document.getElementById('landCostInput');
   if (landCostInput) {
-    landCostInput.value = formatNumberWithCommas(Math.round(landCostManWon));
+    landCostInput.value = formatNumberWithCommas(Math.round(totalCost));
   }
   
   // 재무 요약 업데이트
@@ -1731,6 +1834,40 @@ function calculateLandCost() {
 }
 
 window.calculateLandCost = calculateLandCost;
+
+function addLandPurchase() {
+  const tbody = document.getElementById('landPurchaseTable');
+  if (!tbody) return;
+  
+  const newRow = document.createElement('tr');
+  newRow.innerHTML = `
+    <td style="padding: 6px; border: 1px solid #ddd;"><input type="text" value="토지" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px;"></td>
+    <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="0" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; text-align: right;" oninput="calculateLandCost()"></td>
+    <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="0" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; text-align: center;" oninput="calculateLandCost()"></td>
+    <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="1.0" step="0.1" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; text-align: center;" oninput="calculateLandCost()"></td>
+    <td style="padding: 6px; border: 1px solid #ddd; text-align: right; font-weight: 600; color: #27ae60;" class="land-cost-amount">0</td>
+    <td style="padding: 6px; border: 1px solid #ddd; text-align: center;"><button class="btn-small btn-delete" onclick="deleteLandPurchase(this)" style="font-size: 11px; padding: 3px 8px;">삭제</button></td>
+  `;
+  
+  tbody.appendChild(newRow);
+  calculateLandCost();
+}
+
+window.addLandPurchase = addLandPurchase;
+
+function deleteLandPurchase(btn) {
+  const tbody = document.getElementById('landPurchaseTable');
+  if (!tbody) return;
+  
+  if (tbody.children.length > 1) {
+    btn.closest('tr').remove();
+    calculateLandCost();
+  } else {
+    showToast('최소 1개 이상의 토지 항목이 필요합니다.', 'error');
+  }
+}
+
+window.deleteLandPurchase = deleteLandPurchase;
 
 function toggleDepreciationDetails() {
   const details = document.getElementById('depreciationDetails');
@@ -1812,8 +1949,8 @@ function addDepreciationAsset() {
   const newRow = document.createElement('tr');
   newRow.innerHTML = `
     <td style="padding: 6px; border: 1px solid #ddd;"><input type="text" placeholder="자산명 입력" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px;"></td>
-    <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="0" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; text-align: right;" onchange="calculateDepreciation()"></td>
-    <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="5" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; text-align: center;" onchange="calculateDepreciation()"></td>
+    <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="0" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; text-align: right;" oninput="calculateDepreciation()"></td>
+    <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="5" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; text-align: center;" oninput="calculateDepreciation()"></td>
     <td style="padding: 6px; border: 1px solid #ddd;">
       <select style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px;" onchange="calculateDepreciation()">
         <option value="straight" selected>정액법</option>
@@ -1866,22 +2003,39 @@ window.toggleLoanInterestDetails = toggleLoanInterestDetails;
 
 // 차입금 이자 계산 함수
 function calculateLoanInterest() {
-  const loanAmount = parseFloat(document.getElementById('loanAmount')?.value) || 0;
-  const interestRate = parseFloat(document.getElementById('loanInterestRate')?.value) || 0;
+  const tbody = document.getElementById('loanInterestTable');
+  if (!tbody) return;
   
-  // 연간 이자비용 = 차입금 × 이자율 ÷ 100
-  const annualInterest = loanAmount * interestRate / 100;
+  const rows = tbody.querySelectorAll('tr');
+  let totalInterest = 0;
   
-  // 총 이자비용 표시 업데이트
+  rows.forEach(row => {
+    const amountInput = row.querySelector('td:nth-child(2) input');
+    const rateInput = row.querySelector('td:nth-child(3) input');
+    const interestCell = row.querySelector('.loan-interest-amount');
+    
+    if (amountInput && rateInput && interestCell) {
+      const amount = parseFloat(amountInput.value) || 0;
+      const rate = parseFloat(rateInput.value) || 0;
+      
+      // 연간 이자비용 = 차입금 × 이자율 ÷ 100
+      const interest = amount * rate / 100;
+      
+      interestCell.textContent = formatNumberWithCommas(Math.round(interest));
+      totalInterest += interest;
+    }
+  });
+  
+  // 총 이자비용 업데이트
   const totalEl = document.getElementById('totalLoanInterest');
   if (totalEl) {
-    totalEl.textContent = formatNumberWithCommas(Math.round(annualInterest));
+    totalEl.textContent = formatNumberWithCommas(Math.round(totalInterest));
   }
   
   // 금융 및 세금 테이블의 차입금 이자 입력란 업데이트
   const loanInterestInput = document.getElementById('loanInterestInput');
   if (loanInterestInput) {
-    loanInterestInput.value = formatNumberWithCommas(Math.round(annualInterest));
+    loanInterestInput.value = formatNumberWithCommas(Math.round(totalInterest));
   }
   
   // 재무 요약 업데이트
@@ -1890,7 +2044,152 @@ function calculateLoanInterest() {
 
 window.calculateLoanInterest = calculateLoanInterest;
 
+function addLoanInterest() {
+  const tbody = document.getElementById('loanInterestTable');
+  if (!tbody) return;
+  
+  const newRow = document.createElement('tr');
+  newRow.innerHTML = `
+    <td style="padding: 6px; border: 1px solid #ddd;"><input type="text" value="대출" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px;"></td>
+    <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="0" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; text-align: right;" oninput="calculateLoanInterest()"></td>
+    <td style="padding: 6px; border: 1px solid #ddd;"><input type="number" value="4.5" step="0.1" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; text-align: center;" oninput="calculateLoanInterest()"></td>
+    <td style="padding: 6px; border: 1px solid #ddd; text-align: right; font-weight: 600; color: #1976d2;" class="loan-interest-amount">0</td>
+    <td style="padding: 6px; border: 1px solid #ddd; text-align: center;"><button class="btn-small btn-delete" onclick="deleteLoanInterest(this)" style="font-size: 11px; padding: 3px 8px;">삭제</button></td>
+  `;
+  
+  tbody.appendChild(newRow);
+  calculateLoanInterest();
+}
+
+window.addLoanInterest = addLoanInterest;
+
+function deleteLoanInterest(btn) {
+  const tbody = document.getElementById('loanInterestTable');
+  if (!tbody) return;
+  
+  if (tbody.children.length > 1) {
+    btn.closest('tr').remove();
+    calculateLoanInterest();
+  } else {
+    showToast('최소 1개 이상의 차입금 항목이 필요합니다.', 'error');
+  }
+}
+
+window.deleteLoanInterest = deleteLoanInterest;
+
 // MAP 팝업 열기 함수
+function openOverviewPopup() {
+  const popup = document.getElementById('overviewPopup');
+  if (popup) {
+    popup.style.display = 'flex';
+  }
+}
+
+function closeOverviewPopup() {
+  const popup = document.getElementById('overviewPopup');
+  if (popup) {
+    popup.style.display = 'none';
+    // 팝업 닫을 때 전체화면 상태 초기화
+    const popupContent = document.getElementById('overviewPopupContent');
+    if (popupContent) {
+      popupContent.style.width = '70%';
+      popupContent.style.maxWidth = '1200px';
+      popupContent.style.maxHeight = '85vh';
+    }
+    const fullscreenBtn = document.getElementById('overviewFullscreenBtn');
+    if (fullscreenBtn) {
+      fullscreenBtn.innerHTML = '⛶';
+    }
+  }
+}
+
+function toggleOverviewFullscreen() {
+  const popupContent = document.getElementById('overviewPopupContent');
+  const btn = document.getElementById('overviewFullscreenBtn');
+  const contentContainers = document.querySelectorAll('.overview-tab-content');
+  
+  if (!popupContent || !btn) return;
+  
+  const isFullscreen = popupContent.style.width === '95%';
+  
+  if (isFullscreen) {
+    // 원래 크기로
+    popupContent.style.width = '70%';
+    popupContent.style.maxWidth = '1200px';
+    popupContent.style.maxHeight = '85vh';
+    btn.innerHTML = '⛶';
+    
+    // 컨텐츠 컨테이너 원래 크기로
+    contentContainers.forEach(container => {
+      container.style.maxWidth = '900px';
+    });
+  } else {
+    // 전체화면으로
+    popupContent.style.width = '95%';
+    popupContent.style.maxWidth = 'none';
+    popupContent.style.maxHeight = '95vh';
+    btn.innerHTML = '⛶';
+    
+    // 컨텐츠 컨테이너 확대
+    contentContainers.forEach(container => {
+      container.style.maxWidth = '100%';
+    });
+  }
+}
+
+function switchOverviewTab(tabName) {
+  // 모든 탭 버튼의 active 클래스 제거
+  document.querySelectorAll('.overview-tab-btn').forEach(btn => {
+    btn.style.background = 'rgba(255,255,255,0.2)';
+  });
+  
+  // 모든 탭 컨텐츠 숨기기
+  document.querySelectorAll('.overview-tab-content').forEach(content => {
+    content.style.display = 'none';
+  });
+  
+  // 선택된 탭 활성화
+  const selectedBtn = document.querySelector(`.overview-tab-btn[data-tab="${tabName}"]`);
+  const selectedContent = document.getElementById(`overview-${tabName}`);
+  
+  if (selectedBtn) selectedBtn.style.background = 'rgba(255,255,255,0.4)';
+  if (selectedContent) selectedContent.style.display = 'block';
+  
+  // 벤치마킹 탭이면 첫 번째 업체 표시
+  if (tabName === 'benchmark') {
+    switchBenchmarkCompany('company1');
+  }
+}
+
+function switchBenchmarkCompany(companyName) {
+  // 모든 업체 버튼 비활성화
+  document.querySelectorAll('.benchmark-company-btn').forEach(btn => {
+    btn.style.background = '#f0f0f0';
+    btn.style.color = '#667eea';
+  });
+  
+  // 모든 업체 컨텐츠 숨기기
+  document.querySelectorAll('.benchmark-company-content').forEach(content => {
+    content.style.display = 'none';
+  });
+  
+  // 선택된 업체 활성화
+  const selectedBtn = document.querySelector(`.benchmark-company-btn[data-company="${companyName}"]`);
+  const selectedContent = document.getElementById(`benchmark-${companyName}`);
+  
+  if (selectedBtn) {
+    selectedBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+    selectedBtn.style.color = 'white';
+  }
+  if (selectedContent) selectedContent.style.display = 'block';
+}
+
+window.openOverviewPopup = openOverviewPopup;
+window.closeOverviewPopup = closeOverviewPopup;
+window.toggleOverviewFullscreen = toggleOverviewFullscreen;
+window.switchOverviewTab = switchOverviewTab;
+window.switchBenchmarkCompany = switchBenchmarkCompany;
+
 function openMapPopup() {
   const mapPath = '../map/index.html';
   const width = Math.min(1400, window.screen.width * 0.9);
@@ -1982,6 +2281,65 @@ function addAdditionalRevenueRow() {
 }
 
 window.addAdditionalRevenueRow = addAdditionalRevenueRow;
+
+// 보조금 계산
+function calculateSubsidy(input) {
+  const row = input.closest('tr');
+  if (!row) return;
+  
+  updateSubsidySum();
+}
+
+window.calculateSubsidy = calculateSubsidy;
+
+// 보조금 합계 업데이트
+function updateSubsidySum() {
+  const table = document.getElementById('subsidyTable');
+  if (!table) return;
+  
+  const rows = table.querySelectorAll('tbody tr');
+  let total = 0;
+  
+  rows.forEach(row => {
+    const amountInput = row.querySelector('td:nth-child(2) input');
+    if (amountInput) {
+      const amount = parseFloat(removeCommas(amountInput.value)) || 0;
+      total += amount;
+    }
+  });
+  
+  const sumEl = document.getElementById('subsidySum');
+  const sumBillionEl = document.getElementById('subsidySumBillion');
+  
+  if (sumEl) sumEl.textContent = formatNumberWithCommas(total.toFixed(0));
+  if (sumBillionEl) sumBillionEl.textContent = formatNumberWithCommas((total / 10000).toFixed(2));
+  
+  updateFinancialSummaries();
+}
+
+window.updateSubsidySum = updateSubsidySum;
+
+// 보조금 항목 추가
+function addSubsidyRow() {
+  const table = document.getElementById('subsidyTable');
+  if (!table) return;
+  
+  const tbody = table.querySelector('tbody');
+  if (!tbody) return;
+  
+  const newRow = document.createElement('tr');
+  newRow.innerHTML = `
+    <td><input type="text" placeholder="항목명 입력"></td>
+    <td><input type="text" value="0" oninput="calculateSubsidy(this)"></td>
+    <td><button class="btn-small btn-delete" onclick="deleteFinancialRow(this)">삭제</button></td>
+  `;
+  
+  tbody.appendChild(newRow);
+  bindFinancialInputs();
+  updateSubsidySum();
+}
+
+window.addSubsidyRow = addSubsidyRow;
 
 function getSelectedScenarioRevenue(scenario) {
   // 현재 선택된 시나리오의 매출을 가져옴 (천원 단위를 억원으로 변환)
@@ -2111,6 +2469,25 @@ function getMarketingCost() {
   return 0; // 기본값 0
 }
 
+function getSubsidy() {
+  // 보조금 테이블에서 합계 가져오기
+  const table = document.getElementById('subsidyTable');
+  if (!table) return 0;
+  
+  const rows = table.querySelectorAll('tbody tr');
+  let sum = 0;
+  
+  rows.forEach(row => {
+    const amountInput = row.querySelector('td:nth-child(2) input');
+    if (amountInput) {
+      const value = parseFloat(removeCommas(amountInput.value)) || 0;
+      sum += value;
+    }
+  });
+  
+  return sum / 10000; // 만원 -> 억원
+}
+
 function calculateSimpleIRR(investment, annualCashFlow, years) {
   // NPV = 0이 되는 할인율을 찾는 간단한 IRR 계산
   // Newton-Raphson 방법 사용
@@ -2142,10 +2519,18 @@ function calculateSimpleIRR(investment, annualCashFlow, years) {
 }
 
 function bindFinancialInputs() {
-  const allInputs = document.querySelectorAll('.financial-table tbody td:nth-child(2) input');
+  // 일반 재무 테이블 (2번째 컬럼 input) - CAPEX, Pre-opening, Fixed Cost, Variable Cost, Finance
+  const allInputs = document.querySelectorAll('.financial-table tbody input');
   allInputs.forEach(inp => {
-    inp.removeEventListener('input', updateFinancialSummaries);
-    inp.addEventListener('input', updateFinancialSummaries);
+    // 이미 oninput 속성이 있는 경우 (추가매출, 보조금) 스킵
+    const parentTable = inp.closest('table');
+    if (parentTable && (parentTable.id === 'additionalRevenueTable' || parentTable.id === 'subsidyTable')) {
+      return;
+    }
+    
+    // input 이벤트로 실시간 업데이트
+    inp.removeEventListener('input', handleInputChange);
+    inp.addEventListener('input', handleInputChange);
     
     // Add comma formatting on blur
     inp.removeEventListener('blur', handleBlur);
@@ -2157,9 +2542,12 @@ function bindFinancialInputs() {
   });
 }
 
+function handleInputChange(e) {
+  updateFinancialSummaries();
+}
+
 function handleBlur(e) {
   formatNumberInput(e.target);
-  updateFinancialSummaries();
 }
 
 function handleFocus(e) {
@@ -2323,7 +2711,15 @@ window.saveAllFinancialData = saveAllFinancialData;
 window.loadAllFinancialData = loadAllFinancialData;
 window.resetAllFinancialData = resetAllFinancialData;
 
-function downloadHTMLFile() {
+// 파일 핸들을 저장할 변수
+let savedFileHandle = null;
+
+async function downloadHTMLFile() {
+  // 현재 파일명 가져오기 (URL에서 추출)
+  const currentPath = window.location.pathname;
+  const currentFileName = currentPath.substring(currentPath.lastIndexOf('/') + 1) || 'index.html';
+  const fileNameWithoutExt = currentFileName.replace('.html', '');
+  
   // Update all input values in the DOM before downloading
   // This ensures that current values are reflected in the value attribute
   document.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
@@ -2358,14 +2754,73 @@ function downloadHTMLFile() {
   // Get current HTML content after updating attributes
   let htmlContent = document.documentElement.outerHTML;
   
+  // File System Access API를 지원하는 경우 사용 (현재 디렉토리에서 시작)
+  if (window.showSaveFilePicker) {
+    await saveHTMLWithFilePicker(htmlContent, fileNameWithoutExt);
+  } else {
+    // 지원하지 않는 경우 기존 방식 사용
+    saveLegacyDownload(htmlContent, fileNameWithoutExt);
+  }
+}
+
+async function saveHTMLWithFilePicker(htmlContent, defaultFileName) {
+  try {
+    // 저장된 파일 핸들이 있고 권한이 있는 경우 바로 덮어쓰기
+    if (savedFileHandle) {
+      try {
+        // 파일에 대한 쓰기 권한 확인
+        const permission = await savedFileHandle.queryPermission({ mode: 'readwrite' });
+        
+        if (permission === 'granted' || permission === 'prompt') {
+          const writable = await savedFileHandle.createWritable();
+          await writable.write(htmlContent);
+          await writable.close();
+          
+          showToast('파일이 저장되었습니다!', 'success');
+          return;
+        }
+      } catch (err) {
+        // 권한이 없거나 오류 발생 시 새로 파일 선택
+        console.log('저장된 파일 핸들 사용 불가, 새로 선택합니다.');
+        savedFileHandle = null;
+      }
+    }
+    
+    // 새로 파일 선택
+    const options = {
+      suggestedName: defaultFileName + '.html',
+      types: [{
+        description: 'HTML Files',
+        accept: { 'text/html': ['.html'] }
+      }]
+    };
+    
+    const fileHandle = await window.showSaveFilePicker(options);
+    const writable = await fileHandle.createWritable();
+    await writable.write(htmlContent);
+    await writable.close();
+    
+    // 파일 핸들 저장 (다음에 재사용)
+    savedFileHandle = fileHandle;
+    
+    showToast('파일이 저장되었습니다! (다음부터는 같은 위치에 자동 저장됩니다)', 'success');
+  } catch (err) {
+    // 사용자가 취소한 경우
+    if (err.name !== 'AbortError') {
+      console.error('파일 저장 오류:', err);
+      showToast('파일 저장 중 오류가 발생했습니다.', 'error');
+    }
+  }
+}
+
+function saveLegacyDownload(htmlContent, fileName) {
   // Create a blob with the current HTML
   const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
   
   // Create download link
   const link = document.createElement('a');
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
   link.href = URL.createObjectURL(blob);
-  link.download = `glamping_dashboard_${timestamp}.html`;
+  link.download = fileName + '.html';
   
   // Trigger download
   document.body.appendChild(link);
@@ -2567,6 +3022,7 @@ window.addEventListener('load', ()=>{
   calculateDepreciation();
   calculateLoanInterest();
   updateAdditionalRevenueSum();
+  updateSubsidySum();
   updateFinancialSummaries();
   
   // Initialize calculations and chart after all tables are set up
@@ -3391,6 +3847,210 @@ downloadPdf.onclick=async()=>{
 };
 </script>
 
+<!-- 개요 팝업 -->
+<div id="overviewPopup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+  <div id="overviewPopupContent" style="background: white; width: 70%; max-width: 1200px; max-height: 85vh; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); overflow: hidden; display: flex; flex-direction: column; transition: all 0.3s ease;">
+    <!-- 헤더 -->
+    <div style="padding: 20px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <h2 style="margin: 0; font-size: 24px; font-weight: 600;">📋 사업 개요</h2>
+        <div style="display: flex; gap: 5px;">
+          <button class="overview-tab-btn" data-tab="benchmark" onclick="switchOverviewTab('benchmark')" style="padding: 6px 14px; background: rgba(255,255,255,0.4); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.5)'" onmouseout="if(this.style.background !== 'rgba(255, 255, 255, 0.4)') this.style.background='rgba(255,255,255,0.2)'">벤치마킹</button>
+          <button class="overview-tab-btn" data-tab="progress" onclick="switchOverviewTab('progress')" style="padding: 6px 14px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.5)'" onmouseout="if(this.style.background !== 'rgba(255, 255, 255, 0.4)') this.style.background='rgba(255,255,255,0.2)'">추진개요</button>
+          <button class="overview-tab-btn" data-tab="market" onclick="switchOverviewTab('market')" style="padding: 6px 14px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.5)'" onmouseout="if(this.style.background !== 'rgba(255, 255, 255, 0.4)') this.style.background='rgba(255,255,255,0.2)'">시황</button>
+          <button class="overview-tab-btn" data-tab="reference" onclick="switchOverviewTab('reference')" style="padding: 6px 14px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.5)'" onmouseout="if(this.style.background !== 'rgba(255, 255, 255, 0.4)') this.style.background='rgba(255,255,255,0.2)'">참고자료</button>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button id="overviewFullscreenBtn" onclick="toggleOverviewFullscreen()" style="background: rgba(255,255,255,0.2); border: none; color: white; font-size: 20px; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'" title="전체화면 토글">⛶</button>
+        <button onclick="closeOverviewPopup()" style="background: rgba(255,255,255,0.2); border: none; color: white; font-size: 24px; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'" title="닫기">×</button>
+      </div>
+    </div>
+    
+    <!-- 컨텐츠 -->
+    <div style="padding: 30px; overflow-y: auto; flex: 1;">
+      <!-- 벤치마킹 탭 -->
+      <div id="overview-benchmark" class="overview-tab-content" style="max-width: 900px; margin: 0 auto; display: block;">
+        <h3 style="color: #667eea; margin-top: 0; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">벤치마킹 분석</h3>
+        
+        <!-- 업체 선택 버튼 -->
+        <div style="display: flex; gap: 10px; margin-bottom: 25px;">
+          <button class="benchmark-company-btn" data-company="company1" onclick="switchBenchmarkCompany('company1')" style="flex: 1; padding: 12px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" onmouseover="if(this.style.background.indexOf('linear-gradient') === -1) this.style.background='#e8eaf6'" onmouseout="if(this.style.background.indexOf('linear-gradient') === -1) this.style.background='#f0f0f0'">글램핑앤카라반</button>
+          <button class="benchmark-company-btn" data-company="company2" onclick="switchBenchmarkCompany('company2')" style="flex: 1; padding: 12px 20px; background: #f0f0f0; color: #667eea; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" onmouseover="if(this.style.background.indexOf('linear-gradient') === -1) this.style.background='#e8eaf6'" onmouseout="if(this.style.background.indexOf('linear-gradient') === -1) this.style.background='#f0f0f0'">시모노세키 글램돔</button>
+        </div>
+        
+        <!-- 업체 A 컨텐츠 -->
+        <div id="benchmark-company1" class="benchmark-company-content" style="display: block;">
+          <h4 style="color: #667eea; margin-bottom: 15px; font-size: 18px; font-weight: 600;">글램핑앤카라반 개요</h4>
+          <p style="line-height: 1.8; color: #555; margin-bottom: 25px; font-size: 15px;">
+            경상북도 포항시 남구 호미곶면 구만길 64에 위치한 글램핑앤카라반은 호미곶해변을 품은 오션뷰 글램핑장입니다.
+            포항 호미곶에서 가장 먼저 만나는 바다 전망을 자랑하며, 동해의 일출과 바다 풍경을 감상할 수 있는 최적의 입지를 갖추고 있습니다.
+            대표 김태호가 운영하는 이 시설은 2014년부터 영업을 시작했으며, 바다와 인접한 자연 친화적인 환경에서 프라이빗한 휴양을 제공합니다.
+          </p>
+          
+          <!-- 이미지 갤러리 1 (3개) -->
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
+            <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
+              <img src="../dashboard/img/3.jpg" alt="글램핑 전경 3" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1)'; this.style.zIndex='1';">
+              <img src="../dashboard/img/7.jpg" alt="글램핑 전경 1" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(-30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
+              <img src="../dashboard/img/4.jpg" alt="글램핑 전경 2" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
 
+          </div>
+           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
+            <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
+              <img src="../dashboard/img/2.jpg" alt="글램핑 전경 3" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1)'; this.style.zIndex='1';">
+              <img src="../dashboard/img/pohang_glamping.jpg" alt="글램핑 전경 1" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(-30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
+              <img src="../dashboard/img/phohang_square-1.jpg" alt="글램핑 전경 2" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+
+          </div>
+          
+          <h4 style="color: #667eea; margin-bottom: 15px; font-size: 18px; font-weight: 600;">주요 특징</h4>
+          <ul style="line-height: 2; color: #555; margin-bottom: 25px; font-size: 15px;">
+            <li><strong>오션뷰 입지:</strong> 호미곶해변을 품은 바다 전망, 동해 일출 감상 최적지</li>
+            <li><strong>호미곶 관광지 인접:</strong> 호미곶 해맞이광장, 국립등대박물관 등 주요 관광지와 근접</li>
+            <li><strong>다양한 객실:</strong> 글램핑과 카라반 시설 보유로 고객 선택폭 제공</li>
+            <li><strong>네이버 예약 시스템:</strong> 온라인 예약 시스템 구축으로 편리한 예약 가능</li>
+            <li><strong>SNS 활성화:</strong> 인스타그램, 네이버블로그 운영으로 활발한 마케팅 활동</li>
+          </ul>
+          
+          <h4 style="color: #667eea; margin-bottom: 15px; font-size: 18px; font-weight: 600;">운영 정보</h4>
+          <p style="line-height: 1.8; color: #555; margin-bottom: 20px; font-size: 15px;">
+            <strong>주소:</strong> 경상북도 포항시 남구 호미곶면 구만길 64 (구만리 603)<br>
+            <strong>사업자번호:</strong> 506-21-30521<br>
+            <strong>통신판매번호:</strong> 제2014-경북포항-0285호<br>
+            <strong>대표:</strong> 김태호<br>
+            <strong>연락처:</strong> 010-8974-1004<br>
+            <strong>예약:</strong> 네이버 예약 시스템 운영
+          </p>
+          
+          <!-- 이미지 갤러리 2 (3개) -->
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
+            <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
+              <img src="" alt="글램핑 내부 1" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1)'; this.style.zIndex='1';">
+              <img src="" alt="글램핑 내부 2" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(-30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
+              <img src="" alt="부대시설" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+          </div>
+          
+          <h4 style="color: #667eea; margin-bottom: 15px; font-size: 18px; font-weight: 600;">시사점</h4>
+          <p style="line-height: 1.8; color: #555; margin-bottom: 25px; font-size: 15px;">
+            글램핑앤카라반은 호미곶이라는 우수한 관광 입지를 활용하여 오션뷰라는 차별화된 가치를 제공하고 있습니다.
+            2014년부터 10년 이상 운영되어 온 안정적인 사업 모델이며, 온라인 예약 시스템과 SNS 마케팅을 적극 활용하는 현대적 운영 방식을 보여줍니다.
+            호미곶 관광지와의 시너지를 통해 관광객 유입을 극대화하고 있으며, 바다 전망이라는 핵심 경쟁력을 잘 활용하고 있는 벤치마크 사례입니다.
+          </p>
+          
+          <h4 style="color: #667eea; margin-bottom: 15px; font-size: 18px; font-weight: 600; margin-top: 40px;">소개 영상</h4>
+          <div style="background: #f5f5f5; border-radius: 8px; border: 1px solid #e0e0e0; padding: 20px; margin-bottom: 30px;">
+            <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px;">
+              <iframe src="https://player.vimeo.com/video/802996559?h=c3f6f7f5d3&title=0&byline=0&portrait=0" 
+                      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
+                      allow="autoplay; fullscreen; picture-in-picture" 
+                      allowfullscreen>
+              </iframe>
+            </div>
+            <p style="margin-top: 15px; color: #666; font-size: 14px; text-align: center;">글램핑앤카라반 시설 소개 및 현장 영상</p>
+          </div>
+        </div>
+        
+        <!-- 업체 B 컨텐츠 -->
+        <div id="benchmark-company2" class="benchmark-company-content" style="display: none;">
+          <h4 style="color: #667eea; margin-bottom: 15px; font-size: 18px; font-weight: 600;">시모노세키 글램돔 개요</h4>
+          <p style="line-height: 1.8; color: #555; margin-bottom: 25px; font-size: 15px;">
+            시모노세키 글램돔에 대한 분석 내용을 입력하세요.
+          </p>
+          
+          <h4 style="color: #667eea; margin-bottom: 15px; font-size: 18px; font-weight: 600;">주요 특징</h4>
+          <ul style="line-height: 2; color: #555; margin-bottom: 25px; font-size: 15px;">
+            <li>특징 1</li>
+            <li>특징 2</li>
+            <li>특징 3</li>
+          </ul>
+          
+          <h4 style="color: #667eea; margin-bottom: 15px; font-size: 18px; font-weight: 600;">운영 현황</h4>
+          <p style="line-height: 1.8; color: #555; margin-bottom: 25px; font-size: 15px;">
+            시모노세키 글램돔의 운영 현황을 입력하세요.
+          </p>
+        </div>
+      </div>
+      
+      <!-- 추진개요 탭 -->
+      <div id="overview-progress" class="overview-tab-content" style="max-width: 900px; margin: 0 auto; display: none;">
+        <h3 style="color: #667eea; margin-top: 0; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">프로젝트 추진 개요</h3>
+        <p style="line-height: 1.8; color: #555; margin-bottom: 30px; font-size: 15px;">
+          사업 추진 개요 내용을 입력하세요.
+        </p>
+        
+        <h3 style="color: #667eea; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">주요 마일스톤</h3>
+        <ul style="line-height: 2; color: #555; margin-bottom: 30px; font-size: 15px;">
+          <li>단계 1</li>
+          <li>단계 2</li>
+          <li>단계 3</li>
+        </ul>
+        
+        <h3 style="color: #667eea; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">예상 일정</h3>
+        <p style="line-height: 1.8; color: #555; margin-bottom: 30px; font-size: 15px;">
+          사업 일정에 대한 설명을 입력하세요.
+        </p>
+      </div>
+      
+      <!-- 시황 탭 -->
+      <div id="overview-market" class="overview-tab-content" style="max-width: 900px; margin: 0 auto; display: none;">
+        <h3 style="color: #667eea; margin-top: 0; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">시장 시황 분석</h3>
+        <p style="line-height: 1.8; color: #555; margin-bottom: 30px; font-size: 15px;">
+          시장 현황 및 트렌드 분석 내용을 입력하세요.
+        </p>
+        
+        <h3 style="color: #667eea; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">시장 규모</h3>
+        <p style="line-height: 1.8; color: #555; margin-bottom: 30px; font-size: 15px;">
+          시장 규모에 대한 설명을 입력하세요.
+        </p>
+        
+        <h3 style="color: #667eea; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">성장 전망</h3>
+        <p style="line-height: 1.8; color: #555; margin-bottom: 30px; font-size: 15px;">
+          시장 성장 전망에 대한 설명을 입력하세요.
+        </p>
+      </div>
+      
+      <!-- 참고자료 탭 -->
+      <div id="overview-reference" class="overview-tab-content" style="max-width: 900px; margin: 0 auto; display: none;">
+        <h3 style="color: #667eea; margin-top: 0; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">참고자료</h3>
+        <p style="line-height: 1.8; color: #555; margin-bottom: 30px; font-size: 15px;">
+          관련 참고자료 및 문서를 입력하세요.
+        </p>
+        
+        <h3 style="color: #667eea; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">주요 문서</h3>
+        <ul style="line-height: 2; color: #555; margin-bottom: 30px; font-size: 15px;">
+          <li>문서 1</li>
+          <li>문서 2</li>
+          <li>문서 3</li>
+        </ul>
+        
+        <h3 style="color: #667eea; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">관련 링크</h3>
+        <p style="line-height: 1.8; color: #555; margin-bottom: 30px; font-size: 15px;">
+          관련 웹사이트 및 링크를 입력하세요.
+        </p>
+      </div>
+    </div>
+    
+    <!-- 푸터 -->
+    <div style="padding: 15px 30px; background: #f8f9fa; border-top: 1px solid #e0e0e0; display: flex; justify-content: flex-end;">
+      <button onclick="closeOverviewPopup()" style="padding: 10px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)'">닫기</button>
+    </div>
+  </div>
+</div>
 
 </body></html>
