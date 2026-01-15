@@ -9,6 +9,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+<!-- Tabulator -->
+<link href="https://unpkg.com/tabulator-tables@5.5.2/dist/css/tabulator.min.css" rel="stylesheet">
+<script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
+
+<!-- SheetJS for Excel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 <style>
 body {
   font-family: "Segoe UI", Arial, sans-serif;
@@ -475,6 +482,55 @@ table.large th, table.large td {
   border-radius: 4px;
   font-weight: 600;
   border-left: 4px solid #3498db;
+}
+
+/* Tabulator 커스텀 스타일 */
+.tabulator {
+  background-color: white;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.tabulator-cell {
+  padding: 8px 12px !important;
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  background-color: white !important;
+}
+
+.tabulator-row {
+  background-color: white !important;
+}
+
+.tabulator-row:hover {
+  background-color: #f5f5f5 !important;
+}
+
+.tabulator-header {
+  background-color: #667eea !important;
+  color: white !important;
+  font-weight: 600 !important;
+  border-bottom: 2px solid #5568d3;
+}
+
+.tabulator-header .tabulator-col {
+  background-color: #667eea !important;
+  color: white !important;
+  border-right: 1px solid rgba(255,255,255,0.2);
+}
+
+.tabulator-header .tabulator-col-title {
+  color: white !important;
+}
+
+.tabulator-tableholder {
+  background-color: white;
+}
+
+.tabulator-footer {
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-top: 2px solid #ddd;
 }
 </style>
 </head>
@@ -2159,6 +2215,586 @@ function switchOverviewTab(tabName) {
   if (tabName === 'benchmark') {
     switchBenchmarkCompany('company1');
   }
+  
+  // 스크롤을 최상단으로 이동
+  const popupContent = document.querySelector('#overviewPopupContent > div[style*="overflow-y: auto"]');
+  if (popupContent) {
+    popupContent.scrollTop = 0;
+  }
+}
+
+// 실거래가 테이블 전역 변수
+let transactionTable = null;
+let excelWorkbook = null;
+let allSheetsData = {};
+let activeFilters = {};  // 활성 필터 저장
+let columnValues = {};   // 컬럼별 고유 값 저장
+
+// 엑셀 파일 로드 함수
+function loadExcelFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  console.log('파일 로드 시작:', file.name);
+  
+  // 파일명 표시
+  document.getElementById('fileName').textContent = file.name;
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      excelWorkbook = XLSX.read(data, { type: 'array' });
+      
+      console.log('워크북 로드 완료');
+      console.log('시트 목록:', excelWorkbook.SheetNames);
+      console.log('시트 개수:', excelWorkbook.SheetNames.length);
+      
+      // 모든 시트 데이터 읽기
+      allSheetsData = {};
+      excelWorkbook.SheetNames.forEach((sheetName) => {
+        const worksheet = excelWorkbook.Sheets[sheetName];
+        
+        // 배열 형태로 전체 데이터 읽기 (모든 행)
+        const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+        console.log(`시트 "${sheetName}" 전체 행 수:`, rawData.length);
+        
+        if (rawData.length === 0) {
+          allSheetsData[sheetName] = [];
+          return;
+        }
+        
+        // 실제 헤더 행 찾기 (다양한 값이 있는 행)
+        let headerRowIndex = 0;
+        for (let i = 0; i < Math.min(20, rawData.length); i++) {
+          const row = rawData[i];
+          const nonEmptyCells = row.filter(cell => cell && cell.toString().trim() !== '').length;
+          
+          // 5개 이상의 컬럼이 있고, "NO"나 "시군구" 같은 키워드가 있으면 헤더로 판단
+          if (nonEmptyCells >= 5) {
+            const rowStr = JSON.stringify(row);
+            if (rowStr.includes('NO') || rowStr.includes('시군구') || rowStr.includes('법지') || rowStr.includes('지목')) {
+              headerRowIndex = i;
+              console.log(`헤더 행 발견: ${i}번째 행`, row);
+              break;
+            }
+          }
+        }
+        
+        // 헤더 추출
+        const headers = rawData[headerRowIndex];
+        console.log(`시트 "${sheetName}" 헤더 (${headerRowIndex}번째 행):`, headers);
+        
+        // 나머지 행들을 객체 배열로 변환
+        const jsonData = [];
+        for (let i = headerRowIndex + 1; i < rawData.length; i++) {
+          const row = rawData[i];
+          
+          // 빈 행 건너뛰기
+          const hasData = row.some(cell => cell && cell.toString().trim() !== '');
+          if (!hasData) continue;
+          
+          const rowObj = {};
+          
+          // 각 셀을 헤더와 매칭
+          headers.forEach((header, index) => {
+            const headerKey = header && header.toString().trim() !== '' ? header.toString().trim() : `컬럼${index + 1}`;
+            rowObj[headerKey] = row[index] !== undefined && row[index] !== null ? row[index] : '';
+          });
+          
+          jsonData.push(rowObj);
+        }
+        
+        console.log(`시트 "${sheetName}" 데이터 행 수:`, jsonData.length);
+        if (jsonData.length > 0) {
+          console.log(`시트 "${sheetName}" 컬럼 (${Object.keys(jsonData[0]).length}개):`, Object.keys(jsonData[0]));
+          console.log(`시트 "${sheetName}" 첫 번째 데이터:`, jsonData[0]);
+        }
+        
+        allSheetsData[sheetName] = jsonData;
+      });
+      
+      // 시트 선택 드롭다운 생성
+      const sheetSelect = document.getElementById('sheetSelect');
+      sheetSelect.innerHTML = '';
+      
+      excelWorkbook.SheetNames.forEach((sheetName) => {
+        const option = document.createElement('option');
+        option.value = sheetName;
+        option.textContent = `${sheetName} (${allSheetsData[sheetName].length}행)`;
+        sheetSelect.appendChild(option);
+      });
+      
+      // 시트 선택기 표시
+      document.getElementById('sheetSelector').style.display = 'flex';
+      
+      // 첫 번째 시트 데이터 표시
+      const firstSheetName = excelWorkbook.SheetNames[0];
+      const firstSheetData = allSheetsData[firstSheetName];
+      
+      if (firstSheetData.length === 0) {
+        console.warn('첫 번째 시트에 데이터가 없습니다.');
+        // 데이터가 있는 첫 번째 시트 찾기
+        const sheetWithData = excelWorkbook.SheetNames.find(name => allSheetsData[name].length > 0);
+        if (sheetWithData) {
+          sheetSelect.value = sheetWithData;
+          createTransactionTable(allSheetsData[sheetWithData]);
+        } else {
+          alert('엑셀 파일에서 데이터를 찾을 수 없습니다. 파일을 확인해주세요.');
+        }
+      } else {
+        createTransactionTable(firstSheetData);
+      }
+      
+    } catch (error) {
+      console.error('엑셀 파일 로드 중 오류:', error);
+      alert('엑셀 파일을 읽는 중 오류가 발생했습니다: ' + error.message);
+    }
+  };
+  
+  reader.readAsArrayBuffer(file);
+}
+
+// 시트 변경 함수
+function changeSheet() {
+  const selectedSheet = document.getElementById('sheetSelect').value;
+  console.log('시트 변경:', selectedSheet);
+  const sheetData = allSheetsData[selectedSheet];
+  
+  if (sheetData && sheetData.length > 0) {
+    createTransactionTable(sheetData);
+  } else {
+    alert('선택한 시트에 데이터가 없습니다.');
+  }
+}
+
+// 엑셀 스타일 필터 함수 (전역)
+function excelStyleFilter(rowData) {
+  // activeFilters가 비어있으면 모든 행 표시
+  if (Object.keys(activeFilters).length === 0) {
+    return true;
+  }
+  
+  // 모든 활성 필터를 확인
+  for (let field in activeFilters) {
+    const selectedValues = activeFilters[field];
+    
+    if (!selectedValues || selectedValues.length === 0) {
+      continue;
+    }
+    
+    const cellValue = rowData[field];
+    const cellValueStr = cellValue !== undefined && cellValue !== null && cellValue !== '' ? cellValue.toString() : '(빈 값)';
+    
+    if (!selectedValues.includes(cellValueStr)) {
+      return false;
+    }
+  }
+  
+  return true; // 모든 필터 통과
+}
+
+// Tabulator 테이블 생성 함수
+function createTransactionTable(data) {
+  console.log('테이블 생성 시작');
+  console.log('데이터 행 수:', data.length);
+  console.log('첫 번째 데이터:', data[0]);
+  
+  if (!data || data.length === 0) {
+    console.warn('데이터가 없습니다.');
+    return;
+  }
+  
+  // 필터 초기화
+  activeFilters = {};
+  
+  // 컬럼별 고유 값 추출 (필터용)
+  columnValues = {};
+  const columnKeys = Object.keys(data[0]);
+  
+  columnKeys.forEach(key => {
+    const uniqueValues = [...new Set(data.map(row => {
+      const val = row[key];
+      return val !== undefined && val !== null && val !== '' ? val.toString() : '(빈 값)';
+    }))].sort();
+    columnValues[key] = uniqueValues;
+  });
+  
+  console.log('컬럼별 고유 값:', columnValues);
+  console.log('컬럼별 고유 값:', columnValues);
+  
+  // 커스텀 헤더 필터 생성 함수
+  function createExcelFilter(cell, onRendered, success, cancel, editorParams) {
+    const container = document.createElement("div");
+    container.style.cssText = "position: relative; width: 100%;";
+    
+    const button = document.createElement("button");
+    button.innerHTML = "▼ 필터";
+    button.style.cssText = "width: 100%; padding: 4px; background: white; border: 1px solid #ddd; cursor: pointer; font-size: 12px;";
+    
+    const dropdown = document.createElement("div");
+    dropdown.style.cssText = "display: none; position: fixed; background: white; border: 2px solid #667eea; box-shadow: 0 8px 16px rgba(0,0,0,0.3); z-index: 999999; min-width: 220px; max-height: 400px; border-radius: 6px; display: flex; flex-direction: column;";
+    
+    const field = cell.getColumn().getField();
+    const values = columnValues[field] || [];
+    
+    // 스크롤 가능한 컨텐츠 영역
+    const scrollContent = document.createElement("div");
+    scrollContent.style.cssText = "overflow-y: auto; flex: 1; max-height: 340px;";
+    
+    // 전체 선택/해제 체크박스
+    const selectAllDiv = document.createElement("div");
+    selectAllDiv.style.cssText = "padding: 8px; border-bottom: 2px solid #667eea; background: #f8f9fa;";
+    const selectAllCheckbox = document.createElement("input");
+    selectAllCheckbox.type = "checkbox";
+    selectAllCheckbox.checked = true;
+    selectAllCheckbox.id = `selectAll_${field}`;
+    const selectAllLabel = document.createElement("label");
+    selectAllLabel.htmlFor = `selectAll_${field}`;
+    selectAllLabel.innerHTML = " 전체 선택";
+    selectAllLabel.style.cursor = "pointer";
+    selectAllLabel.style.fontWeight = "600";
+    selectAllDiv.appendChild(selectAllCheckbox);
+    selectAllDiv.appendChild(selectAllLabel);
+    scrollContent.appendChild(selectAllDiv);
+    
+    // 개별 값 체크박스들
+    const checkboxes = [];
+    values.forEach(value => {
+      const div = document.createElement("div");
+      div.style.cssText = "padding: 6px 8px; cursor: pointer; hover: background: #f0f0f0;";
+      div.onmouseover = () => div.style.background = "#f0f0f0";
+      div.onmouseout = () => div.style.background = "white";
+      
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = true;
+      checkbox.value = value;
+      checkbox.style.marginRight = "6px";
+      
+      const label = document.createElement("label");
+      label.innerHTML = value;
+      label.style.cursor = "pointer";
+      label.style.fontSize = "13px";
+      
+      div.appendChild(checkbox);
+      div.appendChild(label);
+      scrollContent.appendChild(div);
+      checkboxes.push(checkbox);
+      
+      // 클릭 시 체크박스 토글
+      div.onclick = (e) => {
+        if (e.target !== checkbox) {
+          checkbox.checked = !checkbox.checked;
+        }
+        updateSelectAll();
+      };
+    });
+    
+    dropdown.appendChild(scrollContent);
+    
+    // 전체 선택 업데이트
+    function updateSelectAll() {
+      const allChecked = checkboxes.every(cb => cb.checked);
+      selectAllCheckbox.checked = allChecked;
+    }
+    
+    // 전체 선택/해제 핸들러
+    selectAllCheckbox.onchange = () => {
+      checkboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+    };
+    
+    // 적용 버튼 (sticky)
+    const applyDiv = document.createElement("div");
+    applyDiv.style.cssText = "padding: 8px; border-top: 2px solid #ddd; display: flex; gap: 5px; background: #f8f9fa; position: sticky; bottom: 0; z-index: 10;";
+    
+    const applyBtn = document.createElement("button");
+    applyBtn.innerHTML = "적용";
+    applyBtn.style.cssText = "flex: 1; padding: 8px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px;";
+    applyBtn.onmouseover = () => applyBtn.style.background = "#5568d3";
+    applyBtn.onmouseout = () => applyBtn.style.background = "#667eea";
+    applyBtn.onclick = () => {
+      const selectedValues = checkboxes.filter(cb => cb.checked).map(cb => cb.value);
+      
+      console.log('필터 적용:', field, '선택된 값:', selectedValues);
+      console.log('선택된 값 개수:', selectedValues.length, '/ 전체:', values.length);
+      
+      if (selectedValues.length === values.length || selectedValues.length === 0) {
+        // 모두 선택되었거나 아무것도 선택 안 된 경우 해당 필드의 필터 제거
+        console.log('필터 제거:', field);
+        delete activeFilters[field];
+      } else {
+        // 선택된 값으로 필터링
+        console.log('필터 설정:', field, selectedValues);
+        activeFilters[field] = selectedValues;
+      }
+      
+      console.log('현재 활성 필터:', activeFilters);
+      
+      // 필터 재적용
+      if (Object.keys(activeFilters).length === 0) {
+        console.log('모든 필터 제거');
+        transactionTable.clearFilter();
+      } else {
+        console.log('필터 적용');
+        transactionTable.clearFilter();  // 기존 필터 제거
+        transactionTable.addFilter(excelStyleFilter);  // 새 필터 추가
+      }
+      
+      console.log('필터 후 행 수:', transactionTable.getDataCount());
+      
+      dropdown.style.display = "none";
+      success({ selectedValues });
+    };
+    
+    const cancelBtn = document.createElement("button");
+    cancelBtn.innerHTML = "취소";
+    cancelBtn.style.cssText = "flex: 1; padding: 8px; background: #e0e0e0; color: #333; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px;";
+    cancelBtn.onmouseover = () => cancelBtn.style.background = "#d0d0d0";
+    cancelBtn.onmouseout = () => cancelBtn.style.background = "#e0e0e0";
+    cancelBtn.onclick = () => {
+      dropdown.style.display = "none";
+      cancel();
+    };
+    
+    applyDiv.appendChild(applyBtn);
+    applyDiv.appendChild(cancelBtn);
+    dropdown.appendChild(applyDiv);
+    
+    // 드롭다운을 body에 추가
+    document.body.appendChild(dropdown);
+    
+    // 버튼 클릭 시 드롭다운 토글
+    button.onclick = (e) => {
+      e.stopPropagation();
+      
+      if (dropdown.style.display === "none") {
+        // 버튼의 위치 계산
+        const rect = button.getBoundingClientRect();
+        const dropdownHeight = 400; // 최대 높이
+        const spaceBelow = window.innerHeight - rect.bottom;
+        const spaceAbove = rect.top;
+        
+        // 아래 공간이 충분하면 아래에, 아니면 위에 표시
+        if (spaceBelow >= dropdownHeight || spaceBelow > spaceAbove) {
+          dropdown.style.top = rect.bottom + "px";
+          dropdown.style.bottom = "auto";
+        } else {
+          dropdown.style.top = "auto";
+          dropdown.style.bottom = (window.innerHeight - rect.top) + "px";
+        }
+        
+        dropdown.style.left = rect.left + "px";
+        dropdown.style.display = "block";
+      } else {
+        dropdown.style.display = "none";
+      }
+    };
+    
+    // 외부 클릭 시 드롭다운 닫기
+    function closeDropdown(e) {
+      if (!container.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.style.display = "none";
+        document.removeEventListener("click", closeDropdown);
+      }
+    }
+    
+    // 드롭다운이 열릴 때 이벤트 리스너 추가
+    setTimeout(() => {
+      if (dropdown.style.display === "block") {
+        document.addEventListener("click", closeDropdown);
+      }
+    }, 100);
+    
+    container.appendChild(button);
+    
+    return container;
+  }
+  
+  // 컬럼 자동 생성 (엑셀 스타일 필터 적용)
+  const columns = Object.keys(data[0]).map(key => ({
+    title: key,
+    field: key,
+    headerSort: true,
+    headerFilter: createExcelFilter,
+    minWidth: 150,
+    resizable: true,
+    formatter: "plaintext",
+    tooltip: true,
+    cssClass: "tabulator-cell"
+  }));
+  
+  console.log('생성된 컬럼:', columns);
+  
+  // 기존 테이블이 있으면 제거
+  if (transactionTable) {
+    console.log('기존 테이블 제거');
+    transactionTable.destroy();
+  }
+  
+  // 컨테이너 확인
+  const container = document.getElementById("transaction-table");
+  if (!container) {
+    console.error('테이블 컨테이너를 찾을 수 없습니다!');
+    return;
+  }
+  
+  console.log('Tabulator 초기화 시작');
+  
+  // Tabulator가 로드되었는지 확인
+  if (typeof Tabulator === 'undefined') {
+    console.error('Tabulator 라이브러리가 로드되지 않았습니다! HTML 테이블로 대체합니다.');
+    createHtmlTable(data, container);
+    return;
+  }
+  
+  try {
+    // Tabulator 테이블 초기화
+    transactionTable = new Tabulator("#transaction-table", {
+      data: data,
+      columns: columns,
+      layout: "fitData",
+      maxHeight: "800px",
+      pagination: false,
+      movableColumns: true,
+      resizableColumns: true,
+      resizableRows: false,
+      tooltips: true,
+      addRowPos: "top",
+      history: true,
+      placeholder: "데이터가 없습니다",
+      langs: {
+        "ko-kr": {
+          "pagination": {
+            "page_size": "페이지 크기",
+            "first": "처음",
+            "first_title": "첫 페이지",
+            "last": "마지막",
+            "last_title": "마지막 페이지",
+            "prev": "이전",
+            "prev_title": "이전 페이지",
+            "next": "다음",
+            "next_title": "다음 페이지",
+            "counter": {
+              "showing": "표시",
+              "of": "중",
+              "rows": "행"
+            }
+          }
+        }
+      },
+      locale: "ko-kr"
+    });
+    
+    console.log('Tabulator 초기화 완료');
+    
+    // 테이블이 렌더링된 후 로그
+    transactionTable.on("tableBuilt", function(){
+      console.log('테이블이 성공적으로 구축되었습니다.');
+      console.log('테이블 데이터 수:', transactionTable.getDataCount());
+    });
+    
+    transactionTable.on("renderComplete", function(){
+      console.log('테이블 렌더링이 완료되었습니다.');
+    });
+    
+  } catch (error) {
+    console.error('Tabulator 초기화 중 오류:', error);
+    alert('Tabulator 테이블 생성 중 오류가 발생했습니다. HTML 테이블로 표시합니다.');
+    createHtmlTable(data, container);
+  }
+}
+
+// 대체 HTML 테이블 생성 함수
+function createHtmlTable(data, container) {
+  console.log('HTML 테이블 생성 시작');
+  
+  if (!data || data.length === 0) {
+    container.innerHTML = '<p style="padding: 20px; text-align: center; color: #999;">데이터가 없습니다.</p>';
+    return;
+  }
+  
+  const columns = Object.keys(data[0]);
+  
+  let html = '<div style="overflow: auto; max-height: 800px;">';
+  html += '<table style="width: 100%; border-collapse: collapse; font-size: 13px; background: white;">';
+  
+  // 헤더
+  html += '<thead><tr style="background: #667eea; color: white; position: sticky; top: 0; z-index: 10;">';
+  columns.forEach(col => {
+    html += `<th style="padding: 12px; text-align: left; border: 1px solid #ddd; font-weight: 600;">${col}</th>`;
+  });
+  html += '</tr></thead>';
+  
+  // 바디
+  html += '<tbody>';
+  data.forEach((row, idx) => {
+    const bgColor = idx % 2 === 0 ? '#fff' : '#f9f9f9';
+    html += `<tr style="background: ${bgColor};" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='${bgColor}'">`;
+    columns.forEach(col => {
+      html += `<td style="padding: 10px; border: 1px solid #ddd;">${row[col] || ''}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  html += '</table></div>';
+  html += `<div style="padding: 10px; background: #f8f9fa; border-top: 2px solid #ddd; font-weight: 600;">총 ${data.length}개 행</div>`;
+  
+  container.innerHTML = html;
+  console.log('HTML 테이블 생성 완료');
+}
+
+// 데이터 정보 표시 함수
+function showDataInfo() {
+  const infoDiv = document.getElementById('dataInfo');
+  const selectedSheet = document.getElementById('sheetSelect').value;
+  
+  if (!excelWorkbook || Object.keys(allSheetsData).length === 0) {
+    infoDiv.innerHTML = '❌ 업로드된 엑셀 데이터가 없습니다.';
+    infoDiv.style.display = 'block';
+    return;
+  }
+  
+  const currentData = allSheetsData[selectedSheet] || [];
+  
+  let info = `<strong>📊 데이터 정보:</strong><br>`;
+  info += `현재 시트: <strong>${selectedSheet}</strong><br>`;
+  info += `총 행 수: <strong>${currentData.length}개</strong><br>`;
+  
+  if (currentData.length > 0) {
+    const columns = Object.keys(currentData[0]);
+    info += `컬럼 수: <strong>${columns.length}개</strong><br>`;
+    info += `컬럼 목록: ${columns.join(', ')}<br>`;
+    info += `<br><strong>첫 번째 데이터 샘플:</strong><br>`;
+    info += `<pre style="background: white; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 12px;">${JSON.stringify(currentData[0], null, 2)}</pre>`;
+  }
+  
+  infoDiv.innerHTML = info;
+  infoDiv.style.display = 'block';
+  
+  console.log('=== 데이터 상세 정보 ===');
+  console.log('시트:', selectedSheet);
+  console.log('데이터:', currentData);
+  console.log('Tabulator 객체:', transactionTable);
+  
+  if (transactionTable) {
+    console.log('Tabulator 데이터 수:', transactionTable.getDataCount());
+    console.log('Tabulator 컬럼:', transactionTable.getColumns().map(col => col.getDefinition()));
+  }
+}
+
+// 테이블 초기화 함수
+function clearTransactionTable() {
+  if (transactionTable) {
+    transactionTable.destroy();
+    transactionTable = null;
+  }
+  excelWorkbook = null;
+  allSheetsData = {};
+  document.getElementById('fileName').textContent = '선택된 파일 없음';
+  document.getElementById('excelFileInput').value = '';
+  document.getElementById('sheetSelector').style.display = 'none';
+  document.getElementById('sheetSelect').innerHTML = '';
 }
 
 function switchBenchmarkCompany(companyName) {
@@ -3856,9 +4492,10 @@ downloadPdf.onclick=async()=>{
         <h2 style="margin: 0; font-size: 24px; font-weight: 600;">📋 사업 개요</h2>
         <div style="display: flex; gap: 5px;">
           <button class="overview-tab-btn" data-tab="benchmark" onclick="switchOverviewTab('benchmark')" style="padding: 6px 14px; background: rgba(255,255,255,0.4); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.5)'" onmouseout="if(this.style.background !== 'rgba(255, 255, 255, 0.4)') this.style.background='rgba(255,255,255,0.2)'">벤치마킹</button>
-          <button class="overview-tab-btn" data-tab="progress" onclick="switchOverviewTab('progress')" style="padding: 6px 14px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.5)'" onmouseout="if(this.style.background !== 'rgba(255, 255, 255, 0.4)') this.style.background='rgba(255,255,255,0.2)'">추진개요</button>
-          <button class="overview-tab-btn" data-tab="market" onclick="switchOverviewTab('market')" style="padding: 6px 14px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.5)'" onmouseout="if(this.style.background !== 'rgba(255, 255, 255, 0.4)') this.style.background='rgba(255,255,255,0.2)'">시황</button>
+          <button class="overview-tab-btn" data-tab="progress" onclick="switchOverviewTab('progress')" style="padding: 6px 14px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.5)'" onmouseout="if(this.style.background !== 'rgba(255, 255, 255, 0.4)') this.style.background='rgba(255,255,255,0.2)'">추진개요 및 분석</button>
+          <button class="overview-tab-btn" data-tab="market" onclick="switchOverviewTab('market')" style="padding: 6px 14px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.5)'" onmouseout="if(this.style.background !== 'rgba(255, 255, 255, 0.4)') this.style.background='rgba(255,255,255,0.2)'">시장분석</button>
           <button class="overview-tab-btn" data-tab="reference" onclick="switchOverviewTab('reference')" style="padding: 6px 14px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.5)'" onmouseout="if(this.style.background !== 'rgba(255, 255, 255, 0.4)') this.style.background='rgba(255,255,255,0.2)'">참고자료</button>
+          <button class="overview-tab-btn" data-tab="transaction" onclick="switchOverviewTab('transaction')" style="padding: 6px 14px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.5)'" onmouseout="if(this.style.background !== 'rgba(255, 255, 255, 0.4)') this.style.background='rgba(255,255,255,0.2)'">실거래가 상세</button>
         </div>
       </div>
       <div style="display: flex; gap: 8px;">
@@ -3936,13 +4573,13 @@ downloadPdf.onclick=async()=>{
           <!-- 이미지 갤러리 2 (3개) -->
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
-              <img src="" alt="글램핑 내부 1" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="../dashboard/img/12.jpg" alt="글램핑 내부 1" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1)'; this.style.zIndex='1';">
-              <img src="" alt="글램핑 내부 2" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="../dashboard/img/16.jpg" alt="글램핑 내부 2" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(-30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
-              <img src="" alt="부대시설" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="../dashboard/img/5.jpg" alt="부대시설" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
           </div>
           
@@ -3970,59 +4607,495 @@ downloadPdf.onclick=async()=>{
         <div id="benchmark-company2" class="benchmark-company-content" style="display: none;">
           <h4 style="color: #667eea; margin-bottom: 15px; font-size: 18px; font-weight: 600;">시모노세키 글램돔 개요</h4>
           <p style="line-height: 1.8; color: #555; margin-bottom: 25px; font-size: 15px;">
-            시모노세키 글램돔에 대한 분석 내용을 입력하세요.
+            일본 야마구치현 시모노세키시에 위치한 시모노세키 글램돔(GLAMDOM SHIMONOSEKI SHIOMI)은 간몬해협을 바라보는 해안 글램핑 시설입니다.
+            시모노세키의 관문인 간몬해협의 웅장한 경관을 객실에서 즐길 수 있으며, 후쿠오카에서 차로 약 45분 거리에 위치한 접근성 좋은 리조트입니다.
+            2022년 개장하여 프리미엄 글램핑 체험을 제공하고 있으며, 바다 전망과 함께 현대적인 시설을 갖춘 럭셔리 글램핑장입니다.
           </p>
+          
+          <!-- 이미지 갤러리 1 (3개) -->
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
+            <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
+              <img src="../dashboard/img/simonoseki/slider01-2.jpg" alt="글램돔 전경 1" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1)'; this.style.zIndex='1';">
+              <img src="../dashboard/img/simonoseki/room.jpg" alt="글램돔 전경 2" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(-30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
+              <img src="../dashboard/img/simonoseki/act_3.jpg" alt="글램돔 전경 3" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
+            <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
+              <img src="../dashboard/img/simonoseki/act_4.jpg" alt="해안 전망" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1)'; this.style.zIndex='1';">
+              <img src="../dashboard/img/simonoseki/gallery09.jpg" alt="간몬해협 전망" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(-30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
+              <img src="../dashboard/img/simonoseki/room_mv.jpg" alt="야경" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+          </div>
           
           <h4 style="color: #667eea; margin-bottom: 15px; font-size: 18px; font-weight: 600;">주요 특징</h4>
           <ul style="line-height: 2; color: #555; margin-bottom: 25px; font-size: 15px;">
-            <li>특징 1</li>
-            <li>특징 2</li>
-            <li>특징 3</li>
+            <li><strong>프리미엄 오션뷰:</strong> 간몬해협을 조망하는 최고의 전망, 해협 야경 감상 가능</li>
+            <li><strong>후쿠오카 근교 입지:</strong> 후쿠오카에서 차로 45분, 접근성이 우수한 관광 거점</li>
+            <li><strong>럭셔리 글램핑:</strong> 돔형 텐트에 고급 침구, 난방, 화장실 등 완비된 프리미엄 시설</li>
+            <li><strong>BBQ & 식사 제공:</strong> 지역 특산물을 활용한 BBQ 패키지와 조식 서비스 제공</li>
+            <li><strong>관광지 연계:</strong> 간몬해협, 카이쿄칸 수족관, 카몬와프 등 주요 관광지 인접</li>
           </ul>
           
-          <h4 style="color: #667eea; margin-bottom: 15px; font-size: 18px; font-weight: 600;">운영 현황</h4>
-          <p style="line-height: 1.8; color: #555; margin-bottom: 25px; font-size: 15px;">
-            시모노세키 글램돔의 운영 현황을 입력하세요.
+          <h4 style="color: #667eea; margin-bottom: 15px; font-size: 18px; font-weight: 600;">운영 정보</h4>
+          <p style="line-height: 1.8; color: #555; margin-bottom: 20px; font-size: 15px;">
+            <strong>위치:</strong> 일본 야마구치현 시모노세키시 미카미마치 시오미<br>
+            <strong>개장:</strong> 2022년<br>
+            <strong>객실 타입:</strong> 글램돔(돔형 글램핑)<br>
+            <strong>주요 시설:</strong> 프라이빗 BBQ 데크, 샤워실, 개별 화장실<br>
+            <strong>특별 서비스:</strong> 조식 제공, 석양 감상 데크, 반려동물 동반 가능(일부 객실)
           </p>
+          
+          <!-- 이미지 갤러리 2 (3개) -->
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
+            <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
+              <img src="../dashboard/img/simonoseki/gd_shimonoseki03.jpg" alt="돔 내부 1" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1)'; this.style.zIndex='1';">
+              <img src="../dashboard/img/simonoseki/smn_1.jpg" alt="BBQ 데크" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(-30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
+              <img src="../dashboard/img/simonoseki/theater.jpg" alt="부대시설" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+          </div>
+          
+          <h4 style="color: #667eea; margin-bottom: 15px; font-size: 18px; font-weight: 600;">시사점</h4>
+          <p style="line-height: 1.8; color: #555; margin-bottom: 25px; font-size: 15px;">
+            시모노세키 글램돔은 간몬해협이라는 독특한 입지를 활용하여 프리미엄 해안 글램핑 경험을 제공하고 있습니다.
+            후쿠오카와 가까운 위치로 대도시 접근성이 우수하며, 돔형 구조물을 활용한 럭셔리 글램핑 콘셉트가 차별화 포인트입니다.
+            지역 특산물을 활용한 식사 서비스와 주변 관광지와의 연계를 통해 종합적인 관광 체험을 제공하고 있으며,
+            해협 전망이라는 독특한 경관 자원을 최대한 활용한 성공적인 프리미엄 글램핑 벤치마크 사례입니다.
+          </p>
+          
+          <h4 style="color: #667eea; margin-bottom: 15px; font-size: 18px; font-weight: 600; margin-top: 40px;">소개 영상</h4>
+          <div style="background: #f5f5f5; border-radius: 8px; border: 1px solid #e0e0e0; padding: 20px; margin-bottom: 30px;">
+            <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px;">
+              <video preload="metadata" tabindex="-1" crossorigin="anonymous" loop playsinline disableremoteplayback disablepictureinpicture controls
+                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: 8px; background: #000;" 
+                     src="blob:https://player.vimeo.com/f4ab0478-fe31-48e4-b93d-e0c7444877c3">
+                <track kind="subtitles" src="https://captions.vimeo.com/captions/260461816.vtt?expires=1768462372&sig=041578ca15e41e4521305281183d63fdd99b8227" id="telecine-track-260461816" srclang="ja-x-autogen" label="日本語 (自動生成)">
+              </video>
+            </div>
+            <p style="margin-top: 15px; color: #666; font-size: 14px; text-align: center;">시모노세키 글램돔 시설 소개 및 현장 영상</p>
+          </div>
         </div>
       </div>
       
-      <!-- 추진개요 탭 -->
+      <!-- 추진개요 및 분석 탭 -->
       <div id="overview-progress" class="overview-tab-content" style="max-width: 900px; margin: 0 auto; display: none;">
         <h3 style="color: #667eea; margin-top: 0; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">프로젝트 추진 개요</h3>
         <p style="line-height: 1.8; color: #555; margin-bottom: 30px; font-size: 15px;">
-          사업 추진 개요 내용을 입력하세요.
+          해양 관광 클러스터 사업은 <strong style="color: #667eea;">부산 북항 재개발</strong>과 <strong style="color: #667eea;">다대포 패키지 개발</strong>을 통해 <span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2px 8px; border-radius: 4px; font-weight: 600;">해양 레저 관광 시장을 선도</span>합니다.
+          기존 해운 사업과 부산의 풍부한 해양 자원을 활용하여 국내 여객 운송 및 관광 비즈니스를 구축하며,
+          <strong style="color: #e91e63;">2030세대</strong>의 레저 활동 증가 트렌드와 <strong>해양레저 시장의 성장세</strong>에 주목하여 사업을 전개합니다.
         </p>
         
-        <h3 style="color: #667eea; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">주요 마일스톤</h3>
-        <ul style="line-height: 2; color: #555; margin-bottom: 30px; font-size: 15px;">
-          <li>단계 1</li>
-          <li>단계 2</li>
-          <li>단계 3</li>
+        <h3 style="color: #667eea; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">주요 사업 구성</h3>
+        
+        <h4 style="color: #667eea; margin-top: 25px; margin-bottom: 15px; font-size: 17px; font-weight: 600;">1. 레저 캠핑 연계</h4>
+        <p style="line-height: 1.8; color: #555; margin-bottom: 20px; font-size: 15px; padding-left: 15px; border-left: 3px solid #667eea;">
+          <strong>해변 글램핑 + 로컬 레저 체험</strong><br>
+          시모노세키 GLAMP DOME을 벤치마킹하여 해변 글램핑 시설을 구축하고,
+          지역 특화 레저 체험 프로그램을 추가하여 차별화된 복합 레저 공간을 조성합니다.
+          프리미엄 글램핑 시설과 함께 해양 스포츠, 해변 액티비티 등 다양한 로컬 체험을 결합합니다.
+        </p>
+        
+        <h4 style="color: #667eea; margin-top: 25px; margin-bottom: 15px; font-size: 17px; font-weight: 600;">2. 관광 패키지</h4>
+        <p style="line-height: 1.8; color: #555; margin-bottom: 20px; font-size: 15px; padding-left: 15px; border-left: 3px solid #667eea;">
+          <strong>해상 투어 크루즈 + 문화관광 + 역사 명소</strong><br>
+          해상 투어 크루즈를 중심으로 부산의 문화관광 자원과 역사 명소를 연계한 종합 관광 패키지를 개발합니다.
+          해양 관광과 육상 관광을 통합하여 시너지를 극대화하고, 부산만의 독특한 해양 문화 체험을 제공합니다.
+        </p>
+        
+        <h4 style="color: #667eea; margin-top: 25px; margin-bottom: 15px; font-size: 17px; font-weight: 600;">3. 북항 2단계 재개발 연계</h4>
+        <p style="line-height: 1.8; color: #555; margin-bottom: 30px; font-size: 15px; padding-left: 15px; border-left: 3px solid #667eea;">
+          <strong>마리나 요트/보트 체험 + F&B</strong><br>
+          북항 2단계 재개발 사업과 연계하여 마리나 시설 기반의 요트 및 보트 체험 프로그램을 구축합니다.
+          해양 레저 시설과 함께 고급 F&B 서비스를 결합하여 프리미엄 해양 관광 거점으로 육성합니다.
+        </p>
+        
+        <h3 style="color: #667eea; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px; margin-top: 50px;">글램핑장 운영여건 분석</h3>
+        
+        <h4 style="color: #667eea; margin-top: 30px; margin-bottom: 15px; font-size: 18px; font-weight: 600;">1. 지리적 여건</h4>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #667eea; margin-bottom: 20px;">
+          <h5 style="color: #667eea; margin-top: 0; margin-bottom: 12px; font-size: 16px; font-weight: 600;">📍 다대포</h5>
+          <ul style="line-height: 1.9; color: #555; margin-bottom: 0; font-size: 15px; padding-left: 20px;">
+            <li>🚇 <strong>부산 지하철 1호선 다대포역</strong>과 근접하여 <span style="background: #e3f2fd; padding: 2px 6px; border-radius: 3px; font-weight: 600;">대중교통 접근성 우수</span>, 차량 이용 시에도 편리한 위치</li>
+            <li>🏖️ 여름철 <strong style="color: #00acc1;">해수욕 연계 캠핑 특화 프로그램</strong> 기획 가능. 성수기 이벤트 및 패키지 상품 제공</li>
+            <li>🏄 <strong>다대포해양레포츠센터</strong> 연계 해양레포츠 체험 (서핑, SUP, 제트스키 등)</li>
+            <li>🌅 넓고 깨끗한 해변과 <span style="background: #fff3e0; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #e65100;">국내 최고의 일몰 명소</span>로 유명하며, 주거지역 인접으로 편의시설 접근 용이</li>
+          </ul>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #764ba2; margin-bottom: 25px;">
+          <h5 style="color: #764ba2; margin-top: 0; margin-bottom: 12px; font-size: 16px; font-weight: 600;">📍 영도</h5>
+          <ul style="line-height: 1.9; color: #555; margin-bottom: 0; font-size: 15px; padding-left: 20px;">
+            <li>🚄 <strong>부산역 및 국제여객터미널</strong> 근접 → <span style="background: #e3f2fd; padding: 2px 6px; border-radius: 3px; font-weight: 600;">교통 허브 최적 입지</span></li>
+            <li>🎭 <strong>해양문화공간</strong> 활용 지역 특화 문화 체험 프로그램 제공 가능</li>
+            <li>🎪 부산항 축제, 해양 스포츠 등 <strong style="color: #9c27b0;">시즌별 이벤트 풍부</strong></li>
+            <li>🛍️ 남포동, 서면, 센텀시티, 동부산 아울렛 등 <span style="background: #fce4ec; padding: 2px 6px; border-radius: 3px; font-weight: 600;">주요 쇼핑 지역 근접</span></li>
+            <li>🌉 <strong>부산항대교·남항대교</strong> 통해 광안리, 해운대, 다대포, 가덕도 등 주요 관광지 접근 용이</li>
+            <li>🏞️ 우수한 자연 경관 보유 및 <strong style="color: #00897b;">인기 관광지 인접</strong> (흰여울문화마을, 감천문화마을, 태종대, 아르떼뮤지엄 등)</li>
+            <li>🎣 낚시·해수욕 즐길 수 있는 해안 명소 다수 (하리항, 동삼동, 감지해변 등)</li>
+          </ul>
+        </div>
+        
+        <h4 style="color: #667eea; margin-top: 30px; margin-bottom: 15px; font-size: 18px; font-weight: 600;">2. 사회적 여건</h4>
+        <ul style="line-height: 1.9; color: #555; margin-bottom: 25px; font-size: 15px; padding-left: 20px;">
+          <li>💰 서부산 체류시설 인프라 부족에 대한 <strong style="color: #1976d2;">정부·지자체의 개선 의지 강화</strong>로 사업 추진 시 <span style="background: #e8f5e9; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #2e7d32;">정부 지원금 유치 가능성 증대</span></li>
+          <li>📈 부산 해외 방문객 <strong style="color: #d32f2f; font-size: 16px;">300만 명</strong> 돌파 및 2028년까지 <strong style="color: #d32f2f; font-size: 16px;">500만 명</strong> 유치 목표 설정. <span style="background: #fff3e0; padding: 2px 6px; border-radius: 3px; font-weight: 600;">5대 전략·15대 중점 과제</span> 추진 중<br>
+              → 서부산은 <strong style="color: #43a047;">생태·자연형 관광 테마</strong>로 개발 확장 예정</li>
+          <li>🏆 부산 외국인 관광객 전년 대비 <span style="background: #ffebee; padding: 2px 8px; border-radius: 3px; font-weight: 700; color: #c62828; font-size: 16px;">↗ 23%</span> 증가, 지출액 <span style="background: #ffebee; padding: 2px 8px; border-radius: 3px; font-weight: 700; color: #c62828; font-size: 16px;">↗ 31.5%</span> 증가로 <strong style="color: #d32f2f;">전국 최고 증가율 달성</strong></li>
         </ul>
         
-        <h3 style="color: #667eea; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">예상 일정</h3>
-        <p style="line-height: 1.8; color: #555; margin-bottom: 30px; font-size: 15px;">
-          사업 일정에 대한 설명을 입력하세요.
-        </p>
+        <h4 style="color: #667eea; margin-top: 30px; margin-bottom: 15px; font-size: 18px; font-weight: 600;">3. 시설적 여건</h4>
+        
+        <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; border-left: 4px solid #4caf50; margin-bottom: 15px;">
+          <h5 style="color: #2e7d32; margin-top: 0; margin-bottom: 12px; font-size: 16px; font-weight: 600;">✅ 긍정적 측면</h5>
+          <ul style="line-height: 1.9; color: #555; margin-bottom: 0; font-size: 15px; padding-left: 20px;">
+            <li>⚡ <strong>기존 사업과의 시너지:</strong> <span style="background: #fff; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #2e7d32; border: 1px solid #4caf50;">부관훼리 기존 업종</span> 유지하며 숙박업을 공동 패키지로 구성 → 고객 안정적 확보, 신규 매출 창출 및 <strong style="color: #1b5e20;">여객 매출 시너지 극대화</strong></li>
+            <li>🚢 <strong>한·일 항로 이점 활용:</strong> <span style="background: #e1f5fe; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #01579b;">한·일 유일 부산-시모노세키 항로 운항선사</span>의 이점 활용 → 시모노세키 글램돔과 <strong>MOU 체결</strong> 및 연계 프로모션. 내국인·일본인 관광객 동시 유치로 선도기업 입지 구축</li>
+            <li>🎟️ <strong>정부 지원 프로그램 연계:</strong> <span style="background: #fff3e0; padding: 2px 8px; border-radius: 3px; font-weight: 600; color: #e65100;">부산워케이션 프로그램</span> (숙박 바우처 1박 <strong>5만원</strong>, 3박 최대 <strong>10만원</strong> 할인) 활용 → 지자체 지원금 유치 및 고객 혜택 제공</li>
+            <li>🎯 <strong>관광 인프라 연계:</strong> 부산시 <span style="background: #fce4ec; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #880e4f;">신규 관광 서비스</span>(수륙양용버스, 해상관광택시, 야간관광)와 오페라하우스, 퐁피두센터, 황령산 유원지, 금정산 국립공원, 태종대 등 주요 관광지 연계 → 송객 서비스 확대 및 추가 매출 창출</li>
+          </ul>
+        </div>
+        
+        <div style="background: #ffebee; padding: 20px; border-radius: 8px; border-left: 4px solid #f44336; margin-bottom: 15px;">
+          <h5 style="color: #c62828; margin-top: 0; margin-bottom: 12px; font-size: 16px; font-weight: 600;">⚠️ 부정적 측면</h5>
+          <ul style="line-height: 1.9; color: #555; margin-bottom: 0; font-size: 15px; padding-left: 20px;">
+            <li>📋 <strong>환경 규제:</strong> 해안가 개발에 따른 <span style="background: #fff; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #c62828; border: 1px solid #f44336;">환경 보호 규제 적용 가능성</span> 및 인허가 절차 복잡성</li>
+            <li>🌊 <strong>해양성 기후 영향:</strong> 강풍, 잦은 강우, <span style="background: #fff3e0; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #e65100;">염분</span> 등으로 인한 시설 부식 및 내구성 저하 우려</li>
+            <li>📐 <strong>공간 제약:</strong> 제한된 부지 면적과 경사도로 인한 시설 배치 및 확장성 제한</li>
+            <li>📉 <strong>계절적 수요 변동:</strong> <span style="background: #fff; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #c62828; border: 1px solid #f44336;">성수기·비수기 수요 편차</span>가 커 비수기 수익성 확보 어려움</li>
+            <li>💸 <strong>초기 투자비 부담:</strong> 특수 환경 대응 시설 및 4계절 운영 인프라 구축으로 초기 비용 증가</li>
+          </ul>
+        </div>
+        
+        <div style="background: #e3f2fd; padding: 20px; border-radius: 8px; border-left: 4px solid #2196f3; margin-bottom: 30px;">
+          <h5 style="color: #1565c0; margin-top: 0; margin-bottom: 12px; font-size: 16px; font-weight: 600;">✅ 대응 방안</h5>
+          <ul style="line-height: 1.9; color: #555; margin-bottom: 0; font-size: 15px; padding-left: 20px;">
+            <li>🎿 <strong>4계절 운영 상품 개발:</strong> 비수기 대응을 위한 <span style="background: #fff3e0; padding: 2px 8px; border-radius: 3px; font-weight: 600; color: #e65100;">사우나, 실내 온수풀장, 온실형 글램핑</span> 등 동절기 특화 시설 구축. 계절별 테마 이벤트(<strong style="color: #f06292;">봄 벚꽃 캠핑</strong>, <strong style="color: #00acc1;">여름 해양스포츠</strong>, <strong style="color: #fb8c00;">가을 낙조 파티</strong>, <strong style="color: #039be5;">겨울 사우나 힐링</strong>) 기획으로 <span style="background: #fff; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #1565c0; border: 1px solid #2196f3;">연중 수요 창출</span></li>
+            <li>🔧 <strong>해양 환경 특화 자재 사용:</strong> 염분 부식 방지를 위한 <span style="background: #e8f5e9; padding: 2px 8px; border-radius: 3px; font-weight: 700; color: #2e7d32;">스테인리스 STS316</span> 이상 등급 자재, <strong>아연도금 강재</strong>, <strong>에폭시 코팅</strong> 처리 시설물 적용. 방수·방청 처리된 해양용 전기설비 및 알루미늄 합금 프레임 사용으로 <span style="background: #fff; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #1565c0; border: 1px solid #2196f3;">내구성 강화</span></li>
+            <li>🌱 <strong>친환경 인허가 전략:</strong> 사전 환경영향평가 실시 및 친환경 인증(<span style="background: #c8e6c9; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #1b5e20;">녹색건축, 에너지효율 1등급</span>) 취득. <strong>태양광 패널</strong>, <strong>우수 재활용 시스템</strong>, 생태 친화적 조경 설계로 환경 규제 대응 및 지자체 협력 강화</li>
+            <li>📦 <strong>공간 최적화 설계:</strong> <span style="background: #fff3e0; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #e65100;">모듈형 글램핑 돔 구조</span>로 경사지 효율적 활용 및 이동식 시설 배치. 지하 공간 활용(창고, 기계실), 다층 데크 구조로 제한된 면적 내 최대 수용 인원 확보</li>
+            <li>🤖 <strong>스마트 운영 시스템:</strong> <span style="background: #e1f5fe; padding: 2px 8px; border-radius: 3px; font-weight: 700; color: #01579b;">IoT 기반</span> 에너지 관리, 예약 시스템 자동화, 원격 시설 제어로 운영 효율 향상. 비수기 인건비 절감 및 유지보수 비용 최소화</li>
+            <li>🤝 <strong>전략적 제휴 확대:</strong> 지역 관광지, 레스토랑, 체험업체와 패키지 상품 개발로 비수기 수요 창출. <span style="background: #fce4ec; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #880e4f;">기업 연수, 워케이션, 단체 예약</span> 유치를 통한 안정적 매출 기반 구축</li>
+          </ul>
+        </div>
+        
+        <h3 style="color: #667eea; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px; margin-top: 40px;">기대 효과</h3>
+        <ul style="line-height: 2; color: #555; margin-bottom: 30px; font-size: 15px;">
+          <li>부산 해양 관광 산업의 종합 발전 및 시장 선도</li>
+          <li>북항 재개발과의 시너지를 통한 지역 경제 활성화</li>
+          <li>2030세대 타겟 해양 레저 콘텐츠 확충</li>
+          <li>글램핑, 크루즈, 마리나를 연계한 통합 관광 생태계 조성</li>
+          <li>기존 해운 사업 역량과 해양 자원의 효율적 활용</li>
+        </ul>
       </div>
       
       <!-- 시황 탭 -->
       <div id="overview-market" class="overview-tab-content" style="max-width: 900px; margin: 0 auto; display: none;">
-        <h3 style="color: #667eea; margin-top: 0; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">시장 시황 분석</h3>
+        <h3 style="color: #667eea; margin-top: 0; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">부산 글램핑 시장 종합 분석</h3>
         <p style="line-height: 1.8; color: #555; margin-bottom: 30px; font-size: 15px;">
-          시장 현황 및 트렌드 분석 내용을 입력하세요.
+          부산광역시 내 <strong style="color: #667eea;">글램핑 및 캠핑 관련 수요-공급 데이터</strong> 종합 분석을 통해 
+          <span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2px 8px; border-radius: 4px; font-weight: 600;">검증된 시장 기회</span>를 발견하였습니다.
+          검색 트렌드와 실제 시설 현황의 비교 분석 결과, <strong style="color: #c62828;">영도구와 서구(다대포)에 블루오션 기회</strong>가 존재합니다.
         </p>
         
-        <h3 style="color: #667eea; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">시장 규모</h3>
-        <p style="line-height: 1.8; color: #555; margin-bottom: 30px; font-size: 15px;">
-          시장 규모에 대한 설명을 입력하세요.
-        </p>
+        <h3 style="color: #667eea; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">🚨 수요-공급 갭 분석: 핵심 발견</h3>
         
-        <h3 style="color: #667eea; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">성장 전망</h3>
-        <p style="line-height: 1.8; color: #555; margin-bottom: 30px; font-size: 15px;">
-          시장 성장 전망에 대한 설명을 입력하세요.
-        </p>
+        <div style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); padding: 30px; border-radius: 12px; margin-bottom: 30px; border: 3px solid #ff9800; box-shadow: 0 4px 12px rgba(255,152,0,0.2);">
+          <h4 style="color: #e65100; margin-top: 0; margin-bottom: 25px; font-size: 20px; font-weight: 700; text-align: center;">⚡ 부산 글램핑 시장의 결정적 기회 ⚡</h4>
+          
+          <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: center; margin-bottom: 25px;">
+            <div style="background: white; padding: 25px; border-radius: 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+              <div style="color: #1976d2; font-size: 16px; font-weight: 600; margin-bottom: 10px;">📊 검색 수요</div>
+              <div style="color: #c62828; font-size: 42px; font-weight: 800; margin-bottom: 8px;">25.8%</div>
+              <div style="color: #666; font-size: 14px; font-weight: 600;">영도구 검색 비중</div>
+              <div style="background: #e3f2fd; padding: 8px; border-radius: 6px; margin-top: 10px;">
+                <div style="color: #1976d2; font-size: 13px; font-weight: 600;">부산 1위 관심 지역</div>
+              </div>
+            </div>
+            
+            <div style="font-size: 48px; color: #f44336; font-weight: 900;">≠</div>
+            
+            <div style="background: white; padding: 25px; border-radius: 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+              <div style="color: #c62828; font-size: 16px; font-weight: 600; margin-bottom: 10px;">🏕️ 실제 공급</div>
+              <div style="color: #d32f2f; font-size: 42px; font-weight: 800; margin-bottom: 8px;">0개</div>
+              <div style="color: #666; font-size: 14px; font-weight: 600;">영도구 글램핑장</div>
+              <div style="background: #ffebee; padding: 8px; border-radius: 6px; margin-top: 10px;">
+                <div style="color: #c62828; font-size: 13px; font-weight: 600;">기장군 외 부재</div>
+              </div>
+            </div>
+          </div>
+          
+          <div style="background: white; padding: 20px; border-radius: 8px; border-left: 5px solid #ff9800;">
+            <h5 style="color: #e65100; margin-top: 0; margin-bottom: 15px; font-size: 18px; font-weight: 700;">🎯 핵심 인사이트</h5>
+            <ul style="line-height: 2; color: #333; margin-bottom: 0; font-size: 15px; padding-left: 20px;">
+              <li><strong style="color: #c62828; font-size: 16px;">영도구: 수요 25.8% vs 공급 0개</strong> - <span style="background: #ffebee; padding: 2px 8px; border-radius: 3px; font-weight: 700; color: #c62828;">극심한 공급 부족</span></li>
+              <li><strong style="color: #2e7d32;">서구(다대포): 높은 검색 관심 vs 글램핑장 부재</strong> - 제2의 블루오션</li>
+              <li>부산 총 캠핑사이트 471개 중 <span style="background: #fff3e0; padding: 2px 8px; border-radius: 3px; font-weight: 700; color: #e65100;">글램핑은 12개(2.4%)</span>에 불과</li>
+              <li>기장군에만 글램핑 시설 집중 → <strong style="color: #1976d2;">영도·서구는 미개척 시장</strong></li>
+              <li><span style="background: #e8f5e9; padding: 2px 8px; border-radius: 3px; font-weight: 700; color: #2e7d32;">선점자 우위(First Mover Advantage)</span> 확보 가능</li>
+            </ul>
+          </div>
+        </div>
+        
+        <h3 style="color: #667eea; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">부산 캠핑·글램핑 시설 현황</h3>
+        
+        <div style="background: #f8f9fa; padding: 25px; border-radius: 8px; margin-bottom: 30px; border-left: 4px solid #667eea;">
+          <h4 style="color: #667eea; margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 600;">📊 부산 캠핑사이트 유형별 분포 (출처: 고캠핑)</h4>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 18px; border-radius: 8px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+              <div style="color: white; font-size: 13px; font-weight: 600; margin-bottom: 5px;">일반야영장</div>
+              <div style="color: white; font-size: 28px; font-weight: 700; margin-bottom: 3px;">240개</div>
+              <div style="color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 600;">48.9%</div>
+            </div>
+            
+            <div style="background: #42a5f5; padding: 18px; border-radius: 8px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+              <div style="color: white; font-size: 13px; font-weight: 600; margin-bottom: 5px;">자동차야영장</div>
+              <div style="color: white; font-size: 28px; font-weight: 700; margin-bottom: 3px;">163개</div>
+              <div style="color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 600;">37.3%</div>
+            </div>
+            
+            <div style="background: #66bb6a; padding: 18px; border-radius: 8px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+              <div style="color: white; font-size: 13px; font-weight: 600; margin-bottom: 5px;">카라반</div>
+              <div style="color: white; font-size: 28px; font-weight: 700; margin-bottom: 3px;">40개</div>
+              <div style="color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 600;">9.1%</div>
+            </div>
+            
+            <div style="background: #ffa726; padding: 18px; border-radius: 8px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+              <div style="color: white; font-size: 13px; font-weight: 600; margin-bottom: 5px;">개인카라반</div>
+              <div style="color: white; font-size: 28px; font-weight: 700; margin-bottom: 3px;">16개</div>
+              <div style="color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 600;">3.3%</div>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #ef5350 0%, #e91e63 100%); padding: 18px; border-radius: 8px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 3px solid #c62828;">
+              <div style="color: white; font-size: 13px; font-weight: 600; margin-bottom: 5px;">🎯 글램핑</div>
+              <div style="color: white; font-size: 28px; font-weight: 700; margin-bottom: 3px;">12개</div>
+              <div style="color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 600;">2.4% 🔥</div>
+            </div>
+          </div>
+          
+          <div style="background: white; padding: 20px; border-radius: 6px; border: 1px solid #e0e0e0; margin-bottom: 20px;">
+            <h5 style="color: #333; margin-top: 0; margin-bottom: 15px; font-size: 16px; font-weight: 600;">💡 시장 구조 분석</h5>
+            <ul style="line-height: 2; color: #555; margin-bottom: 0; font-size: 15px; padding-left: 20px;">
+              <li>부산 총 <strong style="color: #667eea;">471개</strong> 캠핑사이트 중 <span style="background: #ffebee; padding: 2px 8px; border-radius: 3px; font-weight: 700; color: #c62828;">글램핑은 단 12개(2.4%)</span></li>
+              <li>일반야영장·자동차야영장 중심 (총 86.2%) - 저가형 캠핑 시장 포화</li>
+              <li>글램핑은 <strong style="color: #e91e63;">프리미엄 시장</strong>으로 차별화 가능 영역</li>
+              <li><span style="background: #e3f2fd; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #1976d2;">기장군 집중</span> → 영도구·서구는 공백 지역</li>
+            </ul>
+          </div>
+          
+          <div style="background: linear-gradient(135deg, #ffebee 0%, #fce4ec 100%); padding: 20px; border-radius: 8px; border-left: 5px solid #e91e63;">
+            <h5 style="color: #c62828; margin-top: 0; margin-bottom: 15px; font-size: 17px; font-weight: 700;">🚀 사업 기회 포인트</h5>
+            <div style="display: grid; gap: 12px;">
+              <div style="background: white; padding: 15px; border-radius: 6px; border-left: 3px solid #4caf50;">
+                <strong style="color: #2e7d32;">✓ 저경쟁 시장:</strong> <span style="color: #555;">글램핑 2.4%로 시장 포화도 낮음</span>
+              </div>
+              <div style="background: white; padding: 15px; border-radius: 6px; border-left: 3px solid #2196f3;">
+                <strong style="color: #1976d2;">✓ 프리미엄 포지셔닝:</strong> <span style="color: #555;">일반 캠핑장과 차별화된 고급 시장 공략</span>
+              </div>
+              <div style="background: white; padding: 15px; border-radius: 6px; border-left: 3px solid #ff9800;">
+                <strong style="color: #e65100;">✓ 지역 공백:</strong> <span style="color: #555;">영도구·서구(다대포) 글램핑장 전무</span>
+              </div>
+              <div style="background: white; padding: 15px; border-radius: 6px; border-left: 3px solid #9c27b0;">
+                <strong style="color: #6a1b9a;">✓ 선점 효과:</strong> <span style="color: #555;">최초 진입으로 지역 대표 브랜드 구축 가능</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <h3 style="color: #667eea; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">지역별 검색 수요 분석</h3>
+        
+        <!-- 검색건수 히트맵 이미지 -->
+        <div style="background: white; padding: 25px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 2px solid #e0e0e0;">
+          <h4 style="color: #667eea; margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 600; text-align: center;">📍 부산광역시 검색건수 히트맵</h4>
+          <div style="text-align: center; margin-bottom: 15px;">
+            <img src="../dashboard/img/busan_glamping_heatmap.png" alt="부산 검색건수 히트맵" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div style="display: none; padding: 40px; background: #f5f5f5; border-radius: 8px; color: #666;">
+              <p style="margin: 0; font-size: 14px;">💡 이미지를 표시하려면 img 폴더에 'busan_search_heatmap.png' 파일을 저장해주세요.</p>
+            </div>
+          </div>
+          <p style="text-align: center; color: #888; font-size: 13px; margin: 0;">출처: 한국관광공사 데이터랩</p>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 25px; border-radius: 8px; margin-bottom: 30px; border-left: 4px solid #764ba2;">
+          <h4 style="color: #764ba2; margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 600;">📊 부산광역시 지역별 글램핑 검색건수 분포</h4>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; position: relative;">
+              <div style="position: absolute; top: -10px; right: -10px; background: #ff9800; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">블루오션</div>
+              <div style="color: white; font-size: 14px; font-weight: 600; margin-bottom: 8px;">🥇 영도구</div>
+              <div style="color: white; font-size: 36px; font-weight: 700; margin-bottom: 5px;">25.8%</div>
+              <div style="color: rgba(255,255,255,0.9); font-size: 13px; margin-bottom: 10px;">검색 비중 1위</div>
+              <div style="background: rgba(255,255,255,0.2); padding: 8px; border-radius: 6px; margin-top: 10px;">
+                <div style="color: white; font-size: 13px; font-weight: 700;">글램핑장: 0개 ⚠️</div>
+              </div>
+            </div>
+            
+            <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; border: 2px solid #4caf50; text-align: center; position: relative;">
+              <div style="position: absolute; top: -10px; right: -10px; background: #66bb6a; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">기회</div>
+              <div style="color: #2e7d32; font-size: 14px; font-weight: 600; margin-bottom: 8px;">🥈 서구 (다대포)</div>
+              <div style="color: #1b5e20; font-size: 32px; font-weight: 700; margin-bottom: 5px;">높은 관심</div>
+              <div style="color: #388e3c; font-size: 13px; margin-bottom: 10px;">해수욕장 인접</div>
+              <div style="background: #c8e6c9; padding: 8px; border-radius: 6px; margin-top: 10px;">
+                <div style="color: #1b5e20; font-size: 13px; font-weight: 700;">글램핑장: 0개 ⚠️</div>
+              </div>
+            </div>
+            
+            <div style="background: #e1f5fe; padding: 20px; border-radius: 8px; border: 2px solid #2196f3; text-align: center;">
+              <div style="color: #01579b; font-size: 14px; font-weight: 600; margin-bottom: 8px;">🥉 기장군 / 동구</div>
+              <div style="color: #0277bd; font-size: 32px; font-weight: 700; margin-bottom: 5px;">기존 공급</div>
+              <div style="color: #0288d1; font-size: 13px; margin-bottom: 10px;">해운대권 레저</div>
+              <div style="background: #b3e5fc; padding: 8px; border-radius: 6px; margin-top: 10px;">
+                <div style="color: #01579b; font-size: 13px; font-weight: 700;">글램핑장 집중 지역</div>
+              </div>
+            </div>
+          </div>
+          
+          <div style="background: white; padding: 20px; border-radius: 6px; border: 1px solid #e0e0e0;">
+            <h5 style="color: #333; margin-top: 0; margin-bottom: 15px; font-size: 16px; font-weight: 600;">💡 수요-공급 미스매치 핵심 분석</h5>
+            <ul style="line-height: 2; color: #555; margin-bottom: 0; font-size: 15px; padding-left: 20px;">
+              <li><strong style="color: #c62828;">영도구: 검색 25.8% (1위)</strong> → 글램핑장 <span style="background: #ffebee; padding: 2px 8px; border-radius: 3px; font-weight: 700; color: #c62828;">0개</span> = <strong>최대 기회</strong></li>
+              <li><strong>서구(다대포): 높은 검색 관심</strong> → 글램핑장 <span style="background: #ffebee; padding: 2px 8px; border-radius: 3px; font-weight: 700; color: #c62828;">0개</span> = <strong>제2 기회</strong></li>
+              <li><strong>기장군/동구:</strong> 기존 글램핑장 집중 → 경쟁 치열, 차별화 필요</li>
+              <li>검색 데이터는 <span style="background: #e8f5e9; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #2e7d32;">실제 방문 의도 및 사업성</span>과 직접적 연관</li>
+              <li><span style="background: #fff3e0; padding: 2px 8px; border-radius: 3px; font-weight: 700; color: #e65100;">선점 전략</span>: 영도구 1차, 다대포 2차 개발로 서부산 글램핑 시장 장악</li>
+            </ul>
+          </div>
+        </div>
+        
+        <h3 style="color: #667eea; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">검색 트렌드 시계열 분석</h3>
+        
+        <!-- 검색건수 추이 및 유형별 분포 이미지 -->
+        <div style="background: white; padding: 25px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 2px solid #e0e0e0;">
+          <h4 style="color: #667eea; margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 600; text-align: center;">📈 부산광역시 캠핑사이트 검색 추이 및 유형별 분포</h4>
+          <div style="text-align: center; margin-bottom: 15px;">
+            <img src="../dashboard/img/glamping_occu.jpg" alt="부산 검색 추이 및 유형별 분포" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div style="display: none; padding: 40px; background: #f5f5f5; border-radius: 8px; color: #666;">
+              <p style="margin: 0; font-size: 14px;">💡 이미지를 표시하려면 img 폴더에 'busan_search_trends.png' 파일을 저장해주세요.</p>
+            </div>
+          </div>
+          <p style="text-align: center; color: #888; font-size: 13px; margin: 0;">출처: 한국관광공사 데이터랩</p>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 25px; border-radius: 8px; margin-bottom: 30px; border-left: 4px solid #4caf50;">
+          <h4 style="color: #2e7d32; margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 600;">📈 부산광역시 글램핑 검색건수 추이 (2020년~2025년)</h4>
+          
+          <div style="background: white; padding: 20px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #e0e0e0;">
+            <div style="display: flex; align-items: center; gap: 30px; flex-wrap: wrap; margin-bottom: 15px;">
+              <div style="flex: 1; min-width: 200px;">
+                <div style="color: #666; font-size: 13px; margin-bottom: 5px;">평균 검색량 (월간)</div>
+                <div style="color: #667eea; font-size: 28px; font-weight: 700;">3,000~5,000건</div>
+              </div>
+              <div style="flex: 1; min-width: 200px;">
+                <div style="color: #666; font-size: 13px; margin-bottom: 5px;">성수기 피크 (여름)</div>
+                <div style="color: #e91e63; font-size: 28px; font-weight: 700;">8,000건+</div>
+              </div>
+              <div style="flex: 1; min-width: 200px;">
+                <div style="color: #666; font-size: 13px; margin-bottom: 5px;">연평균 증가율</div>
+                <div style="color: #4caf50; font-size: 28px; font-weight: 700;">📈 지속 성장</div>
+              </div>
+            </div>
+            
+            <div style="padding: 15px; background: #fff3e0; border-radius: 6px; border-left: 3px solid #ff9800;">
+              <p style="margin: 0; color: #e65100; font-weight: 600; font-size: 15px;">
+                ⚠️ 계절적 특성: 4~9월 검색량 급증, 10~3월 비수기 수요 관리 필요
+              </p>
+            </div>
+          </div>
+          
+          <div style="background: white; padding: 20px; border-radius: 6px; border: 1px solid #e0e0e0;">
+            <h5 style="color: #333; margin-top: 0; margin-bottom: 15px; font-size: 16px; font-weight: 600;">📌 트렌드 분석 포인트</h5>
+            <ul style="line-height: 2; color: #555; margin-bottom: 0; font-size: 15px; padding-left: 20px;">
+              <li><strong>2020년~2022년:</strong> 코로나19로 인한 <span style="background: #e1f5fe; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #01579b;">국내 여행 수요 급증</span> (글램핑 인기 상승)</li>
+              <li><strong>2023년~2024년:</strong> 안정적인 수요 유지 및 해외여행 재개에도 불구하고 꾸준한 관심</li>
+              <li><strong>2025년 전망:</strong> 워케이션, 힐링 트렌드와 맞물려 <span style="background: #e8f5e9; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #2e7d32;">지속 성장 예상</span></li>
+              <li><strong>계절성:</strong> 여름(6~8월) 피크, 봄·가을 준성수기, 겨울 비수기 뚜렷 → <strong style="color: #d32f2f;">4계절 운영 전략 필수</strong></li>
+            </ul>
+          </div>
+        </div>
+        
+        <h3 style="color: #667eea; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">전략적 결론 및 실행 방향</h3>
+        
+        <div style="background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%); padding: 30px; border-radius: 12px; margin-bottom: 30px; border: 3px solid #e91e63; box-shadow: 0 6px 16px rgba(233,30,99,0.3);">
+          <h4 style="color: #880e4f; margin-top: 0; margin-bottom: 25px; font-size: 20px; font-weight: 700; text-align: center;">🎯 부산 글램핑 시장 진출 핵심 전략</h4>
+          
+          <div style="display: grid; gap: 18px;">
+            <div style="background: white; padding: 22px; border-radius: 10px; border-left: 5px solid #4caf50; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+              <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 12px;">
+                <div style="background: #4caf50; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0;">1</div>
+                <h5 style="color: #2e7d32; margin: 0; font-size: 18px; font-weight: 700;">영도구 우선 진출 - 검증된 수요 시장</h5>
+              </div>
+              <ul style="line-height: 1.9; color: #555; margin: 0; font-size: 15px; padding-left: 55px;">
+                <li>검색 수요 <strong style="color: #c62828;">25.8% (부산 1위)</strong> vs 글램핑장 <strong style="color: #c62828;">0개</strong></li>
+                <li>국제여객터미널 연계 <span style="background: #e1f5fe; padding: 2px 6px; border-radius: 3px; font-weight: 600;">부관훼리 시너지</span></li>
+                <li>태종대·흰여울문화마을 등 <strong>풍부한 관광 인프라</strong></li>
+                <li><span style="background: #e8f5e9; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #2e7d32;">선점자 우위</span> 확보로 지역 대표 브랜드 구축</li>
+              </ul>
+            </div>
+            
+            <div style="background: white; padding: 22px; border-radius: 10px; border-left: 5px solid #2196f3; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+              <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 12px;">
+                <div style="background: #2196f3; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0;">2</div>
+                <h5 style="color: #1976d2; margin: 0; font-size: 18px; font-weight: 700;">서구(다대포) 2차 확장 - 양축 전략</h5>
+              </div>
+              <ul style="line-height: 1.9; color: #555; margin: 0; font-size: 15px; padding-left: 55px;">
+                <li>높은 검색 관심 + 글램핑장 부재 = <strong>제2의 블루오션</strong></li>
+                <li>다대포해수욕장·해양레포츠센터 연계 <span style="background: #fff3e0; padding: 2px 6px; border-radius: 3px; font-weight: 600;">여름 특화</span></li>
+                <li>영도-다대포 <strong style="color: #e65100;">서부산 양축 전략</strong>으로 시장 장악</li>
+                <li>지하철 1호선 접근성으로 대중교통 이용객 공략</li>
+              </ul>
+            </div>
+            
+            <div style="background: white; padding: 22px; border-radius: 10px; border-left: 5px solid #ff9800; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+              <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 12px;">
+                <div style="background: #ff9800; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0;">3</div>
+                <h5 style="color: #e65100; margin: 0; font-size: 18px; font-weight: 700;">프리미엄 포지셔닝 - 차별화 전략</h5>
+              </div>
+              <ul style="line-height: 1.9; color: #555; margin: 0; font-size: 15px; padding-left: 55px;">
+                <li>부산 글램핑 <strong style="color: #c62828;">2.4%</strong> 비중 → 일반 캠핑장과 명확한 차별화</li>
+                <li><span style="background: #fce4ec; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #880e4f;">프리미엄 타겟</span>: 2030세대, 워케이션족, 가족 단위</li>
+                <li>4계절 운영 상품 (사우나·온수풀장·온실 글램핑) 개발</li>
+                <li>시모노세키 글램돔 벤치마킹 + 한일 연계 패키지</li>
+              </ul>
+            </div>
+            
+            <div style="background: white; padding: 22px; border-radius: 10px; border-left: 5px solid #9c27b0; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+              <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 12px;">
+                <div style="background: #9c27b0; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0;">4</div>
+                <h5 style="color: #6a1b9a; margin: 0; font-size: 18px; font-weight: 700;">기존 사업 시너지 극대화</h5>
+              </div>
+              <ul style="line-height: 1.9; color: #555; margin: 0; font-size: 15px; padding-left: 55px;">
+                <li><strong>부관훼리 여객 + 글램핑</strong> 패키지로 송객 시너지</li>
+                <li>한·일 유일 항로 활용 크로스보더 관광 상품</li>
+                <li>일본인 관광객 유치 및 내국인 일본 여행 연계</li>
+                <li>정부 지원 프로그램 (워케이션 바우처) 적극 활용</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div style="background: #263238; padding: 25px; border-radius: 10px; margin-top: 25px; text-align: center;">
+            <div style="color: #ffd54f; font-size: 18px; font-weight: 700; margin-bottom: 12px;">💎 최종 결론</div>
+            <p style="color: white; font-size: 16px; line-height: 1.8; margin: 0;">
+              <strong style="color: #ff9800;">영도구 검색 수요 25.8%</strong> vs <strong style="color: #f44336;">글램핑장 0개</strong>라는 <br>
+              <span style="background: linear-gradient(135deg, #ffd54f 0%, #ffb300 100%); color: #263238; padding: 4px 12px; border-radius: 6px; font-weight: 800; font-size: 18px;">검증된 시장 기회</span>를 선점하여<br>
+              <strong style="color: #4caf50;">서부산 글램핑 시장 1위</strong> 달성
+            </p>
+          </div>
+        </div>
       </div>
       
       <!-- 참고자료 탭 -->
@@ -4043,6 +5116,34 @@ downloadPdf.onclick=async()=>{
         <p style="line-height: 1.8; color: #555; margin-bottom: 30px; font-size: 15px;">
           관련 웹사이트 및 링크를 입력하세요.
         </p>
+      </div>
+      
+      <!-- 실거래가 상세 탭 -->
+      <div id="overview-transaction" class="overview-tab-content" style="max-width: 100%; margin: 0 auto; display: none; padding: 20px;">
+        <h3 style="color: #667eea; margin-top: 0; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">실거래가 상세</h3>
+        
+        <!-- 엑셀 업로드 섹션 -->
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <label for="excelFileInput" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s; display: inline-block;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)'">
+              📁 엑셀 파일 선택
+            </label>
+            <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="display: none;" onchange="loadExcelFile(event)">
+            <span id="fileName" style="color: #666; font-size: 14px;">선택된 파일 없음</span>
+            <div id="sheetSelector" style="display: none; align-items: center; gap: 10px;">
+              <label style="color: #667eea; font-weight: 600; font-size: 14px;">시트 선택:</label>
+              <select id="sheetSelect" onchange="changeSheet()" style="padding: 8px 12px; border: 2px solid #667eea; border-radius: 6px; font-size: 14px; cursor: pointer; background: white; color: #333;">
+              </select>
+            </div>
+            <button onclick="clearTransactionTable()" style="background: #e74c3c; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s;" onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='#e74c3c'">테이블 초기화</button>
+            <button onclick="showDataInfo()" style="background: #3498db; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s;" onmouseover="this.style.background='#2980b9'" onmouseout="this.style.background='#3498db'">데이터 확인</button>
+          </div>
+          <p style="margin-top: 10px; color: #888; font-size: 13px;">💡 엑셀 파일(.xlsx, .xls)을 업로드하면 자동으로 테이블이 생성됩니다. 시트를 선택하여 다른 데이터를 볼 수 있으며, 컬럼 헤더를 클릭하여 정렬할 수 있습니다.</p>
+          <div id="dataInfo" style="margin-top: 10px; padding: 10px; background: #e8f4f8; border-radius: 6px; border-left: 4px solid #3498db; display: none; color: #333; font-size: 13px;"></div>
+        </div>
+        
+        <!-- 테이블 컨테이너 -->
+        <div id="transaction-table" style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: auto; min-height: 200px;"></div>
       </div>
     </div>
     
