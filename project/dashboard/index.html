@@ -1510,6 +1510,10 @@ IRR = 23.6%</div>
 /* 탭 */
 document.querySelectorAll(".tabs button").forEach(btn=>{
   btn.onclick=()=>{
+    document.querySelectorAll('.transaction-filter-dropdown').forEach(dropdown => {
+      dropdown.style.display = 'none';
+    });
+
     document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
     document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
     btn.classList.add("active");
@@ -2194,6 +2198,11 @@ function toggleOverviewFullscreen() {
 }
 
 function switchOverviewTab(tabName) {
+  // 열린 필터 드롭다운 닫기
+  document.querySelectorAll('.transaction-filter-dropdown').forEach(dropdown => {
+    dropdown.style.display = 'none';
+  });
+
   // 모든 탭 버튼의 active 클래스 제거
   document.querySelectorAll('.overview-tab-btn').forEach(btn => {
     btn.style.background = 'rgba(255,255,255,0.2)';
@@ -2227,6 +2236,8 @@ function switchOverviewTab(tabName) {
 let transactionTable = null;
 let excelWorkbook = null;
 let allSheetsData = {};
+let transactionData = []; // 현재 테이블 원본 데이터
+let mergedSheetsData = []; // 전체 시트 통합 데이터
 let activeFilters = {};  // 활성 필터 저장
 let columnValues = {};   // 컬럼별 고유 값 저장
 
@@ -2314,9 +2325,18 @@ function loadExcelFile(event) {
         allSheetsData[sheetName] = jsonData;
       });
       
+      // 전체 시트 통합 데이터 생성
+      mergedSheetsData = getAllSheetsMergedData();
+
       // 시트 선택 드롭다운 생성
       const sheetSelect = document.getElementById('sheetSelect');
       sheetSelect.innerHTML = '';
+
+      // 전체 시트(통합) 옵션
+      const allOption = document.createElement('option');
+      allOption.value = '__all__';
+      allOption.textContent = `전체 시트(통합) (${mergedSheetsData.length}행)`;
+      sheetSelect.appendChild(allOption);
       
       excelWorkbook.SheetNames.forEach((sheetName) => {
         const option = document.createElement('option');
@@ -2328,22 +2348,22 @@ function loadExcelFile(event) {
       // 시트 선택기 표시
       document.getElementById('sheetSelector').style.display = 'flex';
       
-      // 첫 번째 시트 데이터 표시
-      const firstSheetName = excelWorkbook.SheetNames[0];
-      const firstSheetData = allSheetsData[firstSheetName];
-      
-      if (firstSheetData.length === 0) {
-        console.warn('첫 번째 시트에 데이터가 없습니다.');
+      // 통합 시트 기본 표시
+      if (mergedSheetsData.length > 0) {
+        sheetSelect.value = '__all__';
+        createTransactionTable(mergedSheetsData);
+        updatePricePerM2Summary();
+      } else {
+        console.warn('통합 데이터가 없습니다.');
         // 데이터가 있는 첫 번째 시트 찾기
         const sheetWithData = excelWorkbook.SheetNames.find(name => allSheetsData[name].length > 0);
         if (sheetWithData) {
           sheetSelect.value = sheetWithData;
           createTransactionTable(allSheetsData[sheetWithData]);
+          updatePricePerM2Summary();
         } else {
           alert('엑셀 파일에서 데이터를 찾을 수 없습니다. 파일을 확인해주세요.');
         }
-      } else {
-        createTransactionTable(firstSheetData);
       }
       
     } catch (error) {
@@ -2359,39 +2379,317 @@ function loadExcelFile(event) {
 function changeSheet() {
   const selectedSheet = document.getElementById('sheetSelect').value;
   console.log('시트 변경:', selectedSheet);
-  const sheetData = allSheetsData[selectedSheet];
+  if (selectedSheet === '__all__') {
+    mergedSheetsData = getAllSheetsMergedData();
+    const sheetSelect = document.getElementById('sheetSelect');
+    const allOption = sheetSelect.querySelector('option[value="__all__"]');
+    if (allOption) {
+      allOption.textContent = `전체 시트(통합) (${mergedSheetsData.length}행)`;
+    }
+  }
+
+  const sheetData = selectedSheet === '__all__' ? mergedSheetsData : allSheetsData[selectedSheet];
   
   if (sheetData && sheetData.length > 0) {
     createTransactionTable(sheetData);
+    updatePricePerM2Summary();
   } else {
     alert('선택한 시트에 데이터가 없습니다.');
   }
 }
 
-// 엑셀 스타일 필터 함수 (전역)
-function excelStyleFilter(rowData) {
-  // activeFilters가 비어있으면 모든 행 표시
-  if (Object.keys(activeFilters).length === 0) {
+function getAllSheetsMergedData() {
+  const sheetNames = Object.keys(allSheetsData || {});
+  const merged = [];
+  const allKeys = new Set(['시트']);
+
+  sheetNames.forEach(name => {
+    const rows = allSheetsData[name] || [];
+    rows.forEach(row => {
+      Object.keys(row || {}).forEach(key => allKeys.add(key));
+    });
+  });
+
+  sheetNames.forEach(name => {
+    const rows = allSheetsData[name] || [];
+    rows.forEach(row => {
+      const mergedRow = { 시트: name };
+      allKeys.forEach(key => {
+        if (key === '시트') return;
+        mergedRow[key] = row[key] !== undefined && row[key] !== null ? row[key] : '';
+      });
+      merged.push(mergedRow);
+    });
+  });
+
+  return merged;
+}
+
+// 필터 값 정규화 함수
+function normalizeFilterValue(value) {
+  if (value === undefined || value === null) {
+    return '(빈 값)';
+  }
+
+  const str = value.toString().trim();
+  return str === '' ? '(빈 값)' : str;
+}
+
+// 숫자 값 파싱 함수
+function parseNumericValue(value) {
+  const normalized = normalizeFilterValue(value);
+  if (normalized === '(빈 값)') {
+    return null;
+  }
+
+  const cleaned = normalized.replace(/,/g, '');
+  const num = Number(cleaned);
+  return Number.isFinite(num) ? num : null;
+}
+
+// 조건부 필터 평가 함수
+function evaluateCondition(condition, cellValueText) {
+  if (!condition || !condition.op || condition.value === '' || condition.value === null || condition.value === undefined) {
     return true;
   }
-  
+
+  const normalizedCell = normalizeFilterValue(cellValueText);
+  const normalizedValue = normalizeFilterValue(condition.value);
+
+  switch (condition.op) {
+    case 'eq':
+      return normalizedCell === normalizedValue;
+    case 'neq':
+      return normalizedCell !== normalizedValue;
+    case 'contains':
+      return normalizedCell.includes(normalizedValue);
+    case 'starts':
+      return normalizedCell.startsWith(normalizedValue);
+    case 'ends':
+      return normalizedCell.endsWith(normalizedValue);
+    case 'gt':
+    case 'gte':
+    case 'lt':
+    case 'lte':
+    case 'between': {
+      const cellNum = parseNumericValue(normalizedCell);
+      const filterNum = parseNumericValue(normalizedValue);
+      const filterNum2 = parseNumericValue(condition.value2);
+      if (cellNum === null || filterNum === null) {
+        return false;
+      }
+      switch (condition.op) {
+        case 'gt':
+          return cellNum > filterNum;
+        case 'gte':
+          return cellNum >= filterNum;
+        case 'lt':
+          return cellNum < filterNum;
+        case 'lte':
+          return cellNum <= filterNum;
+        case 'between':
+          return filterNum2 !== null && cellNum >= filterNum && cellNum <= filterNum2;
+        default:
+          return true;
+      }
+    }
+    default:
+      return true;
+  }
+}
+
+// 필터 매칭 여부 (특정 필드 제외 가능)
+function rowMatchesFilters(rowData, excludeField = null) {
+  // activeFilters가 비어있으면 모든 행 표시
+  if (!activeFilters || Object.keys(activeFilters).length === 0) {
+    return true;
+  }
+
   // 모든 활성 필터를 확인
   for (let field in activeFilters) {
-    const selectedValues = activeFilters[field];
-    
-    if (!selectedValues || selectedValues.length === 0) {
+    if (excludeField && field === excludeField) {
       continue;
     }
-    
+
+    const filterState = activeFilters[field];
+    const selectedValues = Array.isArray(filterState)
+      ? filterState
+      : (filterState && Array.isArray(filterState.values) ? filterState.values : []);
+    const conditionFilter = !Array.isArray(filterState) && filterState && filterState.condition
+      ? filterState.condition
+      : null;
+    const logicOp = !Array.isArray(filterState) && filterState && filterState.logic
+      ? filterState.logic
+      : 'and';
+
     const cellValue = rowData[field];
-    const cellValueStr = cellValue !== undefined && cellValue !== null && cellValue !== '' ? cellValue.toString() : '(빈 값)';
-    
-    if (!selectedValues.includes(cellValueStr)) {
-      return false;
+    const cellValueStr = normalizeFilterValue(cellValue);
+
+    let checkboxMatch = true;
+    if (selectedValues && selectedValues.length > 0) {
+      checkboxMatch = selectedValues.includes(cellValueStr);
+    }
+
+    let conditionMatch = true;
+    const cond1 = conditionFilter && conditionFilter.cond1 ? conditionFilter.cond1 : null;
+    const cond2 = conditionFilter && conditionFilter.cond2 ? conditionFilter.cond2 : null;
+    const conditionJoin = conditionFilter && conditionFilter.join ? conditionFilter.join : 'and';
+
+    if (cond1 && cond1.value !== '' && cond1.value !== null && cond1.value !== undefined) {
+      const match1 = evaluateCondition(cond1, cellValueStr);
+      const match2 = evaluateCondition(cond2, cellValueStr);
+      if (cond2 && cond2.value !== '' && cond2.value !== null && cond2.value !== undefined) {
+        conditionMatch = conditionJoin === 'or' ? (match1 || match2) : (match1 && match2);
+      } else {
+        conditionMatch = match1;
+      }
+    }
+
+    const hasCheckboxFilter = selectedValues && selectedValues.length > 0;
+    const hasConditionFilter = conditionFilter && conditionFilter.cond1 && conditionFilter.cond1.value !== '' && conditionFilter.cond1.value !== null && conditionFilter.cond1.value !== undefined;
+
+    if (hasCheckboxFilter && hasConditionFilter) {
+      if (logicOp === 'or') {
+        if (!(checkboxMatch || conditionMatch)) return false;
+      } else {
+        if (!(checkboxMatch && conditionMatch)) return false;
+      }
+    } else if (hasCheckboxFilter) {
+      if (!checkboxMatch) return false;
+    } else if (hasConditionFilter) {
+      if (!conditionMatch) return false;
     }
   }
-  
+
   return true; // 모든 필터 통과
+}
+
+// 엑셀 스타일 필터 함수 (전역)
+function excelStyleFilter(rowData) {
+  return rowMatchesFilters(rowData);
+}
+
+// 다른 컬럼 필터를 반영한 값 목록 생성
+function getAvailableColumnValues(field) {
+  if (!transactionData || transactionData.length === 0) {
+    return columnValues[field] || [];
+  }
+
+  const filteredRows = transactionData.filter(row => rowMatchesFilters(row, field));
+  const uniqueValues = [...new Set(filteredRows.map(row => normalizeFilterValue(row[field])))]
+    .sort();
+  return uniqueValues;
+}
+
+// 필터링된 현재 데이터 반환
+function getFilteredTransactionRows() {
+  if (transactionTable) {
+    return transactionTable.getData("active");
+  }
+
+  return transactionData.filter(row => rowMatchesFilters(row));
+}
+
+function findColumnKey(columns, candidates) {
+  if (!columns || columns.length === 0) {
+    return null;
+  }
+
+  for (const candidate of candidates) {
+    const key = columns.find(col => col.includes(candidate));
+    if (key) return key;
+  }
+
+  return null;
+}
+
+function calculatePercentile(sortedValues, percentile) {
+  if (sortedValues.length === 0) {
+    return null;
+  }
+  const index = (sortedValues.length - 1) * percentile;
+  const lower = Math.floor(index);
+  const upper = Math.ceil(index);
+  if (lower === upper) {
+    return sortedValues[lower];
+  }
+  const weight = index - lower;
+  return sortedValues[lower] * (1 - weight) + sortedValues[upper] * weight;
+}
+
+function updatePricePerM2Summary() {
+  const summaryEl = document.getElementById('pricePerM2Summary');
+  const includeOutliersToggle = document.getElementById('includeOutliersToggle');
+  if (!summaryEl || !includeOutliersToggle) {
+    return;
+  }
+
+  const rows = getFilteredTransactionRows();
+  if (!rows || rows.length === 0) {
+    summaryEl.innerHTML = '필터된 데이터가 없습니다.';
+    return;
+  }
+
+  const columns = Object.keys(rows[0] || {});
+  const areaKey = findColumnKey(columns, ['계약면적', '면적']);
+  const priceKey = findColumnKey(columns, ['거래금액', '금액']);
+
+  if (!areaKey || !priceKey) {
+    summaryEl.innerHTML = '계약면적 또는 거래금액 컬럼을 찾을 수 없습니다.';
+    return;
+  }
+
+  const unitPrices = [];
+  let totalArea = 0;
+  let totalPrice = 0;
+  rows.forEach(row => {
+    const area = parseNumericValue(row[areaKey]);
+    const price = parseNumericValue(row[priceKey]);
+    if (area && price && area > 0) {
+      unitPrices.push(price / area);
+      totalArea += area;
+      totalPrice += price;
+    }
+  });
+
+  if (unitPrices.length === 0) {
+    summaryEl.innerHTML = '유효한 거래면적/거래금액 데이터가 없습니다.';
+    return;
+  }
+
+  unitPrices.sort((a, b) => a - b);
+
+  let usedPrices = unitPrices;
+  let iqrInfo = '';
+
+  if (!includeOutliersToggle.checked && unitPrices.length >= 4) {
+    const q1 = calculatePercentile(unitPrices, 0.25);
+    const q3 = calculatePercentile(unitPrices, 0.75);
+    const iqr = q3 - q1;
+    const lower = q1 - 1.5 * iqr;
+    const upper = q3 + 1.5 * iqr;
+    usedPrices = unitPrices.filter(v => v >= lower && v <= upper);
+
+    iqrInfo = ` (IQR 제외: ${lower.toFixed(2)} ~ ${upper.toFixed(2)})`;
+  }
+
+  const totalUnitPrice = usedPrices.reduce((sum, v) => sum + v, 0);
+  const avg = totalArea > 0 ? (totalPrice / totalArea) : (totalUnitPrice / usedPrices.length);
+  const avgPerPyeong = avg * 3.3;
+  const totalAreaPyeong = totalArea / 3.3;
+  const outlierText = includeOutliersToggle.checked ? '이상치 포함' : '이상치 제외';
+
+  summaryEl.innerHTML = `
+    <div><strong>결과:</strong> ${avg.toLocaleString(undefined, { maximumFractionDigits: 2 })} 만원/m² (${outlierText})</div>
+    <div style="margin-top: 4px; color: #555;">평당: ${avgPerPyeong.toLocaleString(undefined, { maximumFractionDigits: 2 })} 만원/평</div>
+    <div style="margin-top: 6px; display: flex; flex-wrap: wrap; gap: 8px;">
+      <span style="background: #e8f4ff; color: #2c3e50; padding: 4px 8px; border-radius: 4px;">총 거래금액: ${totalPrice.toLocaleString(undefined, { maximumFractionDigits: 2 })} 만원</span>
+      <span style="background: #e9f8f1; color: #2c3e50; padding: 4px 8px; border-radius: 4px;">총 면적: ${totalArea.toLocaleString(undefined, { maximumFractionDigits: 2 })} m² (${totalAreaPyeong.toLocaleString(undefined, { maximumFractionDigits: 2 })} 평)</span>
+      <span style="background: #f4eefe; color: #2c3e50; padding: 4px 8px; border-radius: 4px;">거래금액 ÷ 면적: ${(totalArea > 0 ? (totalPrice / totalArea) : 0).toLocaleString(undefined, { maximumFractionDigits: 2 })} 만원/m²</span>
+    </div>
+    <div style="margin-top: 6px; color: #666;">필터된 행 수: ${rows.length} / 유효 데이터: ${unitPrices.length} / 적용 데이터: ${usedPrices.length}${iqrInfo}</div>
+    <div style="margin-top: 4px; color: #666;">로직: 거래금액(만원) ÷ 계약면적(m²), ${includeOutliersToggle.checked ? '전체 평균' : 'IQR(1.5배)로 이상치 제거 후 평균'}</div>
+  `;
 }
 
 // Tabulator 테이블 생성 함수
@@ -2407,16 +2705,17 @@ function createTransactionTable(data) {
   
   // 필터 초기화
   activeFilters = {};
+
+  // 원본 데이터 저장
+  transactionData = Array.isArray(data) ? data : [];
   
   // 컬럼별 고유 값 추출 (필터용)
   columnValues = {};
   const columnKeys = Object.keys(data[0]);
   
   columnKeys.forEach(key => {
-    const uniqueValues = [...new Set(data.map(row => {
-      const val = row[key];
-      return val !== undefined && val !== null && val !== '' ? val.toString() : '(빈 값)';
-    }))].sort();
+    const uniqueValues = [...new Set(data.map(row => normalizeFilterValue(row[key])))]
+      .sort();
     columnValues[key] = uniqueValues;
   });
   
@@ -2433,25 +2732,189 @@ function createTransactionTable(data) {
     button.style.cssText = "width: 100%; padding: 4px; background: white; border: 1px solid #ddd; cursor: pointer; font-size: 12px;";
     
     const dropdown = document.createElement("div");
+    dropdown.className = "transaction-filter-dropdown";
     dropdown.style.cssText = "display: none; position: fixed; background: white; border: 2px solid #667eea; box-shadow: 0 8px 16px rgba(0,0,0,0.3); z-index: 999999; min-width: 220px; max-height: 400px; border-radius: 6px; display: flex; flex-direction: column;";
     
     const field = cell.getColumn().getField();
-    const values = columnValues[field] || [];
+    const values = getAvailableColumnValues(field);
+    const currentFilter = activeFilters[field];
+    const activeSelected = Array.isArray(currentFilter)
+      ? currentFilter
+      : (currentFilter && Array.isArray(currentFilter.values) ? currentFilter.values : null);
+    const activeSelectedSet = activeSelected ? new Set(activeSelected.map(normalizeFilterValue)) : null;
+    const activeCondition = currentFilter && !Array.isArray(currentFilter) ? currentFilter.condition : null;
+
+    // 조건부 필터 UI
+    const conditionDiv = document.createElement("div");
+    conditionDiv.style.cssText = "padding: 8px; border-bottom: 2px solid #ddd; background: #fff;";
+
+    const conditionToggle = document.createElement("input");
+    conditionToggle.type = "checkbox";
+    conditionToggle.id = `condition_${field}`;
+    conditionToggle.style.marginRight = "8px";
+
+    const conditionLabel = document.createElement("label");
+    conditionLabel.htmlFor = `condition_${field}`;
+    conditionLabel.innerHTML = "조건부 필터 사용";
+    conditionLabel.style.cursor = "pointer";
+    conditionLabel.style.fontWeight = "600";
+
+    const conditionControls = document.createElement("div");
+    conditionControls.style.cssText = "display: none; flex-direction: column; gap: 6px; margin-top: 6px;";
+
+    const conditionOp1 = document.createElement("select");
+    conditionOp1.style.cssText = "padding: 4px; font-size: 12px;";
+    const ops = [
+      { value: 'eq', label: '=' },
+      { value: 'neq', label: '≠' },
+      { value: 'contains', label: '포함' },
+      { value: 'starts', label: '시작' },
+      { value: 'ends', label: '끝' },
+      { value: 'gt', label: '>' },
+      { value: 'gte', label: '≥' },
+      { value: 'lt', label: '<' },
+      { value: 'lte', label: '≤' },
+      { value: 'between', label: '범위' }
+    ];
+    ops.forEach(op => {
+      const option = document.createElement("option");
+      option.value = op.value;
+      option.textContent = op.label;
+      conditionOp1.appendChild(option);
+    });
+
+    const conditionInput1 = document.createElement("input");
+    conditionInput1.type = "text";
+    conditionInput1.placeholder = "값";
+    conditionInput1.style.cssText = "width: 80px; padding: 4px; font-size: 12px;";
+
+    const conditionInput2 = document.createElement("input");
+    conditionInput2.type = "text";
+    conditionInput2.placeholder = "~";
+    conditionInput2.style.cssText = "width: 80px; padding: 4px; font-size: 12px; display: none;";
+
+    const conditionJoin = document.createElement("select");
+    conditionJoin.style.cssText = "padding: 4px; font-size: 12px;";
+    const joinOptions = [
+      { value: 'and', label: 'AND' },
+      { value: 'or', label: 'OR' }
+    ];
+    joinOptions.forEach(op => {
+      const option = document.createElement("option");
+      option.value = op.value;
+      option.textContent = op.label;
+      conditionJoin.appendChild(option);
+    });
+
+    const conditionOp2 = document.createElement("select");
+    conditionOp2.style.cssText = "padding: 4px; font-size: 12px;";
+    ops.forEach(op => {
+      const option = document.createElement("option");
+      option.value = op.value;
+      option.textContent = op.label;
+      conditionOp2.appendChild(option);
+    });
+
+    const conditionInput3 = document.createElement("input");
+    conditionInput3.type = "text";
+    conditionInput3.placeholder = "값";
+    conditionInput3.style.cssText = "width: 80px; padding: 4px; font-size: 12px;";
+
+    const conditionInput4 = document.createElement("input");
+    conditionInput4.type = "text";
+    conditionInput4.placeholder = "~";
+    conditionInput4.style.cssText = "width: 80px; padding: 4px; font-size: 12px; display: none;";
+
+    function updateConditionControls() {
+      const enabled = conditionToggle.checked;
+      conditionControls.style.display = enabled ? "flex" : "none";
+      conditionControls.style.opacity = enabled ? "1" : "0.5";
+      conditionOp1.disabled = !enabled;
+      conditionInput1.disabled = !enabled;
+      conditionInput2.disabled = !enabled;
+      conditionJoin.disabled = !enabled;
+      conditionOp2.disabled = !enabled;
+      conditionInput3.disabled = !enabled;
+      conditionInput4.disabled = !enabled;
+
+      conditionInput2.style.display = conditionOp1.value === 'between' ? "inline-block" : "none";
+      conditionInput4.style.display = conditionOp2.value === 'between' ? "inline-block" : "none";
+    }
+
+    conditionOp1.onchange = updateConditionControls;
+    conditionOp2.onchange = updateConditionControls;
+    conditionToggle.onchange = updateConditionControls;
+
+    if (activeCondition && activeCondition.cond1 && activeCondition.cond1.op) {
+      conditionToggle.checked = true;
+      conditionOp1.value = activeCondition.cond1.op;
+      conditionInput1.value = activeCondition.cond1.value ?? '';
+      conditionInput2.value = activeCondition.cond1.value2 ?? '';
+    }
+
+    if (activeCondition && activeCondition.cond2 && activeCondition.cond2.op) {
+      conditionOp2.value = activeCondition.cond2.op;
+      conditionInput3.value = activeCondition.cond2.value ?? '';
+      conditionInput4.value = activeCondition.cond2.value2 ?? '';
+    }
+
+    if (activeCondition && activeCondition.join) {
+      conditionJoin.value = activeCondition.join;
+    }
+
+    updateConditionControls();
+
+    const conditionLine1 = document.createElement("div");
+    conditionLine1.style.cssText = "display: flex; gap: 6px; align-items: center;";
+    conditionLine1.appendChild(conditionOp1);
+    conditionLine1.appendChild(conditionInput1);
+    conditionLine1.appendChild(conditionInput2);
+
+    const conditionLine2 = document.createElement("div");
+    conditionLine2.style.cssText = "display: flex; gap: 6px; align-items: center;";
+    conditionLine2.appendChild(conditionJoin);
+
+    const conditionLine3 = document.createElement("div");
+    conditionLine3.style.cssText = "display: flex; gap: 6px; align-items: center;";
+    conditionLine3.appendChild(conditionOp2);
+    conditionLine3.appendChild(conditionInput3);
+    conditionLine3.appendChild(conditionInput4);
+
+    conditionControls.appendChild(conditionLine1);
+    conditionControls.appendChild(conditionLine2);
+    conditionControls.appendChild(conditionLine3);
+
+    conditionDiv.appendChild(conditionToggle);
+    conditionDiv.appendChild(conditionLabel);
+    conditionDiv.appendChild(conditionControls);
+
+    dropdown.appendChild(conditionDiv);
     
     // 스크롤 가능한 컨텐츠 영역
     const scrollContent = document.createElement("div");
-    scrollContent.style.cssText = "overflow-y: auto; flex: 1; max-height: 340px;";
+    scrollContent.style.cssText = "overflow-y: auto; flex: 1; max-height: 260px;";
+
+    // 텍스트 검색 입력
+    const searchDiv = document.createElement("div");
+    searchDiv.style.cssText = "padding: 8px; border-bottom: 1px solid #eee; background: #fff;";
+    const searchInput = document.createElement("input");
+    searchInput.type = "text";
+    searchInput.placeholder = "텍스트 검색";
+    searchInput.style.cssText = "width: 100%; padding: 6px; font-size: 12px;";
+    searchDiv.appendChild(searchInput);
+    scrollContent.appendChild(searchDiv);
     
     // 전체 선택/해제 체크박스
     const selectAllDiv = document.createElement("div");
-    selectAllDiv.style.cssText = "padding: 8px; border-bottom: 2px solid #667eea; background: #f8f9fa;";
+    selectAllDiv.style.cssText = "padding: 8px; border-bottom: 2px solid #667eea; background: #f8f9fa; display: flex; align-items: center;";
     const selectAllCheckbox = document.createElement("input");
     selectAllCheckbox.type = "checkbox";
     selectAllCheckbox.checked = true;
     selectAllCheckbox.id = `selectAll_${field}`;
+    selectAllCheckbox.style.marginRight = "8px";
     const selectAllLabel = document.createElement("label");
     selectAllLabel.htmlFor = `selectAll_${field}`;
-    selectAllLabel.innerHTML = " 전체 선택";
+    selectAllLabel.innerHTML = "전체 선택";
     selectAllLabel.style.cursor = "pointer";
     selectAllLabel.style.fontWeight = "600";
     selectAllDiv.appendChild(selectAllCheckbox);
@@ -2460,27 +2923,35 @@ function createTransactionTable(data) {
     
     // 개별 값 체크박스들
     const checkboxes = [];
+    const checkboxRows = [];
     values.forEach(value => {
       const div = document.createElement("div");
-      div.style.cssText = "padding: 6px 8px; cursor: pointer; hover: background: #f0f0f0;";
+      div.style.cssText = "padding: 6px 8px; cursor: pointer; display: flex; align-items: center; width: 100%; box-sizing: border-box;";
       div.onmouseover = () => div.style.background = "#f0f0f0";
       div.onmouseout = () => div.style.background = "white";
       
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
-      checkbox.checked = true;
-      checkbox.value = value;
-      checkbox.style.marginRight = "6px";
+      const normalizedValue = normalizeFilterValue(value);
+      checkbox.value = normalizedValue;
+      checkbox.checked = !activeSelectedSet || activeSelectedSet.has(normalizedValue);
+      checkbox.style.marginRight = "8px";
       
       const label = document.createElement("label");
       label.innerHTML = value;
       label.style.cursor = "pointer";
       label.style.fontSize = "13px";
+      label.style.flex = "1";
+      label.style.whiteSpace = "nowrap";
+      label.style.overflow = "hidden";
+      label.style.textOverflow = "ellipsis";
+      label.title = value;
       
       div.appendChild(checkbox);
       div.appendChild(label);
       scrollContent.appendChild(div);
       checkboxes.push(checkbox);
+      checkboxRows.push({ div, label, value: value.toString() });
       
       // 클릭 시 체크박스 토글
       div.onclick = (e) => {
@@ -2495,13 +2966,40 @@ function createTransactionTable(data) {
     
     // 전체 선택 업데이트
     function updateSelectAll() {
-      const allChecked = checkboxes.every(cb => cb.checked);
+      const visibleCheckboxes = checkboxRows
+        .filter(row => row.div.style.display !== "none")
+        .map(row => row.div.querySelector("input[type='checkbox']"));
+
+      if (visibleCheckboxes.length === 0) {
+        selectAllCheckbox.checked = false;
+        return;
+      }
+
+      const allChecked = visibleCheckboxes.every(cb => cb.checked);
       selectAllCheckbox.checked = allChecked;
     }
     
+    // 초기 상태 반영
+    updateSelectAll();
+
     // 전체 선택/해제 핸들러
     selectAllCheckbox.onchange = () => {
-      checkboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+      checkboxRows.forEach(row => {
+        if (row.div.style.display !== "none") {
+          const cb = row.div.querySelector("input[type='checkbox']");
+          cb.checked = selectAllCheckbox.checked;
+        }
+      });
+    };
+
+    // 텍스트 검색 필터
+    searchInput.oninput = () => {
+      const query = searchInput.value.trim().toLowerCase();
+      checkboxRows.forEach(row => {
+        const text = row.value.toLowerCase();
+        row.div.style.display = text.includes(query) ? "flex" : "none";
+      });
+      updateSelectAll();
     };
     
     // 적용 버튼 (sticky)
@@ -2514,37 +3012,75 @@ function createTransactionTable(data) {
     applyBtn.onmouseover = () => applyBtn.style.background = "#5568d3";
     applyBtn.onmouseout = () => applyBtn.style.background = "#667eea";
     applyBtn.onclick = () => {
-      const selectedValues = checkboxes.filter(cb => cb.checked).map(cb => cb.value);
+      const selectedValues = checkboxRows
+        .filter(row => row.div.style.display !== "none")
+        .map(row => row.div.querySelector("input[type='checkbox']"))
+        .filter(cb => cb.checked)
+        .map(cb => cb.value);
+      const allSelected = selectedValues.length === values.length;
+      const conditionEnabled = conditionToggle.checked;
+      const conditionValue1 = conditionInput1.value.trim();
+      const conditionValue2 = conditionInput2.value.trim();
+
+      const conditionFilter = conditionEnabled
+        ? {
+            cond1: {
+              op: conditionOp1.value,
+              value: conditionValue1,
+              value2: conditionOp1.value === 'between' ? conditionValue2 : null
+            },
+            cond2: {
+              op: conditionOp2.value,
+              value: conditionInput3.value.trim(),
+              value2: conditionOp2.value === 'between' ? conditionInput4.value.trim() : null
+            },
+            join: conditionJoin.value
+          }
+        : null;
       
       console.log('필터 적용:', field, '선택된 값:', selectedValues);
       console.log('선택된 값 개수:', selectedValues.length, '/ 전체:', values.length);
       
-      if (selectedValues.length === values.length || selectedValues.length === 0) {
-        // 모두 선택되었거나 아무것도 선택 안 된 경우 해당 필드의 필터 제거
+      if (selectedValues.length === 0 && !conditionFilter) {
+        // 아무것도 선택 안 됐고 숫자 필터도 없으면 해당 필드의 필터 제거
+        console.log('필터 제거:', field);
+        delete activeFilters[field];
+      } else if (allSelected && !conditionFilter) {
+        // 모두 선택이고 숫자 필터가 없으면 해당 필드의 필터 제거
         console.log('필터 제거:', field);
         delete activeFilters[field];
       } else {
-        // 선택된 값으로 필터링
-        console.log('필터 설정:', field, selectedValues);
-        activeFilters[field] = selectedValues;
+        const storedValues = allSelected ? [] : selectedValues;
+        const filterPayload = {
+          values: storedValues,
+          condition: conditionFilter && conditionFilter.cond1 && conditionFilter.cond1.value !== '' ? conditionFilter : null,
+          logic: 'and'
+        };
+        console.log('필터 설정:', field, filterPayload);
+        activeFilters[field] = filterPayload;
       }
       
       console.log('현재 활성 필터:', activeFilters);
       
-      // 필터 재적용
-      if (Object.keys(activeFilters).length === 0) {
-        console.log('모든 필터 제거');
-        transactionTable.clearFilter();
+      // 필터 재적용 - 항상 clearFilter 먼저 호출
+      console.log('필터 재설정 시작');
+      transactionTable.clearFilter();
+      
+      if (Object.keys(activeFilters).length > 0) {
+        console.log('새 필터 추가:', Object.keys(activeFilters));
+        transactionTable.addFilter(excelStyleFilter);
       } else {
-        console.log('필터 적용');
-        transactionTable.clearFilter();  // 기존 필터 제거
-        transactionTable.addFilter(excelStyleFilter);  // 새 필터 추가
+        console.log('필터 없음 - 모든 데이터 표시');
       }
       
-      console.log('필터 후 행 수:', transactionTable.getDataCount());
+      setTimeout(() => {
+        console.log('필터 적용 완료 - 행 수:', transactionTable.getDataCount());
+        updatePricePerM2Summary();
+      }, 100);
       
       dropdown.style.display = "none";
-      success({ selectedValues });
+      // Tabulator 기본 헤더 필터 값은 사용하지 않음 (커스텀 필터만 적용)
+      success("");
     };
     
     const cancelBtn = document.createElement("button");
@@ -2655,7 +3191,9 @@ function createTransactionTable(data) {
       columns: columns,
       layout: "fitData",
       maxHeight: "800px",
-      pagination: false,
+      pagination: "local",
+      paginationSize: 20,
+      paginationSizeSelector: [20, 50, 100, 200],
       movableColumns: true,
       resizableColumns: true,
       resizableRows: false,
@@ -2692,10 +3230,16 @@ function createTransactionTable(data) {
     transactionTable.on("tableBuilt", function(){
       console.log('테이블이 성공적으로 구축되었습니다.');
       console.log('테이블 데이터 수:', transactionTable.getDataCount());
+      updatePricePerM2Summary();
     });
     
     transactionTable.on("renderComplete", function(){
       console.log('테이블 렌더링이 완료되었습니다.');
+      updatePricePerM2Summary();
+    });
+
+    transactionTable.on("dataFiltered", function(){
+      updatePricePerM2Summary();
     });
     
   } catch (error) {
@@ -2791,10 +3335,12 @@ function clearTransactionTable() {
   }
   excelWorkbook = null;
   allSheetsData = {};
+  transactionData = [];
   document.getElementById('fileName').textContent = '선택된 파일 없음';
   document.getElementById('excelFileInput').value = '';
   document.getElementById('sheetSelector').style.display = 'none';
   document.getElementById('sheetSelect').innerHTML = '';
+  updatePricePerM2Summary();
 }
 
 function switchBenchmarkCompany(companyName) {
@@ -4932,7 +5478,7 @@ downloadPdf.onclick=async()=>{
         </div>
         
         <div style="background: #f8f9fa; padding: 25px; border-radius: 8px; margin-bottom: 30px; border-left: 4px solid #764ba2;">
-          <h4 style="color: #764ba2; margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 600;">📊 부산광역시 지역별 글램핑 검색건수 분포</h4>
+          <h4 style="color: #764ba2; margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 600;">📊 부산광역시 지역별 글램핑 검색건수 분포 (티맵내비게이션 기반 숙박&gt;캠프장 유형 목적지 검색량)</h4>
           
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; position: relative;">
@@ -5140,6 +5686,19 @@ downloadPdf.onclick=async()=>{
           </div>
           <p style="margin-top: 10px; color: #888; font-size: 13px;">💡 엑셀 파일(.xlsx, .xls)을 업로드하면 자동으로 테이블이 생성됩니다. 시트를 선택하여 다른 데이터를 볼 수 있으며, 컬럼 헤더를 클릭하여 정렬할 수 있습니다.</p>
           <div id="dataInfo" style="margin-top: 10px; padding: 10px; background: #e8f4f8; border-radius: 6px; border-left: 4px solid #3498db; display: none; color: #333; font-size: 13px;"></div>
+
+          <div id="pricePerM2Panel" style="margin-top: 15px; padding: 12px; background: #fff; border-radius: 6px; border: 1px solid #e0e0e0;">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <strong style="color: #34495e;">m²당 평균 거래가</strong>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #555; cursor: pointer;">
+                <input type="checkbox" id="includeOutliersToggle" checked onchange="updatePricePerM2Summary()">
+                이상치 포함
+              </label>
+            </div>
+            <div id="pricePerM2Summary" style="margin-top: 8px; font-size: 13px; color: #333;">
+              데이터가 로드되면 계산됩니다.
+            </div>
+          </div>
         </div>
         
         <!-- 테이블 컨테이너 -->
