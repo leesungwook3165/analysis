@@ -137,6 +137,177 @@ table.grid input {
   padding: 24px 8px;
 }
 
+/* Venture tree layout */
+.venture-tree {
+  display: grid;
+  grid-template-columns: 28% 36% 36%;
+  gap: 12px;
+  min-height: 320px;
+}
+
+.venture-table {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.venture-detail {
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background: #fff;
+}
+
+
+.venture-visuals-panel {
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.venture-visuals {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.venture-detail h3 {
+  margin-top: 0;
+}
+
+.venture-label {
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.venture-score {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  align-items: center;
+}
+
+.venture-score .score-box {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #f3f5f7;
+  min-width: 140px;
+}
+
+.score-box {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #f3f5f7;
+}
+
+.signal {
+  padding: 6px 10px;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 13px;
+  display: inline-block;
+}
+
+.signal.green { background: #e8f5e9; color: #1b5e20; }
+.signal.yellow { background: #fff8e1; color: #f57f17; }
+.signal.red { background: #ffebee; color: #b71c1c; }
+
+.venture-chart-wrap {
+  margin-top: 14px;
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  background: #fafafa;
+}
+
+#ventureRadar {
+  width: 100%;
+  height: 260px;
+}
+
+.venture-table {
+  margin-top: 12px;
+}
+
+.venture-metrics {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.venture-metrics th,
+.venture-metrics td {
+  border: 1px solid #e0e0e0;
+  padding: 8px;
+  font-size: 13px;
+  text-align: left;
+}
+
+.venture-metrics th {
+  background: #f5f5f5;
+}
+
+.metric-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.metric-tooltip .info-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  color: #555;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: help;
+}
+
+.metric-tooltip .tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  left: 0;
+  top: 100%;
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: #2c3e50;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  width: 240px;
+  z-index: 10;
+  transition: opacity 0.2s ease;
+}
+
+.metric-tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Tabulator row hover (venture tree) */
+#ventureTable .tabulator-row:hover {
+  background-color: #e0e0e0;
+}
+
+#ventureTable .tabulator-row:hover .tabulator-cell,
+#ventureTable .tabulator-cell:hover {
+  background-color: #e0e0e0;
+}
+
+#ventureTable .tabulator-row.venture-row-hover,
+#ventureTable .tabulator-row.venture-row-hover .tabulator-cell {
+  background-color: #e0e0e0;
+}
+
 /* 라디오를 가로로 정렬 */
 .scenario { 
   margin-top: 12px; 
@@ -1470,24 +1641,48 @@ IRR = 23.6%</div>
 
 <!-- 벤처 -->
 <section id="venture" class="panel">
-<h2>해운·물류 신규 벤처 투자</h2>
-<ul>
-  <li>전략적 시너지 확보 목적</li>
-  <li>소액 지분 투자 검토</li>
-  <li>간단한 IRR 시나리오 입력</li>
-</ul>
+<h2>해운물류신규 벤처 투자</h2>
+<div class="venture-tree">
+  <div id="ventureTable" class="venture-table"></div>
+  <div id="ventureDetail" class="venture-detail">
+    <h3>기업 상세 정보</h3>
+    <p>왼쪽 트리에서 기업을 클릭하면 상세 정보가 표시됩니다.</p>
+  </div>
+  <div id="ventureVisuals" class="venture-visuals-panel">
+    <h3>지표 가시화</h3>
+    <div class="venture-visuals">
+      <div class="score-box">
+        <div class="venture-label">종합 투자 점수</div>
+        <div id="ventureTotalScore">-</div>
+      </div>
+      <div class="score-box">
+        <div class="venture-label">투자 신호</div>
+        <div id="ventureSignal" class="signal">-</div>
+      </div>
 
-<label>초기 투자비 (억원)</label>
-<input id="vInvest" type="number" value="10">
+      <div class="venture-chart-wrap">
+        <canvas id="ventureRadar"></canvas>
+      </div>
 
-<label>연간 예상 EBITDA (억원)</label>
-<input id="vEbitda" type="number" value="1.2">
-
-<label>분석 기간 (연)</label>
-<input id="vYears" type="number" value="10">
-
-<button id="ventureAnalyze">벤처 분석 실행</button>
-<div id="ventureSummary" class="note">분석 결과가 여기에 표시됩니다.</div>
+      <div class="venture-table">
+        <div class="venture-label">지표 상세</div>
+        <table class="venture-metrics">
+          <thead>
+            <tr>
+              <th>지표</th>
+              <th>점수(0~5)</th>
+              <th>근거(evidence)</th>
+              <th>출처(source)</th>
+            </tr>
+          </thead>
+          <tbody id="ventureMetricsBody">
+            <tr><td colspan="4">지표 데이터가 없습니다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 </section>
 
 <!-- 통합 -->
@@ -1518,6 +1713,10 @@ document.querySelectorAll(".tabs button").forEach(btn=>{
     document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
     btn.classList.add("active");
     document.getElementById(btn.dataset.tab).classList.add("active");
+
+    if (btn.dataset.tab === 'venture') {
+      initVentureTree(true);
+    }
     
     // KPI 섹션 표시 제어: 글램핑과 통합 탭에서만 표시
     const kpiSection = document.getElementById('kpiSection');
@@ -1588,6 +1787,109 @@ const includeCaravanChart = document.getElementById('includeCaravanChart');
 
 let compareChart, subsidyChart, glampingUnitsChart;
 let projects = {ferry:null, glamping:null, venture:null};
+let ventureTable;
+let ventureRadarChart;
+
+/* Venture tree data */
+const ventureData = [
+  {
+    name: "해운·물류 IT",
+    _children: [
+      {name:"씨드로닉스", stage:"Series A", country:"한국", overview:"선박 운항 데이터 기반 분석 플랫폼. 연료 효율·안전 관리를 자동화.", memo:"데이터 확보는 강점. 선사 연계 PoC 진행 중."},
+      {name:"티투엘 주식회사", stage:"Seed", country:"한국", overview:"물류 운영 데이터 통합 및 대시보드 솔루션.", memo:"초기 레퍼런스 확보 단계."},
+      {name:"맵시(Mapsea)", stage:"Seed", country:"한국", overview:"항로 추천 및 운항 리포팅 SaaS. 의사결정 대시보드 제공.", memo:"사용성 우수. 수익모델 다각화 필요."},
+      {name:"Portlogics", stage:"Pre-A", country:"싱가포르", overview:"항만 운영·혼잡 최적화 솔루션. 실시간 ETA 예측.", memo:"현지 파트너 확보가 관건."},
+      {name:"트레드링스", stage:"Series B", country:"한국", overview:"해운·물류 통합 플랫폼. 화물 추적·서류 자동화.", memo:"대형 화주 레퍼런스 확보."}
+    ]
+  },
+  {
+    name: "스마트·자동화/IoT",
+    _children: [
+      {name:"스마트엠투엠", stage:"Seed", country:"한국", overview:"IoT 센서 기반 원격 모니터링. 냉장·위험물 상태 추적.", memo:"하드웨어 원가 절감 필요."},
+      {name:"스마트큐브", stage:"Series A", country:"한국", overview:"물류 자동화 장비 및 WMS 연동. 창고 피킹 효율 개선.", memo:"설치형 모델에서 구독형 전환 검토."}
+    ]
+  },
+  {
+    name: "친환경·에너지/해양장비",
+    _children: [
+      {name:"골디락스쉬핑", stage:"Pre-A", country:"한국", overview:"친환경 선박 운항 최적화. 탄소배출 리포팅 제공.", memo:"규제 변화 수혜 기대."},
+      {name:"빈센", stage:"Series B", country:"한국", overview:"전기·수소 선박 파워트레인. 실증 프로젝트 진행.", memo:"장비 인증 일정 확인 필요."},
+      {name:"밸류링크유", stage:"Series A", country:"한국", overview:"해운 연료/에너지 관리 플랫폼. 연료 구매 최적화.", memo:"연료 거래 파트너십 검토."},
+      {name:"㈜에코마린", stage:"Seed", country:"한국", overview:"친환경 해양 서비스 및 장비 유지보수.", memo:"현장 네트워크 강점."},
+      {name:"㈜이이에스", stage:"Pre-A", country:"한국", overview:"해양 에너지 시스템 및 저장 솔루션.", memo:"CAPEX 크고 회수기간 길 수 있음."},
+      {name:"㈜지엔테크놀로지스", stage:"Seed", country:"한국", overview:"해양 환경 모니터링 장비/소프트웨어.", memo:"공공 프로젝트 비중 높음."},
+      {name:"코엘트", stage:"Seed", country:"한국", overview:"해양 장비/소재 기술.", memo:"기술 실증 레퍼런스 필요."},
+      {name:"(주)슈니테크", stage:"Seed", country:"한국", overview:"해양 장비 제조 및 유지보수.", memo:"납품 일정 관리 체계 개선 필요."}
+    ]
+  },
+  {
+    name: "조선·해양 엔지니어링",
+    _children: [
+      {name:"씨벤티지", stage:"Pre-A", country:"한국", overview:"해양 구조물 해석/설계 솔루션. 디지털트윈 연계.", memo:"대형 조선소 PoC 중."},
+      {name:"씨라이프사이언스랩", stage:"Seed", country:"한국", overview:"해양 바이오·환경 연구 기반 신소재.", memo:"응용처 확대 필요."},
+      {name:"㈜스피드플로어", stage:"Seed", country:"한국", overview:"선박·산업용 바닥/소재. 유지보수 절감.", memo:"인증 취득 진행."}
+    ]
+  },
+  {
+    name: "우주·항공/신산업",
+    _children: [
+      {name:"한컴인스페이스", stage:"Series A", country:"한국", overview:"위성 데이터 처리/분석 플랫폼. 해양 관측 활용.", memo:"데이터 라이선스 구조 확인."},
+      {name:"이노스페이스", stage:"Series B", country:"한국", overview:"우주 발사체 개발. 중소형 위성 발사.", memo:"발사 일정 리스크 관리."},
+      {name:"리벨리온", stage:"Series B", country:"한국", overview:"AI 반도체 및 서버 솔루션.", memo:"물류 최적화 AI 적용 검토."}
+    ]
+  },
+  {
+    name: "물류/운송 운영",
+    _children: [
+      {name:"씨너지파트너(주)", stage:"Pre-A", country:"한국", overview:"물류 운영 개선 및 투자 연계.", memo:"파트너 네트워크 강점."}
+    ]
+  },
+  {
+    name: "기타",
+    _children: [
+      {name:"심스리얼리티", stage:"Seed", country:"한국", overview:"시뮬레이션/디지털트윈. 항만/운항 시나리오 분석.", memo:"데모 완성도 높음."}
+    ]
+  }
+];
+
+// 투자 지표 기본 객체 (실데이터는 추후 연동)
+const investmentIndicators = {
+  customerPull: {
+    label: "고객 수요 신호",
+    score: null,
+    description: "고객이 자발적으로 찾는지, 반복 사용·추천이 발생하는지 등 수요 신호를 정성적으로 평가합니다.",
+    evidence: "",
+    source: ""
+  },
+  monetizationReadiness: {
+    label: "수익화 준비도",
+    score: null,
+    description: "매출 발생 구조, 가격 정책, 유료 전환 흐름 등 수익화 가능성과 준비 수준을 설명합니다.",
+    evidence: "",
+    source: ""
+  },
+  lockInStrength: {
+    label: "락인 강도",
+    score: null,
+    description: "전환 비용, 데이터/운영 연동, 장기 계약 여부 등 고객 이탈을 막는 요인을 설명합니다.",
+    evidence: "",
+    source: ""
+  },
+  scalabilitySignal: {
+    label: "확장성 신호",
+    score: null,
+    description: "지역·산업 확장 가능성, 단위경제 개선 여지, 운영 자동화 수준 등을 평가합니다.",
+    evidence: "",
+    source: ""
+  },
+  exitVisibility: {
+    label: "엑싯 가시성",
+    score: null,
+    description: "M&A 후보 존재, 상장 가능성, 업계 밸류에이션 비교 등 회수 경로의 가시성을 설명합니다.",
+    evidence: "",
+    source: ""
+  }
+};
 
 /* Financial tables management */
 function addFinancialRow(tableId) {
@@ -4060,6 +4362,12 @@ function computeGlamping(){
 }
 
 function computeVenture(){
+  if(!vInvest || !vEbitda || !vYears){
+    const res = {revenue: 0, ebitda: 0, invest: 0, irr: 0, years: 0};
+    projects.venture = res;
+    if(ventureSummary) ventureSummary.innerHTML = '';
+    return res;
+  }
   const invest = Number(vInvest.value);
   const ebitda = Number(vEbitda.value);
   const years = Number(vYears.value)||10;
@@ -4067,8 +4375,254 @@ function computeVenture(){
   const irrVal = irr(cfs);
   const res = {revenue: ebitda, ebitda, invest, irr: irrVal, years};
   projects.venture = res;
-  ventureSummary.innerHTML = `연간 EBITDA: ${ebitda.toFixed(2)} 억원<br>IRR: ${(irrVal*100).toFixed(2)}%`;
+  if(ventureSummary){
+    ventureSummary.innerHTML = `연간 EBITDA: ${ebitda.toFixed(2)} 억원<br>IRR: ${(irrVal*100).toFixed(2)}%`;
+  }
   return res;
+}
+
+/* Venture tree (Tabulator) */
+function initVentureTree(forceRedraw=false){
+  const tableEl = document.getElementById('ventureTable');
+  const detailEl = document.getElementById('ventureDetail');
+  const visualsEl = document.getElementById('ventureVisuals');
+  if(!tableEl || !detailEl || !visualsEl || typeof Tabulator === 'undefined') return;
+
+  const renderVentureDetail = (d)=>{
+    if(d && d._children && !d.overview){
+      const count = Array.isArray(d._children) ? d._children.length : 0;
+      detailEl.innerHTML = `
+        <h3>${d.name}</h3>
+        <div class='venture-label'>분류</div><div>산업군</div>
+        <div class='venture-label'>기업 수</div><div>${count}개</div>
+        <div class='venture-label'>메모</div><div>하위 기업을 클릭하면 상세 정보가 표시됩니다.</div>
+      `;
+      visualsEl.innerHTML = `
+        <h3>지표 가시화</h3>
+        <div class="venture-visuals">
+          <div class="score-box">
+            <div class="venture-label">종합 투자 점수</div>
+            <div id="ventureTotalScore">-</div>
+          </div>
+          <div class="score-box">
+            <div class="venture-label">투자 신호</div>
+            <div id="ventureSignal" class="signal">-</div>
+          </div>
+
+          <div class="venture-chart-wrap">
+            <canvas id="ventureRadar"></canvas>
+          </div>
+
+          <div class="venture-table">
+            <div class="venture-label">지표 상세</div>
+            <table class="venture-metrics">
+              <thead>
+                <tr>
+                  <th>지표</th>
+                  <th>점수(0~5)</th>
+                  <th>근거(evidence)</th>
+                  <th>출처(source)</th>
+                </tr>
+              </thead>
+              <tbody id="ventureMetricsBody">
+                <tr><td colspan="4">지표 데이터가 없습니다.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+      renderInvestmentIndicators();
+      return;
+    }
+    detailEl.innerHTML = `
+      <h3>${(d && d.name) ? d.name : '-'}</h3>
+      <div class='venture-label'>투자 단계</div><div>${(d && d.stage) ? d.stage : '-'}</div>
+      <div class='venture-label'>국가</div><div>${(d && d.country) ? d.country : '-'}</div>
+      <div class='venture-label'>회사 개요</div><div>${(d && d.overview) ? d.overview : '-'}</div>
+      <div class='venture-label'>내부 메모</div><div>${(d && d.memo) ? d.memo : '-'}</div>
+    `;
+    visualsEl.innerHTML = `
+      <h3>지표 가시화</h3>
+      <div class="venture-visuals">
+        <div class="score-box">
+          <div class="venture-label">종합 투자 점수</div>
+          <div id="ventureTotalScore">-</div>
+        </div>
+        <div class="score-box">
+          <div class="venture-label">투자 신호</div>
+          <div id="ventureSignal" class="signal">-</div>
+        </div>
+
+        <div class="venture-chart-wrap">
+          <canvas id="ventureRadar"></canvas>
+        </div>
+
+        <div class="venture-table">
+          <div class="venture-label">지표 상세</div>
+          <table class="venture-metrics">
+            <thead>
+              <tr>
+                <th>지표</th>
+                <th>점수(0~5)</th>
+                <th>근거(evidence)</th>
+                <th>출처(source)</th>
+              </tr>
+            </thead>
+            <tbody id="ventureMetricsBody">
+              <tr><td colspan="4">지표 데이터가 없습니다.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+    renderInvestmentIndicators();
+  };
+
+  if(!ventureTable){
+    ventureTable = new Tabulator(tableEl,{
+      data: ventureData,
+      layout: "fitColumns",
+      dataTree: true,
+      dataTreeStartExpanded: true,
+      columns: [
+        {title:"기업 / 산업", field:"name", widthGrow: 2},
+        {title:"투자단계", field:"stage"},
+        {title:"국가", field:"country"}
+      ],
+      rowClick: function(e,row){
+        const d = row.getData();
+        renderVentureDetail(d);
+      },
+      rowFormatter: function(row){
+        const el = row.getElement();
+        if(!el) return;
+        el.addEventListener('mouseenter', ()=> el.classList.add('venture-row-hover'));
+        el.addEventListener('mouseleave', ()=> el.classList.remove('venture-row-hover'));
+      }
+    });
+
+    ventureTable.on("cellClick", function(e, cell){
+      const d = cell.getRow().getData();
+      renderVentureDetail(d);
+    });
+
+    renderInvestmentIndicators();
+  } else if(forceRedraw){
+    ventureTable.redraw(true);
+    renderInvestmentIndicators();
+  }
+}
+
+/* Investment indicators rendering */
+function renderInvestmentIndicators(){
+  const totalEl = document.getElementById('ventureTotalScore');
+  const signalEl = document.getElementById('ventureSignal');
+  const tbody = document.getElementById('ventureMetricsBody');
+  const radarEl = document.getElementById('ventureRadar');
+
+  if(!totalEl || !signalEl || !tbody || !radarEl) return;
+
+  if(typeof investmentIndicators !== 'object' || investmentIndicators === null){
+    tbody.innerHTML = `<tr><td colspan="4">investmentIndicators 객체가 없습니다.</td></tr>`;
+    totalEl.textContent = '-';
+    signalEl.textContent = '-';
+    signalEl.className = 'signal';
+    if(ventureRadarChart){
+      ventureRadarChart.destroy();
+      ventureRadarChart = null;
+    }
+    return;
+  }
+
+  const entries = Object.entries(investmentIndicators);
+  if(entries.length === 0){
+    tbody.innerHTML = `<tr><td colspan="4">지표 데이터가 없습니다.</td></tr>`;
+    return;
+  }
+
+  const labels = [];
+  const scores = [];
+  let sum = 0;
+  let count = 0;
+
+  tbody.innerHTML = '';
+  entries.forEach(([key, item])=>{
+    const label = item && item.label ? item.label : key;
+    const score = (item && (item.score === 0 || item.score)) ? item.score : null;
+    const description = item && item.description ? item.description : '계산 기준 정보가 없습니다.';
+    const evidence = item && item.evidence ? item.evidence : '-';
+    const source = item && item.source ? item.source : '-';
+
+    labels.push(label);
+    const scaled = (score === null || score === undefined) ? null : Math.max(0, Math.min(5, Number(score))) * 20;
+    scores.push(scaled === null ? 0 : scaled);
+
+    if(scaled !== null){
+      sum += scaled;
+      count += 1;
+    }
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <span class="metric-tooltip">
+          <span>${label}</span>
+          <span class="info-dot">i</span>
+          <span class="tooltip-text">${description}</span>
+        </span>
+      </td>
+      <td>${score === null || score === undefined ? '-' : score}</td>
+      <td>${evidence}</td>
+      <td>${source}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  const avg = count > 0 ? (sum / count) : null;
+  totalEl.textContent = avg === null ? '-' : avg.toFixed(1);
+
+  let signal = '-';
+  let signalClass = 'signal';
+  if(avg !== null){
+    if(avg >= 70){ signal = 'Green'; signalClass = 'signal green'; }
+    else if(avg >= 40){ signal = 'Yellow'; signalClass = 'signal yellow'; }
+    else { signal = 'Red'; signalClass = 'signal red'; }
+  }
+  signalEl.textContent = signal;
+  signalEl.className = signalClass;
+
+  if(ventureRadarChart){
+    ventureRadarChart.destroy();
+  }
+
+  ventureRadarChart = new Chart(radarEl,{
+    type: 'radar',
+    data: {
+      labels,
+      datasets: [{
+        label: '투자 지표(0~100)',
+        data: scores,
+        fill: true,
+        backgroundColor: 'rgba(52, 73, 94, 0.15)',
+        borderColor: 'rgba(52, 73, 94, 0.8)',
+        pointBackgroundColor: 'rgba(52, 73, 94, 0.8)'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        r: {
+          min: 0,
+          max: 100,
+          ticks: { stepSize: 20 }
+        }
+      },
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
 }
 
 /* 통합 분석 */
@@ -4110,7 +4664,7 @@ function consolidateAnalysis(){
 fareSlider.oninput = ()=> fareRate.innerText = Math.round(Number(fareSlider.value)*100)+"%";
 ferryAnalyze.onclick = computeFerry;
 glampingAnalyze.onclick = computeGlamping;
-ventureAnalyze.onclick = computeVenture;
+if(ventureAnalyze) ventureAnalyze.onclick = computeVenture;
 consolidateBtn.onclick = consolidateAnalysis;
 
 // Show/hide the static scenario tables
