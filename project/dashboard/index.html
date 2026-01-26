@@ -153,18 +153,34 @@ table.grid input {
 }
 
 .venture-detail {
-  padding: 16px;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  background: #fff;
+  padding: 24px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fc 100%);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
 }
 
+.venture-detail:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+}
 
 .venture-visuals-panel {
-  padding: 16px;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  background: #fff;
+  padding: 24px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.venture-visuals-panel h3 {
+  margin-top: 0;
+  font-size: 20px;
+  color: #00695c;
+  border-bottom: 3px solid #00897b;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+  font-weight: 700;
 }
 
 .venture-visuals {
@@ -175,11 +191,21 @@ table.grid input {
 
 .venture-detail h3 {
   margin-top: 0;
+  font-size: 20px;
+  color: #2c3e50;
+  border-bottom: 3px solid #667eea;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+  font-weight: 700;
 }
 
 .venture-label {
-  font-weight: 600;
-  margin-top: 10px;
+  font-weight: 700;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  color: #00695c;
+  font-size: 15px;
+  letter-spacing: -0.3px;
 }
 
 .venture-score {
@@ -190,36 +216,70 @@ table.grid input {
 }
 
 .venture-score .score-box {
-  padding: 10px 14px;
-  border-radius: 8px;
-  background: #f3f5f7;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #00897b 0%, #26a69a 100%);
   min-width: 140px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 137, 123, 0.3);
+  transition: all 0.3s ease;
+}
+
+.venture-score .score-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 137, 123, 0.4);
 }
 
 .score-box {
-  padding: 10px 14px;
-  border-radius: 8px;
-  background: #f3f5f7;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #00897b 0%, #26a69a 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 137, 123, 0.3);
+  transition: all 0.3s ease;
+}
+
+.score-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 137, 123, 0.4);
+}
+
+.score-box .venture-label {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  margin-top: 0;
+  margin-bottom: 4px;
 }
 
 .signal {
-  padding: 6px 10px;
-  border-radius: 14px;
-  font-weight: 600;
-  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 14px;
   display: inline-block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.signal.green { background: #e8f5e9; color: #1b5e20; }
-.signal.yellow { background: #fff8e1; color: #f57f17; }
-.signal.red { background: #ffebee; color: #b71c1c; }
+.signal.green { 
+  background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+  color: white;
+}
+.signal.yellow { 
+  background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+  color: #333;
+}
+.signal.red { 
+  background: linear-gradient(135deg, #f44336 0%, #e57373 100%);
+  color: white;
+}
 
 .venture-chart-wrap {
-  margin-top: 14px;
-  padding: 10px;
-  border: 1px solid #eee;
-  border-radius: 6px;
-  background: #fafafa;
+  margin-top: 20px;
+  padding: 20px;
+  border: none;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
 #ventureRadar {
@@ -228,7 +288,11 @@ table.grid input {
 }
 
 .venture-table {
-  margin-top: 12px;
+  margin-top: 20px;
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
 .venture-metrics {
@@ -239,14 +303,22 @@ table.grid input {
 
 .venture-metrics th,
 .venture-metrics td {
-  border: 1px solid #e0e0e0;
-  padding: 8px;
+  border: 1px solid #e8eaf0;
+  padding: 12px 10px;
   font-size: 13px;
   text-align: left;
 }
 
 .venture-metrics th {
-  background: #f5f5f5;
+  background: linear-gradient(135deg, #00897b 0%, #26a69a 100%);
+  color: white;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+
+.venture-metrics tbody tr:hover {
+  background: #f8f9fc;
+  transition: all 0.2s ease;
 }
 
 .metric-tooltip {
@@ -306,6 +378,40 @@ table.grid input {
 #ventureTable .tabulator-row.venture-row-hover,
 #ventureTable .tabulator-row.venture-row-hover .tabulator-cell {
   background-color: #e0e0e0;
+}
+
+.venture-video-frames {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.venture-video {
+  width: 100%;
+  height: 350px;
+  border: 0;
+  border-radius: 6px;
+  background: #000;
+}
+
+.venture-video-placeholder {
+  font-size: 13px;
+  color: #666;
+  margin-top: 6px;
+}
+
+.venture-video-links {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.venture-video-link {
+  display: inline-block;
+  font-size: 13px;
+  color: #2c3e50;
+  text-decoration: underline;
 }
 
 /* 라디오를 가로로 정렬 */
@@ -1795,59 +1901,54 @@ const ventureData = [
   {
     name: "해운·물류 IT",
     _children: [
-      {name:"씨드로닉스", stage:"Series A", country:"한국", overview:"선박 운항 데이터 기반 분석 플랫폼. 연료 효율·안전 관리를 자동화.", memo:"데이터 확보는 강점. 선사 연계 PoC 진행 중."},
-      {name:"티투엘 주식회사", stage:"Seed", country:"한국", overview:"물류 운영 데이터 통합 및 대시보드 솔루션.", memo:"초기 레퍼런스 확보 단계."},
-      {name:"맵시(Mapsea)", stage:"Seed", country:"한국", overview:"항로 추천 및 운항 리포팅 SaaS. 의사결정 대시보드 제공.", memo:"사용성 우수. 수익모델 다각화 필요."},
-      {name:"Portlogics", stage:"Pre-A", country:"싱가포르", overview:"항만 운영·혼잡 최적화 솔루션. 실시간 ETA 예측.", memo:"현지 파트너 확보가 관건."},
-      {name:"트레드링스", stage:"Series B", country:"한국", overview:"해운·물류 통합 플랫폼. 화물 추적·서류 자동화.", memo:"대형 화주 레퍼런스 확보."}
+      {name:"씨드로닉스", stage:"Series A", country:"한국", overview:"선박 운항 데이터 기반 분석 플랫폼. 연료 효율·안전 관리를 자동화.", memo:"데이터 확보는 강점. 선사 연계 PoC 진행 중.", videoUrl:["https://youtu.be/owDjicRTXjk?si=QRdmsIWLyZTnZqJi", "https://youtu.be/4YXxJof_y4c?si=AU7fHYoRuw3oXFMr"]},
+      {name:"티투엘 주식회사", stage:"Seed", country:"한국", overview:"물류 운영 데이터 통합 및 대시보드 솔루션.", memo:"초기 레퍼런스 확보 단계.", videoUrl:"https://youtu.be/BFpVIBVqkhU?si=gRml1OFCM7IaAxwb"},
+      {name:"심스리얼리티", stage:"Seed", country:"한국", overview:"시뮬레이션/디지털트윈. 항만/운항 시나리오 분석.", memo:"데모 완성도 높음.", videoUrl:"https://youtu.be/9-TuAIweprQ?si=_QS1wdOuA1YZ5xsQ"},
+      {name:"맵시(Mapsea)", stage:"Seed", country:"한국", overview:"항로 추천 및 운항 리포팅 SaaS. 의사결정 대시보드 제공.", memo:"사용성 우수. 수익모델 다각화 필요.", videoUrl:"https://youtu.be/xoGxAOFHosQ?si=cfl5xl2ahrD8zf9T"},
+      {name:"Portlogics", stage:"Pre-A", country:"싱가포르", overview:"항만 운영·혼잡 최적화 솔루션. 실시간 ETA 예측.", memo:"현지 파트너 확보가 관건.", videoUrl:""},
+      {name:"트레드링스", stage:"Series B", country:"한국", overview:"해운·물류 통합 플랫폼. 화물 추적·서류 자동화.", memo:"대형 화주 레퍼런스 확보.", videoUrl:"https://youtu.be/Jgv-NnamHOU?si=K5vycYjKJOJ3dJ-d"}
     ]
   },
   {
     name: "스마트·자동화/IoT",
     _children: [
-      {name:"스마트엠투엠", stage:"Seed", country:"한국", overview:"IoT 센서 기반 원격 모니터링. 냉장·위험물 상태 추적.", memo:"하드웨어 원가 절감 필요."},
-      {name:"스마트큐브", stage:"Series A", country:"한국", overview:"물류 자동화 장비 및 WMS 연동. 창고 피킹 효율 개선.", memo:"설치형 모델에서 구독형 전환 검토."}
+      {name:"스마트엠투엠", stage:"Seed", country:"한국", overview:"IoT 센서 기반 원격 모니터링. 냉장·위험물 상태 추적.", memo:"하드웨어 원가 절감 필요.", videoUrl:""},
+      {name:"스마트큐브", stage:"Series A", country:"한국", overview:"물류 자동화 장비 및 WMS 연동. 창고 피킹 효율 개선.", memo:"설치형 모델에서 구독형 전환 검토.", videoUrl:"https://youtu.be/oO9nk-_1MNc?si=Dv0p7GhxMruKKWdv"}
     ]
   },
   {
     name: "친환경·에너지/해양장비",
     _children: [
-      {name:"골디락스쉬핑", stage:"Pre-A", country:"한국", overview:"친환경 선박 운항 최적화. 탄소배출 리포팅 제공.", memo:"규제 변화 수혜 기대."},
-      {name:"빈센", stage:"Series B", country:"한국", overview:"전기·수소 선박 파워트레인. 실증 프로젝트 진행.", memo:"장비 인증 일정 확인 필요."},
-      {name:"밸류링크유", stage:"Series A", country:"한국", overview:"해운 연료/에너지 관리 플랫폼. 연료 구매 최적화.", memo:"연료 거래 파트너십 검토."},
-      {name:"㈜에코마린", stage:"Seed", country:"한국", overview:"친환경 해양 서비스 및 장비 유지보수.", memo:"현장 네트워크 강점."},
-      {name:"㈜이이에스", stage:"Pre-A", country:"한국", overview:"해양 에너지 시스템 및 저장 솔루션.", memo:"CAPEX 크고 회수기간 길 수 있음."},
-      {name:"㈜지엔테크놀로지스", stage:"Seed", country:"한국", overview:"해양 환경 모니터링 장비/소프트웨어.", memo:"공공 프로젝트 비중 높음."},
-      {name:"코엘트", stage:"Seed", country:"한국", overview:"해양 장비/소재 기술.", memo:"기술 실증 레퍼런스 필요."},
-      {name:"(주)슈니테크", stage:"Seed", country:"한국", overview:"해양 장비 제조 및 유지보수.", memo:"납품 일정 관리 체계 개선 필요."}
+      {name:"골디락스쉬핑", stage:"Pre-A", country:"한국", overview:"친환경 선박 운항 최적화. 탄소배출 리포팅 제공.", memo:"규제 변화 수혜 기대.", videoUrl:""},
+      {name:"빈센", stage:"Series B", country:"한국", overview:"전기·수소 선박 파워트레인. 실증 프로젝트 진행.", memo:"장비 인증 일정 확인 필요.", videoUrl:"https://youtu.be/Grq6erMXOFI?si=1bu-K9Q6EP9DeOGV"},
+      {name:"밸류링크유", stage:"Series A", country:"한국", overview:"해운 연료/에너지 관리 플랫폼. 연료 구매 최적화.", memo:"연료 거래 파트너십 검토.", videoUrl:"https://youtu.be/bBVF316K8Ys?si=hWlP17wIdr3MdPD_"},
+      {name:"㈜에코마린", stage:"Seed", country:"한국", overview:"친환경 해양 서비스 및 장비 유지보수.", memo:"현장 네트워크 강점.", videoUrl:"https://youtu.be/xZpkxcu5zLU?si=KIIpwL6xYSyGHVMW"},
+      {name:"㈜이이에스", stage:"Pre-A", country:"한국", overview:"해양 에너지 시스템 및 저장 솔루션.", memo:"CAPEX 크고 회수기간 길 수 있음.", videoUrl:""},
+      {name:"㈜지엔테크놀로지스", stage:"Seed", country:"한국", overview:"해양 환경 모니터링 장비/소프트웨어.", memo:"공공 프로젝트 비중 높음.", videoUrl:"https://youtu.be/Jm1nwi9L0bE?si=Cyym-1vNSCcIaIo9"},
+      {name:"코엘트", stage:"Seed", country:"한국", overview:"해양 장비/소재 기술.", memo:"기술 실증 레퍼런스 필요.", videoUrl:"https://youtu.be/y0-5h0kSMNg?si=wORMAwx8TuLbuweR"},
+      {name:"(주)슈니테크", stage:"Seed", country:"한국", overview:"해양 장비 제조 및 유지보수.", memo:"납품 일정 관리 체계 개선 필요.", videoUrl:"https://youtu.be/Go6e53O1Niw?si=VtKjR6ff4tEl_hwz"}
     ]
   },
   {
     name: "조선·해양 엔지니어링",
     _children: [
-      {name:"씨벤티지", stage:"Pre-A", country:"한국", overview:"해양 구조물 해석/설계 솔루션. 디지털트윈 연계.", memo:"대형 조선소 PoC 중."},
-      {name:"씨라이프사이언스랩", stage:"Seed", country:"한국", overview:"해양 바이오·환경 연구 기반 신소재.", memo:"응용처 확대 필요."},
-      {name:"㈜스피드플로어", stage:"Seed", country:"한국", overview:"선박·산업용 바닥/소재. 유지보수 절감.", memo:"인증 취득 진행."}
+      {name:"씨벤티지", stage:"Pre-A", country:"한국", overview:"해양 구조물 해석/설계 솔루션. 디지털트윈 연계.", memo:"대형 조선소 PoC 중.", videoUrl:"https://youtu.be/zDDfg20BiY8?si=Rrj1jQj2Hdif1AQZ"},
+      {name:"씨라이프사이언스랩", stage:"Seed", country:"한국", overview:"해양 바이오·환경 연구 기반 신소재.", memo:"응용처 확대 필요.", videoUrl:"https://youtu.be/op6J1oWpz28?si=Nd554ZJHBIdiNV_o"},
+      {name:"㈜스피드플로어", stage:"Seed", country:"한국", overview:"선박·산업용 바닥/소재. 유지보수 절감.", memo:"인증 취득 진행.", videoUrl:"https://youtu.be/BT0vh3suSlU?si=xAhRrccB6qWnKDVi"}
     ]
   },
   {
     name: "우주·항공/신산업",
     _children: [
-      {name:"한컴인스페이스", stage:"Series A", country:"한국", overview:"위성 데이터 처리/분석 플랫폼. 해양 관측 활용.", memo:"데이터 라이선스 구조 확인."},
-      {name:"이노스페이스", stage:"Series B", country:"한국", overview:"우주 발사체 개발. 중소형 위성 발사.", memo:"발사 일정 리스크 관리."},
-      {name:"리벨리온", stage:"Series B", country:"한국", overview:"AI 반도체 및 서버 솔루션.", memo:"물류 최적화 AI 적용 검토."}
+      {name:"한컴인스페이스", stage:"Series A", country:"한국", overview:"위성 데이터 처리/분석 플랫폼. 해양 관측 활용.", memo:"데이터 라이선스 구조 확인.", videoUrl:"https://youtu.be/HYPYu5L5l_I?si=OaCtDbMpsOKpJJuO"},
+      {name:"이노스페이스", stage:"Series B", country:"한국", overview:"우주 발사체 개발. 중소형 위성 발사.", memo:"발사 일정 리스크 관리.", videoUrl:"https://youtu.be/fB5W7WjkVrM?si=hfZmrvZnkqj__dh8"},
+      {name:"리벨리온", stage:"Series B", country:"한국", overview:"AI 반도체 및 서버 솔루션.", memo:"물류 최적화 AI 적용 검토.", videoUrl:"https://youtu.be/8Wx5W6BTyzI?si=ZekEJRYr4IpvGw3u"}
     ]
   },
   {
     name: "물류/운송 운영",
     _children: [
-      {name:"씨너지파트너(주)", stage:"Pre-A", country:"한국", overview:"물류 운영 개선 및 투자 연계.", memo:"파트너 네트워크 강점."}
-    ]
-  },
-  {
-    name: "기타",
-    _children: [
-      {name:"심스리얼리티", stage:"Seed", country:"한국", overview:"시뮬레이션/디지털트윈. 항만/운항 시나리오 분석.", memo:"데모 완성도 높음."}
+      {name:"씨너지파트너(주)", stage:"Pre-A", country:"한국", overview:"물류 운영 개선 및 투자 연계.", memo:"파트너 네트워크 강점.", videoUrl:"https://youtu.be/mTjC6lH4WxU?si=9xYmX1Pbl6EDmP4c"}
     ]
   }
 ];
@@ -4388,6 +4489,99 @@ function initVentureTree(forceRedraw=false){
   const visualsEl = document.getElementById('ventureVisuals');
   if(!tableEl || !detailEl || !visualsEl || typeof Tabulator === 'undefined') return;
 
+  const renderVentureVideo = (url)=>{
+    const normalizeUrls = (value)=>{
+      if(Array.isArray(value)){
+        return value
+          .map(item => (typeof item === 'string' ? item.trim() : ''))
+          .filter(Boolean);
+      }
+      if(typeof value === 'string'){
+        const trimmed = value.trim();
+        return trimmed ? [trimmed] : [];
+      }
+      return [];
+    };
+
+    const urls = normalizeUrls(url);
+    const safeUrl = urls[0] || '';
+    const toEmbedUrl = (raw)=>{
+      if(!raw) return '';
+      try {
+        const u = new URL(raw);
+        const keepParams = (src)=>{
+          const params = new URLSearchParams();
+          ['start','t','list','index','rel','si'].forEach(k=>{
+            const v = src.searchParams.get(k);
+            if(v) params.set(k, v);
+          });
+          if(!params.has('rel')) params.set('rel','0');
+          return params.toString();
+        };
+
+        if(u.hostname.includes('youtu.be')){
+          const id = u.pathname.replace('/','').trim();
+          if(!id) return raw;
+          const qs = keepParams(u);
+          return `https://www.youtube-nocookie.com/embed/${id}${qs ? `?${qs}` : ''}`;
+        }
+
+        if(u.hostname.includes('youtube.com') || u.hostname.includes('youtube-nocookie.com')){
+          let id = '';
+          if(u.pathname.startsWith('/embed/')){
+            id = u.pathname.replace('/embed/','').split('/')[0].trim();
+          } else {
+            id = u.searchParams.get('v') || '';
+          }
+          if(!id) return raw;
+          const qs = keepParams(u);
+          return `https://www.youtube-nocookie.com/embed/${id}${qs ? `?${qs}` : ''}`;
+        }
+
+        return raw;
+      } catch {
+        return raw;
+      }
+    };
+    const embedUrl = toEmbedUrl(safeUrl);
+    requestAnimationFrame(()=>{
+      const framesEl = document.getElementById('ventureVideoFrames');
+      const noteEl = document.getElementById('ventureVideoNote');
+      const linksEl = document.getElementById('ventureVideoLinks');
+      if(!framesEl || !noteEl) return;
+      if(safeUrl){
+        framesEl.innerHTML = urls
+          .map((u, idx)=>{
+            const iframeId = `ventureVideo${idx + 1}`;
+            const embed = toEmbedUrl(u);
+            return `<iframe id="${iframeId}" class="venture-video" width="560" height="500" src="${embed}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
+          })
+          .join('');
+        if(location.protocol === 'file:'){
+          noteEl.textContent = '로컬 파일에서 유튜브가 차단될 수 있습니다. 로컬 서버로 열어주세요.';
+        } else {
+          noteEl.textContent = '';
+        }
+        if(linksEl){
+          linksEl.innerHTML = urls
+            .map((u, idx)=>{
+              const label = urls.length > 1 ? `영상 열기 #${idx + 1}` : '영상 열기';
+              return `<a class="venture-video-link" href="${u}" target="_blank" rel="noopener">${label}</a>`;
+            })
+            .join('');
+          linksEl.style.display = 'flex';
+        }
+      } else {
+        framesEl.innerHTML = '';
+        noteEl.textContent = '영상 URL이 없습니다.';
+        if(linksEl){
+          linksEl.innerHTML = '';
+          linksEl.style.display = 'none';
+        }
+      }
+    });
+  };
+
   const renderVentureDetail = (d)=>{
     if(d && d._children && !d.overview){
       const count = Array.isArray(d._children) ? d._children.length : 0;
@@ -4432,6 +4626,7 @@ function initVentureTree(forceRedraw=false){
         </div>
       `;
       renderInvestmentIndicators();
+      renderVentureVideo('');
       return;
     }
     detailEl.innerHTML = `
@@ -4440,6 +4635,12 @@ function initVentureTree(forceRedraw=false){
       <div class='venture-label'>국가</div><div>${(d && d.country) ? d.country : '-'}</div>
       <div class='venture-label'>회사 개요</div><div>${(d && d.overview) ? d.overview : '-'}</div>
       <div class='venture-label'>내부 메모</div><div>${(d && d.memo) ? d.memo : '-'}</div>
+      <div class="venture-chart-wrap">
+        <div class="venture-label">소개 영상</div>
+          <div id="ventureVideoFrames" class="venture-video-frames"></div>
+        <div id="ventureVideoNote" class="venture-video-placeholder">영상 URL이 없습니다.</div>
+          <div id="ventureVideoLinks" class="venture-video-links"></div>
+      </div>
     `;
     visualsEl.innerHTML = `
       <h3>지표 가시화</h3>
@@ -4476,6 +4677,7 @@ function initVentureTree(forceRedraw=false){
       </div>
     `;
     renderInvestmentIndicators();
+    renderVentureVideo(d && d.videoUrl);
   };
 
   if(!ventureTable){
@@ -4487,7 +4689,8 @@ function initVentureTree(forceRedraw=false){
       columns: [
         {title:"기업 / 산업", field:"name", widthGrow: 2},
         {title:"투자단계", field:"stage"},
-        {title:"국가", field:"country"}
+        {title:"국가", field:"country"},
+        {title:"영상 URL", field:"videoUrl", visible:false}
       ],
       rowClick: function(e,row){
         const d = row.getData();
@@ -5594,8 +5797,8 @@ downloadPdf.onclick=async()=>{
           <button class="overview-tab-btn" data-tab="benchmark" onclick="switchOverviewTab('benchmark')" style="padding: 6px 14px; background: rgba(255,255,255,0.4); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.5)'" onmouseout="if(this.style.background !== 'rgba(255, 255, 255, 0.4)') this.style.background='rgba(255,255,255,0.2)'">벤치마킹</button>
           <button class="overview-tab-btn" data-tab="progress" onclick="switchOverviewTab('progress')" style="padding: 6px 14px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.5)'" onmouseout="if(this.style.background !== 'rgba(255, 255, 255, 0.4)') this.style.background='rgba(255,255,255,0.2)'">추진개요 및 분석</button>
           <button class="overview-tab-btn" data-tab="market" onclick="switchOverviewTab('market')" style="padding: 6px 14px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.5)'" onmouseout="if(this.style.background !== 'rgba(255, 255, 255, 0.4)') this.style.background='rgba(255,255,255,0.2)'">시장분석</button>
-          <button class="overview-tab-btn" data-tab="reference" onclick="switchOverviewTab('reference')" style="padding: 6px 14px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.5)'" onmouseout="if(this.style.background !== 'rgba(255, 255, 255, 0.4)') this.style.background='rgba(255,255,255,0.2)'">참고자료</button>
           <button class="overview-tab-btn" data-tab="transaction" onclick="switchOverviewTab('transaction')" style="padding: 6px 14px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.5)'" onmouseout="if(this.style.background !== 'rgba(255, 255, 255, 0.4)') this.style.background='rgba(255,255,255,0.2)'">실거래가 상세</button>
+          <button class="overview-tab-btn" data-tab="reference" onclick="switchOverviewTab('reference')" style="padding: 6px 14px; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.5)'" onmouseout="if(this.style.background !== 'rgba(255, 255, 255, 0.4)') this.style.background='rgba(255,255,255,0.2)'">참고자료</button>
         </div>
       </div>
       <div style="display: flex; gap: 8px;">
@@ -5628,25 +5831,25 @@ downloadPdf.onclick=async()=>{
           <!-- 이미지 갤러리 1 (3개) -->
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
-              <img src="../dashboard/img/3.jpg" alt="글램핑 전경 3" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="img/3.jpg" alt="글램핑 전경 3" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1)'; this.style.zIndex='1';">
-              <img src="../dashboard/img/7.jpg" alt="글램핑 전경 1" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="img/7.jpg" alt="글램핑 전경 1" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(-30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
-              <img src="../dashboard/img/4.jpg" alt="글램핑 전경 2" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="img/4.jpg" alt="글램핑 전경 2" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
 
           </div>
            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
-              <img src="../dashboard/img/2.jpg" alt="글램핑 전경 3" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="img/2.jpg" alt="글램핑 전경 3" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1)'; this.style.zIndex='1';">
-              <img src="../dashboard/img/pohang_glamping.jpg" alt="글램핑 전경 1" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="img/pohang_glamping.jpg" alt="글램핑 전경 1" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(-30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
-              <img src="../dashboard/img/phohang_square-1.jpg" alt="글램핑 전경 2" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="img/phohang_square-1.jpg" alt="글램핑 전경 2" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
 
           </div>
@@ -5673,13 +5876,13 @@ downloadPdf.onclick=async()=>{
           <!-- 이미지 갤러리 2 (3개) -->
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
-              <img src="../dashboard/img/12.jpg" alt="글램핑 내부 1" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="img/12.jpg" alt="글램핑 내부 1" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1)'; this.style.zIndex='1';">
-              <img src="../dashboard/img/16.jpg" alt="글램핑 내부 2" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="img/16.jpg" alt="글램핑 내부 2" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(-30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
-              <img src="../dashboard/img/5.jpg" alt="부대시설" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="img/5.jpg" alt="부대시설" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
           </div>
           
@@ -5715,25 +5918,25 @@ downloadPdf.onclick=async()=>{
           <!-- 이미지 갤러리 1 (3개) -->
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
-              <img src="../dashboard/img/simonoseki/slider01-2.jpg" alt="글램돔 전경 1" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="img/simonoseki/slider01-2.jpg" alt="글램돔 전경 1" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1)'; this.style.zIndex='1';">
-              <img src="../dashboard/img/simonoseki/room.jpg" alt="글램돔 전경 2" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="img/simonoseki/room.jpg" alt="글램돔 전경 2" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(-30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
-              <img src="../dashboard/img/simonoseki/act_3.jpg" alt="글램돔 전경 3" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="img/simonoseki/act_3.jpg" alt="글램돔 전경 3" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
           </div>
           
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
-              <img src="../dashboard/img/simonoseki/act_4.jpg" alt="해안 전망" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="img/simonoseki/act_4.jpg" alt="해안 전망" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1)'; this.style.zIndex='1';">
-              <img src="../dashboard/img/simonoseki/gallery09.jpg" alt="간몬해협 전망" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="img/simonoseki/gallery09.jpg" alt="간몬해협 전망" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(-30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
-              <img src="../dashboard/img/simonoseki/room_mv.jpg" alt="야경" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="img/simonoseki/room_mv.jpg" alt="야경" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
           </div>
           
@@ -5758,13 +5961,13 @@ downloadPdf.onclick=async()=>{
           <!-- 이미지 갤러리 2 (3개) -->
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
-              <img src="../dashboard/img/simonoseki/gd_shimonoseki03.jpg" alt="돔 내부 1" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="img/simonoseki/gd_shimonoseki03.jpg" alt="돔 내부 1" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1)'; this.style.zIndex='1';">
-              <img src="../dashboard/img/simonoseki/smn_1.jpg" alt="BBQ 데크" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="img/simonoseki/smn_1.jpg" alt="BBQ 데크" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             <div style="aspect-ratio: 4/3; background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; cursor: pointer; position: relative; transition: transform 0.3s ease, z-index 0s; transform-origin: center center;" onmouseover="this.style.transform='scale(2.5) translateX(-30%)'; this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1) translateX(0)'; this.style.zIndex='1';">
-              <img src="../dashboard/img/simonoseki/theater.jpg" alt="부대시설" style="width: 100%; height: 100%; object-fit: cover;" />
+              <img src="img/simonoseki/theater.jpg" alt="부대시설" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
           </div>
           
@@ -5779,11 +5982,12 @@ downloadPdf.onclick=async()=>{
           <h4 style="color: #667eea; margin-bottom: 15px; font-size: 18px; font-weight: 600; margin-top: 40px;">소개 영상</h4>
           <div style="background: #f5f5f5; border-radius: 8px; border: 1px solid #e0e0e0; padding: 20px; margin-bottom: 30px;">
             <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px;">
-              <video preload="metadata" tabindex="-1" crossorigin="anonymous" loop playsinline disableremoteplayback disablepictureinpicture controls
-                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: 8px; background: #000;" 
-                     src="blob:https://player.vimeo.com/f4ab0478-fe31-48e4-b93d-e0c7444877c3">
-                <track kind="subtitles" src="https://captions.vimeo.com/captions/260461816.vtt?expires=1768462372&sig=041578ca15e41e4521305281183d63fdd99b8227" id="telecine-track-260461816" srclang="ja-x-autogen" label="日本語 (自動生成)">
-              </video>
+              <iframe 
+                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: 8px;" 
+                     src="https://www.youtube.com/embed/JyKvqnUvWps" 
+                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                     allowfullscreen>
+              </iframe>
             </div>
             <p style="margin-top: 15px; color: #666; font-size: 14px; text-align: center;">시모노세키 글램돔 시설 소개 및 현장 영상</p>
           </div>
@@ -6023,7 +6227,7 @@ downloadPdf.onclick=async()=>{
         <div style="background: white; padding: 25px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 2px solid #e0e0e0;">
           <h4 style="color: #667eea; margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 600; text-align: center;">📍 부산광역시 검색건수 히트맵</h4>
           <div style="text-align: center; margin-bottom: 15px;">
-            <img src="../dashboard/img/busan_glamping_heatmap.png" alt="부산 검색건수 히트맵" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <img src="img/busan_glamping_heatmap.png" alt="부산 검색건수 히트맵" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
             <div style="display: none; padding: 40px; background: #f5f5f5; border-radius: 8px; color: #666;">
               <p style="margin: 0; font-size: 14px;">💡 이미지를 표시하려면 img 폴더에 'busan_search_heatmap.png' 파일을 저장해주세요.</p>
             </div>
@@ -6083,7 +6287,7 @@ downloadPdf.onclick=async()=>{
         <div style="background: white; padding: 25px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 2px solid #e0e0e0;">
           <h4 style="color: #667eea; margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 600; text-align: center;">📈 부산광역시 캠핑사이트 검색 추이 및 유형별 분포</h4>
           <div style="text-align: center; margin-bottom: 15px;">
-            <img src="../dashboard/img/glamping_occu.jpg" alt="부산 검색 추이 및 유형별 분포" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <img src="img/glamping_occu.jpg" alt="부산 검색 추이 및 유형별 분포" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
             <div style="display: none; padding: 40px; background: #f5f5f5; border-radius: 8px; color: #666;">
               <p style="margin: 0; font-size: 14px;">💡 이미지를 표시하려면 img 폴더에 'busan_search_trends.png' 파일을 저장해주세요.</p>
             </div>
