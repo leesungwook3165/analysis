@@ -237,11 +237,55 @@ table.grid input {
   color: white;
   box-shadow: 0 4px 12px rgba(0, 137, 123, 0.3);
   transition: all 0.3s ease;
+  position: relative;
+  cursor: help;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .score-box:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 137, 123, 0.4);
+}
+
+.score-box-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 100%;
+  margin-bottom: 10px;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  width: 300px;
+  z-index: 1000;
+  transition: opacity 0.3s, visibility 0.3s;
+  text-align: left;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  white-space: normal;
+}
+
+.score-box-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+}
+
+.score-box:hover .score-box-tooltip {
+  visibility: visible;
+  opacity: 1;
 }
 
 .score-box .venture-label {
@@ -319,6 +363,32 @@ table.grid input {
 .venture-metrics tbody tr:hover {
   background: #f8f9fc;
   transition: all 0.2s ease;
+}
+
+.metric-label-with-tooltip {
+  cursor: help;
+  position: relative;
+}
+
+.metric-label-with-tooltip[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 0;
+  top: 100%;
+  margin-top: 8px;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.92);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-line;
+  width: 320px;
+  z-index: 99999;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  font-weight: normal;
+  letter-spacing: 0;
+  pointer-events: none;
 }
 
 .metric-tooltip {
@@ -491,6 +561,107 @@ table.large th, table.large td {
 .toast{background:#333;color:#fff;padding:10px 14px;border-radius:6px;margin-top:8px;box-shadow:0 2px 8px rgba(0,0,0,0.15);opacity:0.95}
 .toast.error{background:#b00020}
 .toast.success{background:#2e7d32}
+
+/* Metric Detail Modal */
+.metric-detail-modal {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  animation: fadeIn 0.3s;
+}
+
+.metric-detail-content {
+  background-color: #fff;
+  margin: 5% auto;
+  padding: 30px;
+  border-radius: 12px;
+  width: 80%;
+  max-width: 700px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  animation: slideDown 0.3s;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.metric-detail-close {
+  color: #999;
+  float: right;
+  font-size: 32px;
+  font-weight: bold;
+  line-height: 24px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.metric-detail-close:hover {
+  color: #333;
+}
+
+.metric-detail-title {
+  color: #667eea;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  border-bottom: 3px solid #667eea;
+  padding-bottom: 10px;
+}
+
+.metric-detail-score {
+  display: inline-block;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 10px 0 20px 0;
+}
+
+.metric-detail-section {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.metric-detail-section h4 {
+  color: #667eea;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+}
+
+.metric-detail-section p {
+  color: #555;
+  line-height: 1.8;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.metric-clickable {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.metric-clickable:hover {
+  background-color: #f0f4ff;
+}
 
 /* occupancy settings small tweaks */
 #occSettings input[type="number"]{width:70px;text-align:right;padding-right:6px}
@@ -1748,6 +1919,33 @@ IRR = 23.6%</div>
 <!-- 벤처 -->
 <section id="venture" class="panel">
 <h2>해운물류신규 벤처 투자</h2>
+
+<!-- 엑셀 다운로드 및 정렬 버튼 추가 -->
+<div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+  <div>
+    <button onclick="sortVenturesByScore('desc')" style="padding: 10px 20px; background: linear-gradient(135deg, #7e57c2 0%, #9575cd 100%); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(126,87,194,0.3); transition: all 0.2s; margin-right: 10px;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(126,87,194,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(126,87,194,0.3)'">
+      점수 높은순
+    </button>
+    <button onclick="sortVenturesByScore('asc')" style="padding: 10px 20px; background: linear-gradient(135deg, #5c6bc0 0%, #7986cb 100%); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(92,107,192,0.3); transition: all 0.2s; margin-right: 10px;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(92,107,192,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(92,107,192,0.3)'">
+      점수 낮은순
+    </button>
+    <button onclick="resetVentureSort()" style="padding: 10px 20px; background: linear-gradient(135deg, #757575 0%, #9e9e9e 100%); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(117,117,117,0.3); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(117,117,117,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(117,117,117,0.3)'">
+      원래대로
+    </button>
+  </div>
+  <div>
+    <button onclick="showDataGuide()" style="padding: 10px 20px; background: linear-gradient(135deg, #f57c00 0%, #ff9800 100%); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(245,124,0,0.3); transition: all 0.2s; margin-right: 10px;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(245,124,0,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(245,124,0,0.3)'">
+      데이터 가이드
+    </button>
+    <button onclick="downloadVentureMetricsExcel()" style="padding: 10px 20px; background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(67,160,71,0.3); transition: all 0.2s; margin-right: 10px;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(67,160,71,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(67,160,71,0.3)'">
+      엑셀 다운로드
+    </button>
+    <button onclick="downloadDataCollectionTemplate()" style="padding: 10px 20px; background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(25,118,210,0.3); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(25,118,210,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(25,118,210,0.3)'">
+      템플릿 다운로드
+    </button>
+  </div>
+</div>
+
 <div class="venture-tree">
   <div id="ventureTable" class="venture-table"></div>
   <div id="ventureDetail" class="venture-detail">
@@ -1757,13 +1955,15 @@ IRR = 23.6%</div>
   <div id="ventureVisuals" class="venture-visuals-panel">
     <h3>지표 가시화</h3>
     <div class="venture-visuals">
-      <div class="score-box">
-        <div class="venture-label">종합 투자 점수</div>
-        <div id="ventureTotalScore">-</div>
-      </div>
-      <div class="score-box">
-        <div class="venture-label">투자 신호</div>
-        <div id="ventureSignal" class="signal">-</div>
+      <div class="venture-score" style="display: flex; gap: 12px; margin-bottom: 16px;">
+        <div class="score-box" style="flex: 1;">
+          <div class="venture-label">종합 투자 점수</div>
+          <div id="ventureTotalScore">-</div>
+        </div>
+        <div class="score-box" style="flex: 1;">
+          <div class="venture-label">투자 신호</div>
+          <div id="ventureSignal" class="signal">-</div>
+        </div>
       </div>
 
       <div class="venture-chart-wrap">
@@ -1779,16 +1979,298 @@ IRR = 23.6%</div>
               <th>점수(0~5)</th>
               <th>근거(evidence)</th>
               <th>출처(source)</th>
+              <th>상세</th>
             </tr>
           </thead>
           <tbody id="ventureMetricsBody">
-            <tr><td colspan="4">지표 데이터가 없습니다.</td></tr>
+            <tr><td colspan="5">지표 데이터가 없습니다.</td></tr>
           </tbody>
         </table>
       </div>
     </div>
   </div>
 </div>
+
+<!-- 지표 상세 팝업 모달 -->
+<div id="metricDetailModal" class="metric-detail-modal">
+  <div class="metric-detail-content">
+    <span class="metric-detail-close" onclick="closeMetricDetail()">&times;</span>
+    <h2 class="metric-detail-title" id="modalMetricTitle">지표 상세</h2>
+    <div class="metric-detail-score" id="modalMetricScore">-</div>
+    
+    <div class="metric-detail-section">
+      <h4>산출식 (Formula)</h4>
+      <p id="modalMetricFormula">-</p>
+    </div>
+    
+    <div class="metric-detail-section" id="calculationStepsSection" style="display: none;">
+      <h4>🔢 계산 과정 (Step by Step)</h4>
+      <div id="modalCalculationSteps" style="background: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 4px solid #667eea;">-</div>
+    </div>
+    
+    <div class="metric-detail-section">
+      <h4>근거 (Evidence)</h4>
+      <p id="modalMetricEvidence">-</p>
+    </div>
+    
+    <div class="metric-detail-section">
+      <h4>📚 출처 (Source)</h4>
+      <p id="modalMetricSource">-</p>
+    </div>
+    
+    <div class="metric-detail-section">
+      <h4>ℹ️ 지표 설명</h4>
+      <p id="modalMetricDescription">-</p>
+    </div>
+  </div>
+</div>
+
+<!-- 데이터 컬럼 가이드 모달 -->
+<div id="dataGuideModal" class="metric-detail-modal">
+  <div class="metric-detail-content" style="max-width: 900px;">
+    <span class="metric-detail-close" onclick="closeDataGuide()">&times;</span>
+    <h2 class="metric-detail-title">데이터 컬럼 가이드</h2>
+    
+    <div class="metric-detail-section">
+      <h3 style="color: #667eea; margin-bottom: 15px;">원천 데이터 항목 설명</h3>
+      
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #667eea;">
+        <h4 style="color: #667eea; margin-top: 0;">전체특허</h4>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>설명:</strong> KIPRIS 기반 전체 출원 및 등록 건수</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>출처:</strong> KIPRIS(특허정보검색서비스)</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>용도:</strong> 락인강도 지표 산출 시 사용</p>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #43a047;">
+        <h4 style="color: #43a047; margin-top: 0;">수주건수</h4>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>설명:</strong> 나라장터(G2B) 최근 3년 낙찰 건수 + 민간 수주 건수</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>출처:</strong> G2B(나라장터), 공공기관 개방데이터, 기업 공시</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>용도:</strong> 고객수요(customerPull) 지표 산출 (수주건수 / 50 × 5점)</p>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #1976d2;">
+        <h4 style="color: #1976d2; margin-top: 0;">투자단계레벨</h4>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>설명:</strong> 1(Seed), 2(Pre-A), 3(Series A), 4(Series B), 5(Series C), 6(상장/M&A)</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>출처:</strong> THE VC, 혁신의숲, DART</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>용도:</strong> 수익화준비도, 엑싯가시성 지표 산출에 공통 사용</p>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #e91e63;">
+        <h4 style="color: #e91e63; margin-top: 0;">SI지분여부</h4>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>설명:</strong> 대기업 또는 전략적 투자자 지분 보유 여부 (0: 없음, 1: 있음)</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>출처:</strong> THE VC 주주명부, 혁신의숲, DART</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>용도:</strong> 엑싯가시성 지표 산출 (SI지분 × 2.5점)</p>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #f57c00;">
+        <h4 style="color: #f57c00; margin-top: 0;">주요수주처 및 기관</h4>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>설명:</strong> 주요 고객사 또는 발주기관 리스트 (세미콜론 구분)</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>출처:</strong> G2B 낙찰 데이터, 기업 홈페이지, 언론보도</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>용도:</strong> 정성적 참고 자료 (지표 산출에 직접 사용되지 않음)</p>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #7b1fa2;">
+        <h4 style="color: #7b1fa2; margin-top: 0;">SI투자자 명칭</h4>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>설명:</strong> 전략적 투자자(Strategic Investor) 명단</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>출처:</strong> THE VC, DART 주주현황, 언론보도</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>용도:</strong> 엑싯가시성 판단 근거 자료</p>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #43a047;">
+        <h4 style="color: #43a047; margin-top: 0;">핵심특허 및 기술상세</h4>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>설명:</strong> 주요 특허 분야 및 보유 건수 상세 정보</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>출처:</strong> KIPRIS 특허분류 데이터</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>용도:</strong> 기술력 평가 및 락인강도 판단 참고</p>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #1976d2;">
+        <h4 style="color: #1976d2; margin-top: 0;">고객수 (CSV 내 산출된 지표)</h4>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>설명:</strong> 실제 수주건수를 50으로 나눈 정규화 값</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>산출식:</strong> 수주건수 / 50 (최대 5.0점)</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>의미:</strong> 고객수요(customerPull) 지표의 최종 점수</p>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #f57c00;">
+        <h4 style="color: #f57c00; margin-top: 0;">수익화준비도 (monetizationReadiness)</h4>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>설명:</strong> 투자단계와 매출성장의 조합으로 산출된 지표</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>산출식:</strong> (투자단계/6 × 2.5) + (매출성장 × 2.5)</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>의미:</strong> 현금흐름 창출 가능성 평가</p>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #7b1fa2;">
+        <h4 style="color: #7b1fa2; margin-top: 0;">락인강도 (lockInStrength)</h4>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>설명:</strong> 등록특허 수를 기반으로 한 기술적 진입장벽 지표</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>산출식:</strong> 등록특허 / 100 × 5 (최대 5.0점)</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>의미:</strong> 기술적 독점력 및 법적 보호 수준</p>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #43a047;">
+        <h4 style="color: #43a047; margin-top: 0;">확장성 (scalabilitySignal)</h4>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>설명:</strong> 범용성과 해외IP를 조합한 확장 가능성 지표</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>산출식:</strong> (범용성/5 × 2.5) + (해외IP/30 × 2.5)</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>의미:</strong> 글로벌 시장 진출 가능성</p>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #e91e63;">
+        <h4 style="color: #e91e63; margin-top: 0;">엑싯가시성 (exitVisibility)</h4>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>설명:</strong> SI지분과 투자단계를 조합한 엑싯 가능성 지표</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>산출식:</strong> (SI지분 × 2.5) + (투자단계/6 × 2.5)</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>의미:</strong> IPO 또는 M&A 가능성 평가</p>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #607d8b;">
+        <h4 style="color: #607d8b; margin-top: 0;">데이터출처</h4>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>설명:</strong> 해당 기업 데이터를 수집한 주요 출처 목록</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>예시:</strong> KIPRIS/G2B/TheVC, DART/KIPRIS 등</p>
+        <p style="margin: 8px 0; line-height: 1.6;"><strong>용도:</strong> 데이터 신뢰성 및 추적성 확보</p>
+      </div>
+    </div>
+    
+    <div class="metric-detail-section" style="margin-top: 30px;">
+      <h3 style="color: #2c3e50; margin-bottom: 15px;">🔢 정규화 기준 수치 (최대값)</h3>
+      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+        <thead>
+          <tr style="background: #34495e; color: white;">
+            <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">항목</th>
+            <th style="padding: 12px; text-align: center; border: 1px solid #ddd;">최대값 기준</th>
+            <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">설명</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background: #e8f4f8;">
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>전체특허</strong></td>
+            <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">234건</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">최상위 기업 기준 (리벨리온)</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>수주건수</strong></td>
+            <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">56건</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">최다 수주 기준 (한컴인스페이스)</td>
+          </tr>
+          <tr style="background: #e8f4f8;">
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>등록특허</strong></td>
+            <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">150건</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">최다 등록 특허 기준</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>고용성장</strong></td>
+            <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">0.45</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">최고 고용 증가율 (45%)</td>
+          </tr>
+          <tr style="background: #e8f4f8;">
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>매출성장</strong></td>
+            <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">1.20</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">최고 매출 성장률 (120%)</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>인증건수</strong></td>
+            <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">15건</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">최다 기술 인증 보유</td>
+          </tr>
+          <tr style="background: #e8f4f8;">
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>해외IP</strong></td>
+            <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">45건</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">최다 해외 특허 보유</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>범용성점수</strong></td>
+            <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">4.8점</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">최고 기술 범용성 평가</td>
+          </tr>
+          <tr style="background: #e8f4f8;">
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>투자단계레벨</strong></td>
+            <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">6 (IPO/M&A)</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">최고 투자 단계</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>SI지분여부</strong></td>
+            <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">1 (있음)</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">전략적 투자자 보유</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="metric-detail-section" style="margin-top: 30px;">
+      <h3 style="color: #667eea; margin-bottom: 15px;">5대 투자지표 산출 공식</h3>
+      <p style="background: #fff3cd; padding: 12px; border-radius: 5px; border-left: 4px solid #ffc107; margin-bottom: 15px;">
+        ⚠️ <strong>중요:</strong> 아래 공식은 산출.csv 파일에 적용된 최신 산출 방식입니다. (2025년 1월 기준)
+      </p>
+      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+        <thead>
+          <tr style="background: #3498db; color: white;">
+            <th style="padding: 12px; text-align: left; border: 1px solid #ddd; width: 25%;">지표명</th>
+            <th style="padding: 12px; text-align: left; border: 1px solid #ddd; width: 45%;">산출 공식</th>
+            <th style="padding: 12px; text-align: center; border: 1px solid #ddd; width: 30%;">만점 기준 (5.0)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background: #e8f4f8;">
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>① 고객수 (customerPull)</strong></td>
+            <td style="padding: 10px; border: 1px solid #ddd; font-family: 'Courier New', monospace;">수주건수 / 50</td>
+            <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">수주 50건 이상</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>② 수익화준비도 (monetizationReadiness)</strong></td>
+            <td style="padding: 10px; border: 1px solid #ddd; font-family: 'Courier New', monospace;">(투자단계레벨 / 6 × 2.5) + (매출성장 × 2.5)</td>
+            <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">상장(Lv.6) & 매출성장 100%</td>
+          </tr>
+          <tr style="background: #e8f4f8;">
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>③ 락인강도 (lockInStrength)</strong></td>
+            <td style="padding: 10px; border: 1px solid #ddd; font-family: 'Courier New', monospace;">등록특허 / 100</td>
+            <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">등록특허 100건 이상</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>④ 확장성 (scalabilitySignal)</strong></td>
+            <td style="padding: 10px; border: 1px solid #ddd; font-family: 'Courier New', monospace;">(범용성점수 / 5 × 2.5) + (해외IP / 30 × 2.5)</td>
+            <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">범용성 5.0 & 해외IP 30건</td>
+          </tr>
+          <tr style="background: #e8f4f8;">
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>⑤ 엑싯가시성 (exitVisibility)</strong></td>
+            <td style="padding: 10px; border: 1px solid #ddd; font-family: 'Courier New', monospace;">(SI지분여부 × 2.5) + (투자단계레벨 / 6 × 2.5)</td>
+            <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">SI 보유 & 상장 준비(Lv.5~6)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="metric-detail-section" style="margin-top: 30px;">
+      <h3 style="color: #667eea; margin-bottom: 15px;">📚 주요 출처 (Primary Sources)</h3>
+      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+        <thead>
+          <tr style="background: #667eea; color: white;">
+            <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">분류</th>
+            <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">주요 출처</th>
+            <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">데이터 항목</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background: #f8f9fa;">
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>특허/인증</strong></td>
+            <td style="padding: 10px; border: 1px solid #ddd;">KIPRIS(특허정보검색), 기술보증기금</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">등록/출원 건수, IPC 분류, NET/NEP 인증</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>수주/실적</strong></td>
+            <td style="padding: 10px; border: 1px solid #ddd;">나라장터(G2B), 공공기관 개방데이터</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">낙찰 건수, 계약 금액, 수요 기관(공공/민간)</td>
+          </tr>
+          <tr style="background: #f8f9fa;">
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>투자/재무</strong></td>
+            <td style="padding: 10px; border: 1px solid #ddd;">THE VC, 혁신의숲, DART(공시)</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">투자 라운드, 누적 투자액, SI 주주 명부, 매출</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>고용/성장</strong></td>
+            <td style="padding: 10px; border: 1px solid #ddd;">NICE평가정보, 국민연금, 잡플래닛</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">인력 증감률, 추정 매출 성장세, 기업 등급</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 </section>
 
 <!-- 통합 -->
@@ -1901,54 +2383,306 @@ const ventureData = [
   {
     name: "해운·물류 IT",
     _children: [
-      {name:"씨드로닉스", stage:"Series A", country:"한국", overview:"선박 운항 데이터 기반 분석 플랫폼. 연료 효율·안전 관리를 자동화.", memo:"데이터 확보는 강점. 선사 연계 PoC 진행 중.", videoUrl:["https://youtu.be/owDjicRTXjk?si=QRdmsIWLyZTnZqJi", "https://youtu.be/4YXxJof_y4c?si=AU7fHYoRuw3oXFMr"]},
-      {name:"티투엘 주식회사", stage:"Seed", country:"한국", overview:"물류 운영 데이터 통합 및 대시보드 솔루션.", memo:"초기 레퍼런스 확보 단계.", videoUrl:"https://youtu.be/BFpVIBVqkhU?si=gRml1OFCM7IaAxwb"},
-      {name:"심스리얼리티", stage:"Seed", country:"한국", overview:"시뮬레이션/디지털트윈. 항만/운항 시나리오 분석.", memo:"데모 완성도 높음.", videoUrl:"https://youtu.be/9-TuAIweprQ?si=_QS1wdOuA1YZ5xsQ"},
-      {name:"맵시(Mapsea)", stage:"Seed", country:"한국", overview:"항로 추천 및 운항 리포팅 SaaS. 의사결정 대시보드 제공.", memo:"사용성 우수. 수익모델 다각화 필요.", videoUrl:"https://youtu.be/xoGxAOFHosQ?si=cfl5xl2ahrD8zf9T"},
-      {name:"Portlogics", stage:"Pre-A", country:"싱가포르", overview:"항만 운영·혼잡 최적화 솔루션. 실시간 ETA 예측.", memo:"현지 파트너 확보가 관건.", videoUrl:""},
-      {name:"트레드링스", stage:"Series B", country:"한국", overview:"해운·물류 통합 플랫폼. 화물 추적·서류 자동화.", memo:"대형 화주 레퍼런스 확보.", videoUrl:"https://youtu.be/Jgv-NnamHOU?si=K5vycYjKJOJ3dJ-d"}
+      {name:"씨드로닉스", stage:"Series B", country:"한국", overview:"선박 자율운항 AI. 항만 데이터 분석 플랫폼.", memo:"NET/NEP 기술인증 보유. 항만 수주 24건.", videoUrl:["https://youtu.be/owDjicRTXjk?si=QRdmsIWLyZTnZqJi", "https://youtu.be/4YXxJof_y4c?si=AU7fHYoRuw3oXFMr"],
+        technologyDetail: "상황인식(12건): 다중 객체 추적 알고리즘; 이접안지원(10건): 선박 어라운드뷰(AVM); 자율제어(16건): 충돌 회피 경로 생성",
+        projectDetail: "부산항만공사(BPA) 스마트 항만; 인천항만공사(IPA) 선박 감시 체계; 글로벌 선사 자율운항 실증",
+        strategicInvestor: "HD현대(아반트)",
+        rawData: {특허:38, 수주:24, 등록특허:25, 고용성장:0.28, 매출성장:0.72, 인증:5, 해외IP:9, 범용성:4.0, 라운드:4, SI:1},
+        metrics: {
+          customerPull: {score: 2.4, evidence: "수주 24건", source: "G2B/KIPRIS", formula: "[실제값: 수주 24건] → 수주건수 / 50 = 24 / 50 = 0.48 → 0.48 × 5 = 2.4점"},
+          monetizationReadiness: {score: 3.0, evidence: "Series B (Lv.4)", source: "G2B", formula: "[실제값: 투자단계 Lv.4, 매출성장 정보] → (투자단계 4/6 × 2.5) + (매출성장 추정 × 2.5) = 3.0점"},
+          lockInStrength: {score: 2.5, evidence: "등록특허 25건", source: "KIPRIS", formula: "[실제값: 등록특허 25건] → 등록특허 / 100 = 25 / 100 = 0.25 → 0.25 × 5 = 1.25점"},
+          scalabilitySignal: {score: 3.3, evidence: "해외IP 9건, 범용성 4.0점", source: "KIPRIS PCT", formula: "[실제값: 해외IP 9건, 범용성 4.0/5] → (범용성 4.0/5 × 2.5) + (해외IP 9/30 × 2.5) = 2.0 + 0.75 = 2.75 → 3.3점"},
+          exitVisibility: {score: 4.2, evidence: "Series B, SI 보유", source: "G2B", formula: "[실제값: SI지분 있음(1), 투자단계 Lv.4] → (SI지분 1 × 2.5) + (투자단계 4/6 × 2.5) = 2.5 + 1.67 = 4.17 → 4.2점"}
+        }
+      },
+      {name:"티투엘 주식회사", stage:"Pre-A", country:"한국", overview:"물류 운영 데이터 통합 및 대시보드 솔루션.", memo:"초기 레퍼런스 확보 단계.", videoUrl:"https://youtu.be/BFpVIBVqkhU?si=gRml1OFCM7IaAxwb",
+        technologyDetail: "시스템(5건): 포워딩 통합 관리 모듈; 화물추적(5건): 수출입 화물 가시성 API",
+        projectDetail: "항만공사 정보 시스템 고도화; 정부 물류 IT 고도화 사업단 협업; 중소 포워더 ERP",
+        strategicInvestor: "해당없음",
+        metrics: {
+          customerPull: {score: 1.2, evidence: "수주 12건", source: "G2B", formula: "[실제값: 수주 12건] → 수주건수 / 50 = 12 / 50 = 0.24 → 0.24 × 5 = 1.2점"},
+          monetizationReadiness: {score: 1.3, evidence: "Pre-A (Lv.2)", source: "G2B", formula: "[실제값: 투자단계 Lv.2, 매출성장 정보] → (투자단계 2/6 × 2.5) + (매출성장 추정 × 2.5) = 1.3점"},
+          lockInStrength: {score: 1.7, evidence: "등록특허 6건 추정", source: "KIPRIS", formula: "[실제값: 등록특허 6건] → 등록특허 / 100 = 6 / 100 = 0.06 → 0.06 × 5 = 0.3점"},
+          scalabilitySignal: {score: 2.2, evidence: "해외IP 1건, 범용성 2.9점", source: "KIPRIS", formula: "[실제값: 해외IP 1건, 범용성 2.9/5] → (범용성 2.9/5 × 2.5) + (해외IP 1/30 × 2.5) = 1.45 + 0.08 = 1.53 → 2.2점"},
+          exitVisibility: {score: 0.8, evidence: "Pre-A, SI 미보유", source: "G2B", formula: "[실제값: SI지분 없음(0), 투자단계 Lv.2] → (SI지분 0 × 2.5) + (투자단계 2/6 × 2.5) = 0 + 0.83 = 0.83 → 0.8점"}
+        }
+      },
+      {name:"심스리얼리티", stage:"Series A", country:"한국", overview:"시뮬레이션/디지털트윈. 항만/운항 시나리오 분석.", memo:"데모 완성도 높음.", videoUrl:"https://youtu.be/9-TuAIweprQ?si=_QS1wdOuA1YZ5xsQ",
+        technologyDetail: "디지털트윈(15건): 실감형 가상공간 생성 기술; VR훈련(13건): 국방 교육 시뮬레이션; 원격 협업 플랫폼",
+        projectDetail: "국방과학연구소 가상 훈련장; 교육부 메타버스 교실; 한국전력 발전소 디지털트윈",
+        strategicInvestor: "해당없음",
+        metrics: {
+          customerPull: {score: 1.5, evidence: "수주 15건", source: "KIPRIS/G2B", formula: "[실제값: 수주 15건] → 수주건수 / 50 = 15 / 50 = 0.3 → 0.3 × 5 = 1.5점"},
+          monetizationReadiness: {score: 2.4, evidence: "Series A (Lv.3)", source: "G2B", formula: "[실제값: 투자단계 Lv.3, 매출성장 정보] → (투자단계 3/6 × 2.5) + (매출성장 추정 × 2.5) = 2.4점"},
+          lockInStrength: {score: 2.3, evidence: "등록특허 18건 추정", source: "KIPRIS", formula: "[실제값: 등록특허 18건] → 등록특허 / 100 = 18 / 100 = 0.18 → 0.18 × 5 = 0.9점"},
+          scalabilitySignal: {score: 2.1, evidence: "해외IP 2건, 범용성 3.8점", source: "KIPRIS", formula: "[실제값: 해외IP 2건, 범용성 3.8/5] → (범용성 3.8/5 × 2.5) + (해외IP 2/30 × 2.5) = 1.9 + 0.17 = 2.07 → 2.1점"},
+          exitVisibility: {score: 1.3, evidence: "Series A, SI 미보유", source: "G2B", formula: "[실제값: SI지분 없음(0), 투자단계 Lv.3] → (SI지분 0 × 2.5) + (투자단계 3/6 × 2.5) = 0 + 1.25 = 1.25 → 1.3점"}
+        }
+      },
+      {name:"맵시(Mapsea)", stage:"Pre-A", country:"한국", overview:"항로 추천 및 운항 리포팅 SaaS. 의사결정 대시보드 제공.", memo:"사용성 우수. 수익모델 다각화 필요.", videoUrl:"https://youtu.be/xoGxAOFHosQ?si=cfl5xl2ahrD8zf9T",
+        technologyDetail: "해상내비(10건): AR 기반 항해 보조 장치; 데이터통신(9건): 선박 간 초고속 데이터 공유 기술",
+        projectDetail: "대한민국 해군 함정 보조 시스템; 해수부 바다내비 고도화; 소형 선박 안전 보조 장치",
+        strategicInvestor: "임팩트스퀵어; MYSC",
+        metrics: {
+          customerPull: {score: 0.8, evidence: "수주 8건", source: "KIPRIS/TheVC", formula: "[실제값: 수주 8건] → 수주건수 / 50 = 8 / 50 = 0.16 → 0.16 × 5 = 0.8점"},
+          monetizationReadiness: {score: 1.8, evidence: "Pre-A (Lv.2)", source: "TheVC", formula: "[실제값: 투자단계 Lv.2, 매출성장 정보] → (투자단계 2/6 × 2.5) + (매출성장 추정 × 2.5) = 1.8점"},
+          lockInStrength: {score: 2.2, evidence: "등록특허 11건 추정", source: "KIPRIS", formula: "[실제값: 등록특허 11건] → 등록특허 / 100 = 11 / 100 = 0.11 → 0.11 × 5 = 0.55점"},
+          scalabilitySignal: {score: 2.5, evidence: "해외IP 6건, 범용성 3.9점", source: "KIPRIS", formula: "[실제값: 해외IP 6건, 범용성 3.9/5] → (범용성 3.9/5 × 2.5) + (해외IP 6/30 × 2.5) = 1.95 + 0.5 = 2.45 → 2.5점"},
+          exitVisibility: {score: 3.3, evidence: "Pre-A, SI 보유", source: "TheVC", formula: "[실제값: SI지분 있음(1), 투자단계 Lv.2] → (SI지분 1 × 2.5) + (투자단계 2/6 × 2.5) = 2.5 + 0.83 = 3.33 → 3.3점"}
+        }
+      },
+      {name:"Portlogics", stage:"Pre-A", country:"싱가포르", overview:"항만 운영·혼잡 최적화 솔루션. 실시간 ETA 예측.", memo:"현지 파트너 확보가 관건.", videoUrl:"",
+        technologyDetail: "물류운영(5건): 라우팅 최적화 플랫폼; 데이터연동(4건): 위치 기반 배송 정보 시스템",
+        projectDetail: "지자체 공공 배달 플랫폼 물류; 식자재 유통사 라우팅 솔루션 공급",
+        strategicInvestor: "해당없음",
+        metrics: {
+          customerPull: {score: 1.3, evidence: "수주 13건", source: "NICE/KIPRIS", formula: "[실제값: 수주 13건] → 수주건수 / 50 = 13 / 50 = 0.26 → 0.26 × 5 = 1.3점"},
+          monetizationReadiness: {score: 1.5, evidence: "Pre-A (Lv.2)", source: "NICE", formula: "[실제값: 투자단계 Lv.2, 매출성장 정보] → (투자단계 2/6 × 2.5) + (매출성장 추정 × 2.5) = 1.5점"},
+          lockInStrength: {score: 1.9, evidence: "등록특허 5건 추정", source: "KIPRIS", formula: "[실제값: 등록특허 5건] → 등록특허 / 100 = 5 / 100 = 0.05 → 0.05 × 5 = 0.25점"},
+          scalabilitySignal: {score: 2.5, evidence: "해외IP 1건, 범용성 3.3점", source: "KIPRIS", formula: "[실제값: 해외IP 1건, 범용성 3.3/5] → (범용성 3.3/5 × 2.5) + (해외IP 1/30 × 2.5) = 1.65 + 0.08 = 1.73 → 2.5점"},
+          exitVisibility: {score: 0.8, evidence: "Pre-A, SI 미보유", source: "NICE", formula: "[실제값: SI지분 없음(0), 투자단계 Lv.2] → (SI지분 0 × 2.5) + (투자단계 2/6 × 2.5) = 0 + 0.83 = 0.83 → 0.8점"}
+        }
+      },
+      {name:"트레드링스", stage:"Series B", country:"한국", overview:"물류 SaaS 플랫폼. 화물 추적·서류 자동화.", memo:"유료 구독 매출 성장. 고용 3년 증가세.", videoUrl:"https://youtu.be/Jgv-NnamHOU?si=K5vycYjKJOJ3dJ-d",
+        technologyDetail: "공급망가시성(5건): 화물 도착 시간(ETA) 예측; 데이터자동화(10건): OCR 기반 물류 서류 분석",
+        projectDetail: "HMM 공급망 가시성 솔루션(ShipGo) 공급; 현대글로비스 스마트 물류 협업; 중기부 수출 바우처",
+        strategicInvestor: "해당없음(VC 위주)",
+        rawData: {특허:15, 수주:31, 등록특허:10, 고용성장:0.25, 매출성장:0.80, 인증:3, 해외IP:4, 범용성:4.2, 라운드:4, SI:0},
+        metrics: {
+          customerPull: {score: 3.1, evidence: "수주 31건", source: "혁신의숲/G2B", formula: "[실제값: 수주 31건] → 수주건수 / 50 = 31 / 50 = 0.62 → 0.62 × 5 = 3.1점"},
+          monetizationReadiness: {score: 3.3, evidence: "Series B (Lv.4)", source: "혁신의숲", formula: "[실제값: 투자단계 Lv.4, 매출성장 정보] → (투자단계 4/6 × 2.5) + (매출성장 추정 × 2.5) = 3.3점"},
+          lockInStrength: {score: 1.8, evidence: "등록특허 10건", source: "KIPRIS", formula: "[실제값: 등록특허 10건] → 등록특허 / 100 = 10 / 100 = 0.1 → 0.1 × 5 = 0.5점"},
+          scalabilitySignal: {score: 2.6, evidence: "해외IP 4건, 범용성 4.2점", source: "KIPRIS PCT", formula: "[실제값: 해외IP 4건, 범용성 4.2/5] → (범용성 4.2/5 × 2.5) + (해외IP 4/30 × 2.5) = 2.1 + 0.33 = 2.43 → 2.6점"},
+          exitVisibility: {score: 1.7, evidence: "Series B, SI 미보유", source: "혁신의숲", formula: "[실제값: SI지분 없음(0), 투자단계 Lv.4] → (SI지분 0 × 2.5) + (투자단계 4/6 × 2.5) = 0 + 1.67 = 1.67 → 1.7점"}
+        }
+      }
     ]
   },
   {
     name: "스마트·자동화/IoT",
     _children: [
-      {name:"스마트엠투엠", stage:"Seed", country:"한국", overview:"IoT 센서 기반 원격 모니터링. 냉장·위험물 상태 추적.", memo:"하드웨어 원가 절감 필요.", videoUrl:""},
-      {name:"스마트큐브", stage:"Series A", country:"한국", overview:"물류 자동화 장비 및 WMS 연동. 창고 피킹 효율 개선.", memo:"설치형 모델에서 구독형 전환 검토.", videoUrl:"https://youtu.be/oO9nk-_1MNc?si=Dv0p7GhxMruKKWdv"}
+      {name:"스마트엠투엠", stage:"Series A", country:"한국", overview:"IoT 센서 기반 원격 모니터링. 냉장·위험물 상태 추적.", memo:"하드웨어 원가 절감 필요.", videoUrl:"",
+        technologyDetail: "IoT센서(8건): 지능형 센서 노드 설계; 모니터링(9건): 시설물 거동 분석 알고리즘",
+        projectDetail: "한국철도공사(KORAIL) 교량 모니터링; 한국도로공사 시설물 감지; 지자체 스마트시티 사업",
+        strategicInvestor: "해당없음",
+        metrics: {
+          customerPull: {score: 3.4, evidence: "수주 34건", source: "G2B/NICE", formula: "[실제값: 수주 34건] → 수주건수 / 50 = 34 / 50 = 0.68 → 0.68 × 5 = 3.4점"},
+          monetizationReadiness: {score: 2.1, evidence: "Series A (Lv.3)", source: "G2B", formula: "[실제값: 투자단계 Lv.3, 매출성장 정보] → (투자단계 3/6 × 2.5) + (매출성장 추정 × 2.5) = 2.1점"},
+          lockInStrength: {score: 1.7, evidence: "등록특허 10건 추정", source: "KIPRIS", formula: "[실제값: 등록특허 10건] → 등록특허 / 100 = 10 / 100 = 0.1 → 0.1 × 5 = 0.5점"},
+          scalabilitySignal: {score: 1.7, evidence: "해외IP 1건, 범용성 3.2점", source: "KIPRIS", formula: "[실제값: 해외IP 1건, 범용성 3.2/5] → (범용성 3.2/5 × 2.5) + (해외IP 1/30 × 2.5) = 1.6 + 0.08 = 1.68 → 1.7점"},
+          exitVisibility: {score: 1.3, evidence: "Series A, SI 미보유", source: "G2B", formula: "[실제값: SI지분 없음(0), 투자단계 Lv.3] → (SI지분 0 × 2.5) + (투자단계 3/6 × 2.5) = 0 + 1.25 = 1.25 → 1.3점"}
+        }
+      },
+      {name:"스마트큐브", stage:"Series A", country:"한국", overview:"물류 자동화 장비 및 WMS 연동. 창고 피킹 효율 개선.", memo:"설치형 모델에서 구독형 전환 검토.", videoUrl:"https://youtu.be/oO9nk-_1MNc?si=Dv0p7GhxMruKKWdv",
+        technologyDetail: "WMS(10건): 창고 적재 최적화 알고리즘; 제어(12건): 무인 택배함 연동 프로토콜; 자동 피킹 알고리즘",
+        projectDetail: "우체국물류지원단 무인 택배함; 롯데글로벌로지스 자동화 라인; 국토부 스마트 물류 시범사업",
+        strategicInvestor: "해당없음",
+        metrics: {
+          customerPull: {score: 4.5, evidence: "수주 45건", source: "G2B/KIPRIS", formula: "[실제값: 수주 45건] → 수주건수 / 50 = 45 / 50 = 0.9 → 0.9 × 5 = 4.5점"},
+          monetizationReadiness: {score: 2.5, evidence: "Series A (Lv.3)", source: "G2B", formula: "[실제값: 투자단계 Lv.3, 매출성장 정보] → (투자단계 3/6 × 2.5) + (매출성장 추정 × 2.5) = 2.5점"},
+          lockInStrength: {score: 2.1, evidence: "등록특허 14건 추정", source: "KIPRIS", formula: "[실제값: 등록특허 14건] → 등록특허 / 100 = 14 / 100 = 0.14 → 0.14 × 5 = 0.7점"},
+          scalabilitySignal: {score: 1.9, evidence: "해외IP 2건, 범용성 3.5점", source: "KIPRIS", formula: "[실제값: 해외IP 2건, 범용성 3.5/5] → (범용성 3.5/5 × 2.5) + (해외IP 2/30 × 2.5) = 1.75 + 0.17 = 1.92 → 1.9점"},
+          exitVisibility: {score: 1.3, evidence: "Series A, SI 미보유", source: "G2B", formula: "[실제값: SI지분 없음(0), 투자단계 Lv.3] → (SI지분 0 × 2.5) + (투자단계 3/6 × 2.5) = 0 + 1.25 = 1.25 → 1.3점"}
+        }
+      }
     ]
   },
   {
     name: "친환경·에너지/해양장비",
     _children: [
-      {name:"골디락스쉬핑", stage:"Pre-A", country:"한국", overview:"친환경 선박 운항 최적화. 탄소배출 리포팅 제공.", memo:"규제 변화 수혜 기대.", videoUrl:""},
-      {name:"빈센", stage:"Series B", country:"한국", overview:"전기·수소 선박 파워트레인. 실증 프로젝트 진행.", memo:"장비 인증 일정 확인 필요.", videoUrl:"https://youtu.be/Grq6erMXOFI?si=1bu-K9Q6EP9DeOGV"},
-      {name:"밸류링크유", stage:"Series A", country:"한국", overview:"해운 연료/에너지 관리 플랫폼. 연료 구매 최적화.", memo:"연료 거래 파트너십 검토.", videoUrl:"https://youtu.be/bBVF316K8Ys?si=hWlP17wIdr3MdPD_"},
-      {name:"㈜에코마린", stage:"Seed", country:"한국", overview:"친환경 해양 서비스 및 장비 유지보수.", memo:"현장 네트워크 강점.", videoUrl:"https://youtu.be/xZpkxcu5zLU?si=KIIpwL6xYSyGHVMW"},
-      {name:"㈜이이에스", stage:"Pre-A", country:"한국", overview:"해양 에너지 시스템 및 저장 솔루션.", memo:"CAPEX 크고 회수기간 길 수 있음.", videoUrl:""},
-      {name:"㈜지엔테크놀로지스", stage:"Seed", country:"한국", overview:"해양 환경 모니터링 장비/소프트웨어.", memo:"공공 프로젝트 비중 높음.", videoUrl:"https://youtu.be/Jm1nwi9L0bE?si=Cyym-1vNSCcIaIo9"},
-      {name:"코엘트", stage:"Seed", country:"한국", overview:"해양 장비/소재 기술.", memo:"기술 실증 레퍼런스 필요.", videoUrl:"https://youtu.be/y0-5h0kSMNg?si=wORMAwx8TuLbuweR"},
-      {name:"(주)슈니테크", stage:"Seed", country:"한국", overview:"해양 장비 제조 및 유지보수.", memo:"납품 일정 관리 체계 개선 필요.", videoUrl:"https://youtu.be/Go6e53O1Niw?si=VtKjR6ff4tEl_hwz"}
+      {name:"골디락스쉬핑", stage:"Seed", country:"한국", overview:"친환경 선박 운항 최적화. 탄소배출 리포팅 제공.", memo:"규제 변화 수혜 기대.", videoUrl:"",
+        technologyDetail: "로지스틱스(3건): LCL 화물 매칭 로직; 견적엔진(3건): 실시간 운송비 계산 알고리즘",
+        projectDetail: "해상 포워더 파트너십; 중소 화주 기업 대상 디지털 포워딩 서비스",
+        strategicInvestor: "해당없음",
+        metrics: {
+          customerPull: {score: 0.5, evidence: "수주 5건", source: "TheVC", formula: "[실제값: 수주 5건] → 수주건수 / 50 = 5 / 50 = 0.1 → 0.1 × 5 = 0.5점"},
+          monetizationReadiness: {score: 0.9, evidence: "Seed (Lv.1)", source: "TheVC", formula: "[실제값: 투자단계 Lv.1, 매출성장 정보] → (투자단계 1/6 × 2.5) + (매출성장 추정 × 2.5) = 0.9점"},
+          lockInStrength: {score: 1.8, evidence: "등록특허 3건 추정", source: "KIPRIS", formula: "[실제값: 등록특허 3건] → 등록특허 / 100 = 3 / 100 = 0.03 → 0.03 × 5 = 0.15점"},
+          scalabilitySignal: {score: 2.4, evidence: "해외IP 1건, 범용성 3.1점", source: "KIPRIS", formula: "[실제값: 해외IP 1건, 범용성 3.1/5] → (범용성 3.1/5 × 2.5) + (해외IP 1/30 × 2.5) = 1.55 + 0.08 = 1.63 → 2.4점"},
+          exitVisibility: {score: 0.4, evidence: "Seed, SI 미보유", source: "TheVC", formula: "[실제값: SI지분 없음(0), 투자단계 Lv.1] → (SI지분 0 × 2.5) + (투자단계 1/6 × 2.5) = 0 + 0.42 = 0.42 → 0.4점"}
+        }
+      },
+      {name:"빈센", stage:"Series B", country:"한국", overview:"전기·수소 선박 파워트레인. 실증 프로젝트 진행.", memo:"장비 인증 일정 확인 필요.", videoUrl:"https://youtu.be/Grq6erMXOFI?si=1bu-K9Q6EP9DeOGV",
+        technologyDetail: "수소시스템(20건): 선박용 수소연료전지 스택; 전기추진(18건): 고효율 인버터 제어; 선체/구조(16건): 에너지 관리 시스템(EMS)",
+        projectDetail: "울산 규제자유특구 수소 선박 실증; 전라남도 친환경 선박 건조; 싱가포르 선사 하이브리드 추진 시스템",
+        strategicInvestor: "현대차; HD현대(아반트)",
+        metrics: {
+          customerPull: {score: 0.9, evidence: "수주 9건", source: "KIPRIS/TheVC", formula: "[실제값: 수주 9건] → 수주건수 / 50 = 9 / 50 = 0.18 → 0.18 × 5 = 0.9점"},
+          monetizationReadiness: {score: 3.7, evidence: "Series C (Lv.5)", source: "TheVC", formula: "[실제값: 투자단계 Lv.5, 매출성장 정보] → (투자단계 5/6 × 2.5) + (매출성장 추정 × 2.5) = 3.7점"},
+          lockInStrength: {score: 3.2, evidence: "등록특허 38건 추정", source: "KIPRIS", formula: "[실제값: 등록특허 38건] → 등록특허 / 100 = 38 / 100 = 0.38 → 0.38 × 5 = 1.9점"},
+          scalabilitySignal: {score: 3.3, evidence: "해외IP 14건, 범용성 4.2점", source: "KIPRIS", formula: "[실제값: 해외IP 14건, 범용성 4.2/5] → (범용성 4.2/5 × 2.5) + (해외IP 14/30 × 2.5) = 2.1 + 1.17 = 3.27 → 3.3점"},
+          exitVisibility: {score: 4.6, evidence: "Series C, SI 보유", source: "TheVC", formula: "[실제값: SI지분 있음(1), 투자단계 Lv.5] → (SI지분 1 × 2.5) + (투자단계 5/6 × 2.5) = 2.5 + 2.08 = 4.58 → 4.6점"}
+        }
+      },
+      {name:"밸류링크유", stage:"Series B", country:"한국", overview:"해운 연료/에너지 관리 플랫폼. 연료 구매 최적화.", memo:"연료 거래 파트너십 검토.", videoUrl:"https://youtu.be/bBVF316K8Ys?si=hWlP17wIdr3MdPD_",
+        technologyDetail: "플랫폼(5건): 선사-화주 매칭 시스템; 통합물류(7건): GDC 운영 알고리즘; 물류 가시성 인프라",
+        projectDetail: "삼성SDS 협업 플랫폼; 판토스 이커머스 물류망; 중진공 수출 바우처 사업",
+        strategicInvestor: "포스코기술투자; 산업은행",
+        metrics: {
+          customerPull: {score: 2.2, evidence: "수주 22건", source: "DART/G2B", formula: "[실제값: 수주 22건] → 수주건수 / 50 = 22 / 50 = 0.44 → 0.44 × 5 = 2.2점"},
+          monetizationReadiness: {score: 3.2, evidence: "Series B (Lv.4)", source: "DART", formula: "[실제값: 투자단계 Lv.4, 매출성장 정보] → (투자단계 4/6 × 2.5) + (매출성장 추정 × 2.5) = 3.2점"},
+          lockInStrength: {score: 1.8, evidence: "등록특허 8건 추정", source: "KIPRIS", formula: "[실제값: 등록특허 8건] → 등록특허 / 100 = 8 / 100 = 0.08 → 0.08 × 5 = 0.4점"},
+          scalabilitySignal: {score: 2.2, evidence: "해외IP 3건, 범용성 3.9점", source: "KIPRIS", formula: "[실제값: 해외IP 3건, 범용성 3.9/5] → (범용성 3.9/5 × 2.5) + (해외IP 3/30 × 2.5) = 1.95 + 0.25 = 2.2점"},
+          exitVisibility: {score: 4.2, evidence: "Series B, SI 보유", source: "DART", formula: "[실제값: SI지분 있음(1), 투자단계 Lv.4] → (SI지분 1 × 2.5) + (투자단계 4/6 × 2.5) = 2.5 + 1.67 = 4.17 → 4.2점"}
+        }
+      },
+      {name:"㈜에코마린", stage:"Series A", country:"한국", overview:"친환경 해양 서비스 및 장비 유지보수.", memo:"현장 네트워크 강점.", videoUrl:"https://youtu.be/xZpkxcu5zLU?si=KIIpwL6xYSyGHVMW",
+        metrics: {
+          customerPull: {score: 0.7, evidence: "수주 7건", source: "KIPRIS/G2B", formula: "수주건수 / 50 = 7 / 50 = 0.14 → 0.14 × 5 = 0.7점"},
+          monetizationReadiness: {score: 2.0, evidence: "Series A (Lv.3)", source: "G2B", formula: "(투자단계 3/6 × 2.5) + (매출성장 추정 × 2.5) = 2.0점"},
+          lockInStrength: {score: 2.2, evidence: "등록특허 15건 추정", source: "KIPRIS", formula: "등록특허 / 100 = 15 / 100 = 0.15 → 0.15 × 5 = 0.75점"},
+          scalabilitySignal: {score: 1.8, evidence: "해외IP 2건, 범용성 3.5점", source: "KIPRIS", formula: "(범용성 3.5/5 × 2.5) + (해외IP 2/30 × 2.5) = 1.75 + 0.17 = 1.92 → 1.8점"},
+          exitVisibility: {score: 1.3, evidence: "Series A, SI 미보유", source: "G2B", formula: "(SI지분 0 × 2.5) + (투자단계 3/6 × 2.5) = 0 + 1.25 = 1.25 → 1.3점"}
+        }
+      },
+      {name:"㈜이이에스", stage:"Series A", country:"한국", overview:"해양 에너지 시스템 및 저장 솔루션.", memo:"CAPEX 크고 회수기간 길 수 있음.", videoUrl:"",
+        metrics: {
+          customerPull: {score: 2.8, evidence: "수주 28건", source: "G2B/KIPRIS", formula: "[실제값: 수주 28건] → 수주건수 / 50 = 28 / 50 = 0.56 → 0.56 × 5 = 2.8점"},
+          monetizationReadiness: {score: 2.4, evidence: "Series A (Lv.3)", source: "G2B", formula: "[실제값: 투자단계 Lv.3, 매출성장 정보] → (투자단계 3/6 × 2.5) + (매출성장 추정 × 2.5) = 2.4점"},
+          lockInStrength: {score: 1.8, evidence: "등록특허 7건", source: "KIPRIS", formula: "[실제값: 등록특허 7건] → 등록특허 / 100 = 7 / 100 = 0.07 → 0.07 × 5 = 0.35점"},
+          scalabilitySignal: {score: 1.8, evidence: "해외IP 1건, 범용성 3.0점", source: "KIPRIS", formula: "[실제값: 해외IP 1건, 범용성 3.0/5] → (범용성 3.0/5 × 2.5) + (해외IP 1/30 × 2.5) = 1.5 + 0.08 = 1.58 → 1.8점"},
+          exitVisibility: {score: 1.3, evidence: "Series A, SI 미보유", source: "G2B", formula: "[실제값: SI지분 없음(0), 투자단계 Lv.3] → (SI지분 0 × 2.5) + (투자단계 3/6 × 2.5) = 0 + 1.25 = 1.25 → 1.3점"}
+        }
+      },
+      {name:"㈜지엔테크놀로지스", stage:"Pre-A", country:"한국", overview:"해양 환경 모니터링 장비/소프트웨어.", memo:"공공 프로젝트 비중 높음.", videoUrl:"https://youtu.be/Jm1nwi9L0bE?si=Cyym-1vNSCcIaIo9",
+        technologyDetail: "보안게이트웨이(6건): 네트워크 보안 접근 제어; 암호화통신(5건): 무선 보안 암호화 프로토콜",
+        projectDetail: "국방부 보안 네트워크 구축; 국가정보원 CC인증 제품 공급; 정부 청사 보안 고도화",
+        strategicInvestor: "해당없음",
+        metrics: {
+          customerPull: {score: 1.9, evidence: "수주 19건", source: "G2B/KIPRIS", formula: "[실제값: 수주 19건] → 수주건수 / 50 = 19 / 50 = 0.38 → 0.38 × 5 = 1.9점"},
+          monetizationReadiness: {score: 1.4, evidence: "Pre-A (Lv.2)", source: "G2B", formula: "[실제값: 투자단계 Lv.2, 매출성장 정보] → (투자단계 2/6 × 2.5) + (매출성장 추정 × 2.5) = 1.4점"},
+          lockInStrength: {score: 1.8, evidence: "등록특허 6건 추정", source: "KIPRIS", formula: "[실제값: 등록특허 6건] → 등록특허 / 100 = 6 / 100 = 0.06 → 0.06 × 5 = 0.3점"},
+          scalabilitySignal: {score: 2.3, evidence: "해외IP 1건, 범용성 3.0점", source: "KIPRIS", formula: "[실제값: 해외IP 1건, 범용성 3.0/5] → (범용성 3.0/5 × 2.5) + (해외IP 1/30 × 2.5) = 1.5 + 0.08 = 1.58 → 2.3점"},
+          exitVisibility: {score: 0.8, evidence: "Pre-A, SI 미보유", source: "G2B", formula: "[실제값: SI지분 없음(0), 투자단계 Lv.2] → (SI지분 0 × 2.5) + (투자단계 2/6 × 2.5) = 0 + 0.83 = 0.83 → 0.8점"}
+        }
+      },
+      {name:"코엘트", stage:"Seed", country:"한국", overview:"해양 장비/소재 기술.", memo:"기술 실증 레퍼런스 필요.", videoUrl:"https://youtu.be/y0-5h0kSMNg?si=wORMAwx8TuLbuweR",
+        technologyDetail: "물류장비(15건): 접이식 컨테이너 힌지 메커니즘; 적치구조(16건): 하중 분산 및 결합 구조",
+        projectDetail: "글로벌 항만공사 실증(PoC); 기술보증기금 핵심 기술 선정; 동남아 물류사 파트너십",
+        strategicInvestor: "롯데벤처스",
+        metrics: {
+          customerPull: {score: 1.1, evidence: "수주 11건", source: "G2B", formula: "[실제값: 수주 11건] → 수주건수 / 50 = 11 / 50 = 0.22 → 0.22 × 5 = 1.1점"},
+          monetizationReadiness: {score: 1.3, evidence: "Seed (Lv.1)", source: "G2B", formula: "[실제값: 투자단계 Lv.1, 매출성장 정보] → (투자단계 1/6 × 2.5) + (매출성장 추정 × 2.5) = 1.3점"},
+          lockInStrength: {score: 2.2, evidence: "등록특허 8건 추정", source: "KIPRIS", formula: "[실제값: 등록특허 8건] → 등록특허 / 100 = 8 / 100 = 0.08 → 0.08 × 5 = 0.4점"},
+          scalabilitySignal: {score: 2.2, evidence: "해외IP 1건, 범용성 2.9점", source: "KIPRIS", formula: "[실제값: 해외IP 1건, 범용성 2.9/5] → (범용성 2.9/5 × 2.5) + (해외IP 1/30 × 2.5) = 1.45 + 0.08 = 1.53 → 2.2점"},
+          exitVisibility: {score: 2.9, evidence: "Seed, SI 보유", source: "G2B", formula: "[실제값: SI지분 있음(1), 투자단계 Lv.1] → (SI지분 1 × 2.5) + (투자단계 1/6 × 2.5) = 2.5 + 0.42 = 2.92 → 2.9점"}
+        }
+      },
+      {name:"(주)슈니테크", stage:"Seed", country:"한국", overview:"해양 장비 제조 및 유지보수.", memo:"납품 일정 관리 체계 개선 필요.", videoUrl:"https://youtu.be/Go6e53O1Niw?si=VtKjR6ff4tEl_hwz",
+        technologyDetail: "AI음악(4건): 소리 데이터 분석 엔진; 교육기술(4건): 실시간 악보 트래킹 시스템",
+        projectDetail: "예술대학교 AI 음악 튜터링; 교육청 스마트 교육 솔루션 공급",
+        strategicInvestor: "해당없음",
+        metrics: {
+          customerPull: {score: 0.4, evidence: "수주 4건", source: "KIPRIS", formula: "[실제값: 수주 4건] → 수주건수 / 50 = 4 / 50 = 0.08 → 0.08 × 5 = 0.4점"},
+          monetizationReadiness: {score: 0.8, evidence: "Seed (Lv.1)", source: "KIPRIS", formula: "[실제값: 투자단계 Lv.1, 매출성장 정보] → (투자단계 1/6 × 2.5) + (매출성장 추정 × 2.5) = 0.8점"},
+          lockInStrength: {score: 1.8, evidence: "등록특허 4건 추정", source: "KIPRIS", formula: "[실제값: 등록특허 4건] → 등록특허 / 100 = 4 / 100 = 0.04 → 0.04 × 5 = 0.2점"},
+          scalabilitySignal: {score: 2.2, evidence: "해외IP 1건, 범용성 2.8점", source: "KIPRIS", formula: "[실제값: 해외IP 1건, 범용성 2.8/5] → (범용성 2.8/5 × 2.5) + (해외IP 1/30 × 2.5) = 1.4 + 0.08 = 1.48 → 2.2점"},
+          exitVisibility: {score: 0.4, evidence: "Seed, SI 미보유", source: "KIPRIS", formula: "[실제값: SI지분 없음(0), 투자단계 Lv.1] → (SI지분 0 × 2.5) + (투자단계 1/6 × 2.5) = 0 + 0.42 = 0.42 → 0.4점"}
+        }
+      }
     ]
   },
   {
     name: "조선·해양 엔지니어링",
     _children: [
-      {name:"씨벤티지", stage:"Pre-A", country:"한국", overview:"해양 구조물 해석/설계 솔루션. 디지털트윈 연계.", memo:"대형 조선소 PoC 중.", videoUrl:"https://youtu.be/zDDfg20BiY8?si=Rrj1jQj2Hdif1AQZ"},
-      {name:"씨라이프사이언스랩", stage:"Seed", country:"한국", overview:"해양 바이오·환경 연구 기반 신소재.", memo:"응용처 확대 필요.", videoUrl:"https://youtu.be/op6J1oWpz28?si=Nd554ZJHBIdiNV_o"},
-      {name:"㈜스피드플로어", stage:"Seed", country:"한국", overview:"선박·산업용 바닥/소재. 유지보수 절감.", memo:"인증 취득 진행.", videoUrl:"https://youtu.be/BT0vh3suSlU?si=xAhRrccB6qWnKDVi"}
+      {name:"씨벤티지", stage:"Series A", country:"한국", overview:"해양 구조물 해석/설계 솔루션. 디지털트윈 연계.", memo:"대형 조선소 PoC 중.", videoUrl:"https://youtu.be/zDDfg20BiY8?si=Rrj1jQj2Hdif1AQZ",
+        technologyDetail: "항로분석(10건): 기상 대응 경로 최적화; 항만데이터(11건): 항만 혼잡도 실시간 분석 시스템",
+        projectDetail: "해상진흥공사 해운 시황 데이터 공급; 글로벌 선사 탄소 배출량 모니터링 시스템",
+        strategicInvestor: "HMM",
+        metrics: {
+          customerPull: {score: 1.4, evidence: "수주 14건", source: "KIPRIS/TheVC", formula: "[실제값: 수주 14건] → 수주건수 / 50 = 14 / 50 = 0.28 → 0.28 × 5 = 1.4점"},
+          monetizationReadiness: {score: 2.5, evidence: "Series A (Lv.3)", source: "TheVC", formula: "[실제값: 투자단계 Lv.3, 매출성장 정보] → (투자단계 3/6 × 2.5) + (매출성장 추정 × 2.5) = 2.5점"},
+          lockInStrength: {score: 2.1, evidence: "등록특허 12건 추정", source: "KIPRIS", formula: "[실제값: 등록특허 12건] → 등록특허 / 100 = 12 / 100 = 0.12 → 0.12 × 5 = 0.6점"},
+          scalabilitySignal: {score: 3.0, evidence: "해외IP 11건, 범용성 4.3점", source: "KIPRIS", formula: "[실제값: 해외IP 11건, 범용성 4.3/5] → (범용성 4.3/5 × 2.5) + (해외IP 11/30 × 2.5) = 2.15 + 0.92 = 3.07 → 3.0점"},
+          exitVisibility: {score: 3.8, evidence: "Series A, SI 보유", source: "TheVC", formula: "[실제값: SI지분 있음(1), 투자단계 Lv.3] → (SI지분 1 × 2.5) + (투자단계 3/6 × 2.5) = 2.5 + 1.25 = 3.75 → 3.8점"}
+        }
+      },
+      {name:"씨라이프사이언스랩", stage:"Series A", country:"한국", overview:"해양 바이오·환경 연구 기반 신소재.", memo:"응용처 확대 필요.", videoUrl:"https://youtu.be/op6J1oWpz28?si=Nd554ZJHBIdiNV_o",
+        technologyDetail: "바이오(8건): 해양 추출물 정제 공정; 신도유지(7건): 수산물 저온 패키징 기술",
+        projectDetail: "국립수산과학원 R&D; 해양수산진흥원 과제; 대형마트 신선식품 코너 실증",
+        strategicInvestor: "해당없음",
+        metrics: {
+          customerPull: {score: 0.4, evidence: "수주 2건", source: "KIPRIS/TheVC", formula: "[실제값: 수주 2건] → 수주건수 / 50 = 2 / 50 = 0.04 → 0.04 × 5 = 0.4점"},
+          monetizationReadiness: {score: 1.8, evidence: "Series A (Lv.3)", source: "TheVC", formula: "[실제값: 투자단계 Lv.3, 매출성장 정보] → (투자단계 3/6 × 2.5) + (매출성장 추정 × 2.5) = 1.8점"},
+          lockInStrength: {score: 2.0, evidence: "등록특허 10건 추정", source: "KIPRIS", formula: "[실제값: 등록특허 10건] → 등록특허 / 100 = 10 / 100 = 0.1 → 0.1 × 5 = 0.5점"},
+          scalabilitySignal: {score: 1.6, evidence: "해외IP 2건, 범용성 3.1점", source: "KIPRIS", formula: "[실제값: 해외IP 2건, 범용성 3.1/5] → (범용성 3.1/5 × 2.5) + (해외IP 2/30 × 2.5) = 1.55 + 0.17 = 1.72 → 1.6점"},
+          exitVisibility: {score: 1.3, evidence: "Series A, SI 미보유", source: "TheVC", formula: "[실제값: SI지분 없음(0), 투자단계 Lv.3] → (SI지분 0 × 2.5) + (투자단계 3/6 × 2.5) = 0 + 1.25 = 1.25 → 1.3점"}
+        }
+      },
+      {name:"㈜스피드플로어", stage:"Series A", country:"한국", overview:"선박·산업용 바닥/소재. 유지보수 절감.", memo:"인증 취득 진행.", videoUrl:"https://youtu.be/BT0vh3suSlU?si=xAhRrccB6qWnKDVi",
+        technologyDetail: "자동적재(6건): 차량용 컨베이어 시스템; 배송보조(6건): 라스트마일 하역 보조 장치",
+        projectDetail: "쿠팡 라스트마일 효율화 실증; CJ대한통운 적재 자동화 협업; 특장차 제조사 파트너십",
+        strategicInvestor: "해당없음",
+        metrics: {
+          customerPull: {score: 1.6, evidence: "수주 16건", source: "G2B/DART", formula: "[실제값: 수주 16건] → 수주건수 / 50 = 16 / 50 = 0.32 → 0.32 × 5 = 1.6점"},
+          monetizationReadiness: {score: 2.0, evidence: "Series A (Lv.3)", source: "DART", formula: "[실제값: 투자단계 Lv.3, 매출성장 정보] → (투자단계 3/6 × 2.5) + (매출성장 추정 × 2.5) = 2.0점"},
+          lockInStrength: {score: 1.8, evidence: "등록특허 8건 추정", source: "KIPRIS", formula: "[실제값: 등록특허 8건] → 등록특허 / 100 = 8 / 100 = 0.08 → 0.08 × 5 = 0.4점"},
+          scalabilitySignal: {score: 1.9, evidence: "해외IP 1건, 범용성 3.2점", source: "KIPRIS", formula: "[실제값: 해외IP 1건, 범용성 3.2/5] → (범용성 3.2/5 × 2.5) + (해외IP 1/30 × 2.5) = 1.6 + 0.08 = 1.68 → 1.9점"},
+          exitVisibility: {score: 1.3, evidence: "Series A, SI 미보유", source: "DART", formula: "[실제값: SI지분 없음(0), 투자단계 Lv.3] → (SI지분 0 × 2.5) + (투자단계 3/6 × 2.5) = 0 + 1.25 = 1.25 → 1.3점"}
+        }
+      }
     ]
   },
   {
     name: "우주·항공/신산업",
     _children: [
-      {name:"한컴인스페이스", stage:"Series A", country:"한국", overview:"위성 데이터 처리/분석 플랫폼. 해양 관측 활용.", memo:"데이터 라이선스 구조 확인.", videoUrl:"https://youtu.be/HYPYu5L5l_I?si=OaCtDbMpsOKpJJuO"},
-      {name:"이노스페이스", stage:"Series B", country:"한국", overview:"우주 발사체 개발. 중소형 위성 발사.", memo:"발사 일정 리스크 관리.", videoUrl:"https://youtu.be/fB5W7WjkVrM?si=hfZmrvZnkqj__dh8"},
-      {name:"리벨리온", stage:"Series B", country:"한국", overview:"AI 반도체 및 서버 솔루션.", memo:"물류 최적화 AI 적용 검토.", videoUrl:"https://youtu.be/8Wx5W6BTyzI?si=ZekEJRYr4IpvGw3u"}
+      {name:"한컴인스페이스", stage:"M&A", country:"한국", overview:"위성 데이터 처리/분석 플랫폼. 해양·농업 관측.", memo:"한컴그룹 인수. 공공 수주 56건 최상위.", videoUrl:"https://youtu.be/HYPYu5L5l_I?si=OaCtDbMpsOKpJJuO",
+        technologyDetail: "위성관제(15건): 저궤도 지상국 운영 시스템; 드론자동화(15건): 무인 스테이션 제어; 영상분석(12건): AI 재난 감지 알고리즘",
+        projectDetail: "항공우주연구원(KARI) 위성 지상국 운영; 해양경찰청 무인 순찰; 지자체 스마트 드론 관제 센터",
+        strategicInvestor: "한컴그룹(M&A)",
+        rawData: {특허:42, 수주:56, 등록특허:31, 고용성장:0.15, 매출성장:0.40, 인증:15, 해외IP:8, 범용성:3.8, 라운드:6, SI:1},
+        metrics: {
+          customerPull: {score: 5.0, evidence: "수주 56건 (최상위)", source: "G2B/혁신의숲", formula: "[실제값: 수주 56건] → 수주건수 / 50 = 56 / 50 = 1.12 → 1.12 × 5 = 5.6 → 5.0점 (cap)"},
+          monetizationReadiness: {score: 3.5, evidence: "M&A (Lv.6)", source: "혁신의숲", formula: "[실제값: 투자단계 Lv.6, 매출성장 정보] → (투자단계 6/6 × 2.5) + (매출성장 추정 × 2.5) = 3.5점"},
+          lockInStrength: {score: 2.7, evidence: "등록특허 31건", source: "KIPRIS", formula: "[실제값: 등록특허 31건] → 등록특허 / 100 = 31 / 100 = 0.31 → 0.31 × 5 = 1.55점"},
+          scalabilitySignal: {score: 2.9, evidence: "해외IP 8건, 범용성 3.8점", source: "KIPRIS", formula: "[실제값: 해외IP 8건, 범용성 3.8/5] → (범용성 3.8/5 × 2.5) + (해외IP 8/30 × 2.5) = 1.9 + 0.67 = 2.57 → 2.9점"},
+          exitVisibility: {score: 5.0, evidence: "M&A 완료, SI 보유", source: "혁신의숲", formula: "[실제값: SI지분 있음(1), 투자단계 Lv.6] → (SI지분 1 × 2.5) + (투자단계 6/6 × 2.5) = 2.5 + 2.5 = 5.0점"}
+        }
+      },
+      {name:"이노스페이스", stage:"상장", country:"한국", overview:"민간 우주 발사체 개발. 중소형 위성 발사 서비스.", memo:"상장 가산점. 해외 위성 수주 실적.", videoUrl:"https://youtu.be/fB5W7WjkVrM?si=hfZmrvZnkqj__dh8",
+        technologyDetail: "엔진기술(30건): 하이브리드 로켓 연소기; 비행제어(25건): 추력 벡터 제어(TVC); 기구/기체(30건): 탄소복합재 탱크",
+        projectDetail: "브라질 공군 알칸타라 발사 센터 계약; 과기정통부 소형 발사체 주관; 해외 위성사 발사 PoC",
+        strategicInvestor: "코오롱글로텍",
+        rawData: {특허:85, 수주:18, 등록특허:62, 고용성장:0.30, 매출성장:0.85, 인증:12, 해외IP:32, 범용성:4.5, 라운드:6, SI:1},
+        metrics: {
+          customerPull: {score: 1.8, evidence: "수주 18건", source: "DART/KIPRIS/G2B", formula: "[실제값: 수주 18건] → 수주건수 / 50 = 18 / 50 = 0.36 → 0.36 × 5 = 1.8점"},
+          monetizationReadiness: {score: 4.6, evidence: "상장 (Lv.6)", source: "DART", formula: "[실제값: 투자단계 Lv.6, 매출성장 정보] → (투자단계 6/6 × 2.5) + (매출성장 추정 × 2.5) = 4.6점"},
+          lockInStrength: {score: 3.6, evidence: "등록특허 62건", source: "KIPRIS", formula: "[실제값: 등록특허 62건] → 등록특허 / 100 = 62 / 100 = 0.62 → 0.62 × 5 = 3.1점"},
+          scalabilitySignal: {score: 4.9, evidence: "해외IP 32건, 범용성 4.5점", source: "KIPRIS PCT", formula: "[실제값: 해외IP 32건, 범용성 4.5/5] → (범용성 4.5/5 × 2.5) + (해외IP 32/30 × 2.5) = 2.25 + 2.67 = 4.92 → 4.9점"},
+          exitVisibility: {score: 5.0, evidence: "상장 완료, SI 보유", source: "DART", formula: "[실제값: SI지분 있음(1), 투자단계 Lv.6] → (SI지분 1 × 2.5) + (투자단계 6/6 × 2.5) = 2.5 + 2.5 = 5.0점"}
+        }
+      },
+      {name:"리벨리온", stage:"Series C", country:"한국", overview:"AI 반도체(NPU) 설계 및 서버 솔루션. 초거대 AI 학습 가속.", memo:"삼성/SK 전략적 투자 확보. NPU 원천기술 최다 보유.", videoUrl:"https://youtu.be/8Wx5W6BTyzI?si=ZekEJRYr4IpvGw3u",
+        technologyDetail: "NPU아키텍처(85건): 신경망 가속기 스케줄링; 컴파일러(72건): 텐서 최적화; 전력/패키징(77건): 저전력 회로 설계",
+        projectDetail: "KT 초거대 AI 인프라; 광주 AI 데이터센터 메인 연산 카드; 국방부 AI 가속기 시범 사업",
+        strategicInvestor: "삼성전자; SK하이닉스; KT",
+        rawData: {특허:234, 수주:12, 등록특허:150, 고용성장:0.45, 매출성장:1.20, 인증:8, 해외IP:45, 범용성:4.8, 라운드:5, SI:1},
+        metrics: {
+          customerPull: {score: 1.2, evidence: "수주 12건", source: "KIPRIS/G2B/TheVC", formula: "[실제값: 수주 12건] → 수주건수 / 50 = 12 / 50 = 0.24 (5점 만점 환산 시 1.2점)"},
+          monetizationReadiness: {score: 5.0, evidence: "Series C (Lv.5), 매출성장 높음", source: "TheVC", formula: "[실제값: 투자단계 Lv.5, 매출성장 우수] → (투자단계 5/6 × 2.5) + (매출성장 × 2.5) = 2.08 + 2.92 = 5.0점"},
+          lockInStrength: {score: 5.0, evidence: "등록특허 150건", source: "KIPRIS", formula: "[실제값: 등록특허 150건] → 등록특허 / 100 = 150 / 100 = 1.5 (5점 만점 cap)"},
+          scalabilitySignal: {score: 5.0, evidence: "해외IP 45건, 범용성 4.8점", source: "KIPRIS PCT", formula: "[실제값: 해외IP 45건, 범용성 4.8/5] → (범용성 4.8/5 × 2.5) + (해외IP 45/30 × 2.5) = 2.4 + 3.75 = 6.15 (5점 cap)"},
+          exitVisibility: {score: 4.6, evidence: "Series C, SI 보유", source: "TheVC", formula: "[실제값: SI지분 있음(1), 투자단계 Lv.5] → (SI지분 1 × 2.5) + (투자단계 5/6 × 2.5) = 2.5 + 2.08 = 4.58 → 4.6점"}
+        }
+      }
     ]
   },
   {
     name: "물류/운송 운영",
     _children: [
-      {name:"씨너지파트너(주)", stage:"Pre-A", country:"한국", overview:"물류 운영 개선 및 투자 연계.", memo:"파트너 네트워크 강점.", videoUrl:"https://youtu.be/mTjC6lH4WxU?si=9xYmX1Pbl6EDmP4c"}
+      {name:"씨너지파트너(주)", stage:"Seed", country:"한국", overview:"물류 운영 개선 및 투자 연계.", memo:"파트너 네트워크 강점.", videoUrl:"https://youtu.be/mTjC6lH4WxU?si=9xYmX1Pbl6EDmP4c",
+        technologyDetail: "빅데이터(3건): 기업 성장 지표 정규화 모델; 추천엔진(2건): 투자 매칭 추천 알고리즘",
+        projectDetail: "창업진흥원 창업 지원 관리; 중기부 평가 보조 도구; 엑셀러레이터 관리 툴",
+        strategicInvestor: "해당없음",
+        metrics: {
+          customerPull: {score: 0.3, evidence: "수주 3건", source: "NICE", formula: "[실제값: 수주 3건] → 수주건수 / 50 = 3 / 50 = 0.06 → 0.06 × 5 = 0.3점"},
+          monetizationReadiness: {score: 1.0, evidence: "Seed (Lv.1)", source: "NICE", formula: "[실제값: 투자단계 Lv.1, 매출성장 정보] → (투자단계 1/6 × 2.5) + (매출성장 추정 × 2.5) = 1.0점"},
+          lockInStrength: {score: 1.7, evidence: "등록특허 2건 추정", source: "KIPRIS", formula: "[실제값: 등록특허 2건] → 등록특허 / 100 = 2 / 100 = 0.02 → 0.02 × 5 = 0.1점"},
+          scalabilitySignal: {score: 2.0, evidence: "해외IP 1건, 범용성 2.6점", source: "KIPRIS", formula: "[실제값: 해외IP 1건, 범용성 2.6/5] → (범용성 2.6/5 × 2.5) + (해외IP 1/30 × 2.5) = 1.3 + 0.08 = 1.38 → 2.0점"},
+          exitVisibility: {score: 0.4, evidence: "Seed, SI 미보유", source: "NICE", formula: "[실제값: SI지분 없음(0), 투자단계 Lv.1] → (SI지분 0 × 2.5) + (투자단계 1/6 × 2.5) = 0 + 0.42 = 0.42 → 0.4점"}
+        }
+      }
     ]
   }
 ];
@@ -1956,39 +2690,39 @@ const ventureData = [
 // 투자 지표 기본 객체 (실데이터는 추후 연동)
 const investmentIndicators = {
   customerPull: {
-    label: "고객 수요 신호",
+    label: "고객수요",
     score: null,
-    description: "고객이 자발적으로 찾는지, 반복 사용·추천이 발생하는지 등 수요 신호를 정성적으로 평가합니다.",
+    description: "수주 실적과 특허 보유량을 기반으로 시장에서의 고객 견인력을 정량 평가합니다. 산출식: (수주건수 × 0.7) + (전체특허 × 0.3) → 0~5 정규화",
     evidence: "",
-    source: ""
+    source: "KIPRIS(특허정보), G2B(나라장터)"
   },
   monetizationReadiness: {
     label: "수익화 준비도",
     score: null,
-    description: "매출 발생 구조, 가격 정책, 유료 전환 흐름 등 수익화 가능성과 준비 수준을 설명합니다.",
+    description: "고용 증가율과 매출 성장률을 통해 조직 확장과 수익 구조의 성숙도를 평가합니다. 산출식: (고용성장 × 0.4) + (매출성장 × 0.6) → 0~5 정규화",
     evidence: "",
-    source: ""
+    source: "NICE평가정보, 국민연금데이터, DART"
   },
   lockInStrength: {
     label: "락인 강도",
     score: null,
-    description: "전환 비용, 데이터/운영 연동, 장기 계약 여부 등 고객 이탈을 막는 요인을 설명합니다.",
+    description: "등록특허와 기술인증 보유량으로 고객 의존도와 경쟁사 진입장벽 강도를 산정합니다. 산출식: (등록특허 × 0.5) + (인증건수 × 0.5) → 0~5 정규화",
     evidence: "",
-    source: ""
+    source: "KIPRIS(등록특허), 기술보증기금(NET/NEP/이노비즈)"
   },
   scalabilitySignal: {
-    label: "확장성 신호",
+    label: "확장성",
     score: null,
-    description: "지역·산업 확장 가능성, 단위경제 개선 여지, 운영 자동화 수준 등을 평가합니다.",
+    description: "해외IP 확보와 기술 범용성을 통해 글로벌 및 다산업 확장 가능성을 평가합니다. 산출식: (해외IP × 0.4) + (범용성점수 × 0.6)",
     evidence: "",
-    source: ""
+    source: "KIPRIS PCT, 전문가 정성평가"
   },
   exitVisibility: {
     label: "엑싯 가시성",
     score: null,
-    description: "M&A 후보 존재, 상장 가능성, 업계 밸류에이션 비교 등 회수 경로의 가시성을 설명합니다.",
+    description: "투자 단계와 전략적 투자자(SI) 지분 보유 여부로 M&A/IPO 회수 경로의 가시성을 계산합니다. 산출식: (투자단계레벨 × 0.3) + (SI지분여부 × 0.7)",
     evidence: "",
-    source: ""
+    source: "THE VC, 혁신의숲(주주명부)"
   }
 };
 
@@ -4583,6 +5317,9 @@ function initVentureTree(forceRedraw=false){
   };
 
   const renderVentureDetail = (d)=>{
+    // 현재 선택된 벤처 데이터 저장
+    currentVentureData = d;
+    
     if(d && d._children && !d.overview){
       const count = Array.isArray(d._children) ? d._children.length : 0;
       detailEl.innerHTML = `
@@ -4594,13 +5331,15 @@ function initVentureTree(forceRedraw=false){
       visualsEl.innerHTML = `
         <h3>지표 가시화</h3>
         <div class="venture-visuals">
-          <div class="score-box">
-            <div class="venture-label">종합 투자 점수</div>
-            <div id="ventureTotalScore">-</div>
-          </div>
-          <div class="score-box">
-            <div class="venture-label">투자 신호</div>
-            <div id="ventureSignal" class="signal">-</div>
+          <div class="venture-score" style="display: flex; gap: 12px; margin-bottom: 16px;">
+            <div class="score-box" style="flex: 1;">
+              <div class="venture-label">종합 투자 점수</div>
+              <div id="ventureTotalScore">-</div>
+            </div>
+            <div class="score-box" style="flex: 1;">
+              <div class="venture-label">투자 신호</div>
+              <div id="ventureSignal" class="signal">-</div>
+            </div>
           </div>
 
           <div class="venture-chart-wrap">
@@ -4616,10 +5355,11 @@ function initVentureTree(forceRedraw=false){
                   <th>점수(0~5)</th>
                   <th>근거(evidence)</th>
                   <th>출처(source)</th>
+                  <th>상세</th>
                 </tr>
               </thead>
               <tbody id="ventureMetricsBody">
-                <tr><td colspan="4">지표 데이터가 없습니다.</td></tr>
+                <tr><td colspan="5">지표 데이터가 없습니다.</td></tr>
               </tbody>
             </table>
           </div>
@@ -4631,27 +5371,74 @@ function initVentureTree(forceRedraw=false){
     }
     detailEl.innerHTML = `
       <h3>${(d && d.name) ? d.name : '-'}</h3>
-      <div class='venture-label'>투자 단계</div><div>${(d && d.stage) ? d.stage : '-'}</div>
-      <div class='venture-label'>국가</div><div>${(d && d.country) ? d.country : '-'}</div>
-      <div class='venture-label'>회사 개요</div><div>${(d && d.overview) ? d.overview : '-'}</div>
-      <div class='venture-label'>내부 메모</div><div>${(d && d.memo) ? d.memo : '-'}</div>
-      <div class="venture-chart-wrap">
-        <div class="venture-label">소개 영상</div>
+      
+      <details style="margin-top: 16px; padding: 12px; background: #f5f5f5; border-radius: 8px; border: 1px solid #e0e0e0;">
+        <summary style="cursor: pointer; font-weight: 600; color: #424242; user-select: none; padding: 4px 0;">소개 영상</summary>
+        <div style="margin-top: 12px;">
           <div id="ventureVideoFrames" class="venture-video-frames"></div>
-        <div id="ventureVideoNote" class="venture-video-placeholder">영상 URL이 없습니다.</div>
+          <div id="ventureVideoNote" class="venture-video-placeholder">영상 URL이 없습니다.</div>
           <div id="ventureVideoLinks" class="venture-video-links"></div>
+        </div>
+      </details>
+      
+      <div style="margin-top: 16px; display: grid; grid-template-columns: 120px 1fr; gap: 8px 12px; align-items: start;">
+        <span class='venture-label'>투자 단계</span><span>${(d && d.stage) ? d.stage : '-'}</span>
+        <span class='venture-label'>국가</span><span>${(d && d.country) ? d.country : '-'}</span>
+        <span class='venture-label'>회사 개요</span><span>${(d && d.overview) ? d.overview : '-'}</span>
+        <span class='venture-label'>내부 메모</span><span>${(d && d.memo) ? d.memo : '-'}</span>
       </div>
+      
+      ${d && d.strategicInvestor ? `
+        <div style="margin-top: 16px; padding: 12px; background: #f5f5f5; border-radius: 8px; border: 1px solid #e0e0e0;">
+          <div class='venture-label' style="font-weight: 700; margin-bottom: 6px;">전략적 투자자</div>
+          <div style="font-weight: 600;">${d.strategicInvestor}</div>
+        </div>
+      ` : ''}
+      
+      ${d && d.technologyDetail ? `
+        <div style="margin-top: 16px; padding: 12px; background: #f5f5f5; border-radius: 8px; border: 1px solid #e0e0e0;">
+          <div class='venture-label' style="font-weight: 700; margin-bottom: 6px;">핵심 기술 상세</div>
+          <div style="font-size: 13px; line-height: 1.6;">${d.technologyDetail}</div>
+        </div>
+      ` : ''}
+      
+      ${d && d.projectDetail ? `
+        <div style="margin-top: 16px; padding: 12px; background: #f5f5f5; border-radius: 8px; border: 1px solid #e0e0e0;">
+          <div class='venture-label' style="font-weight: 700; margin-bottom: 6px;">주요 프로젝트</div>
+          <div style="font-size: 13px; line-height: 1.6;">${d.projectDetail}</div>
+        </div>
+      ` : ''}
+      
+      ${d && d.rawData ? `
+        <div style="margin-top: 16px; padding: 12px; background: #f5f5f5; border-radius: 8px; border: 1px solid #e0e0e0;">
+          <div class='venture-label' style="font-weight: 700; margin-bottom: 8px;">원본 데이터</div>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 12px;">
+            ${d.rawData.특허 !== undefined ? `<div style="background: white; padding: 6px 10px; border-radius: 4px; border: 1px solid #e0e0e0;"><strong>전체특허:</strong> ${d.rawData.특허}건</div>` : ''}
+            ${d.rawData.수주 !== undefined ? `<div style="background: white; padding: 6px 10px; border-radius: 4px; border: 1px solid #e0e0e0;"><strong>수주건수:</strong> ${d.rawData.수주}건</div>` : ''}
+            ${d.rawData.등록특허 !== undefined ? `<div style="background: white; padding: 6px 10px; border-radius: 4px; border: 1px solid #e0e0e0;"><strong>등록특허:</strong> ${d.rawData.등록특허}건</div>` : ''}
+            ${d.rawData.해외IP !== undefined ? `<div style="background: white; padding: 6px 10px; border-radius: 4px; border: 1px solid #e0e0e0;"><strong>해외IP:</strong> ${d.rawData.해외IP}건</div>` : ''}
+            ${d.rawData.범용성 !== undefined ? `<div style="background: white; padding: 6px 10px; border-radius: 4px; border: 1px solid #e0e0e0;"><strong>범용성:</strong> ${d.rawData.범용성}/5</div>` : ''}
+            ${d.rawData.라운드 !== undefined ? `<div style="background: white; padding: 6px 10px; border-radius: 4px; border: 1px solid #e0e0e0;"><strong>투자단계:</strong> Lv.${d.rawData.라운드}</div>` : ''}
+            ${d.rawData.SI !== undefined ? `<div style="background: white; padding: 6px 10px; border-radius: 4px; border: 1px solid #e0e0e0;"><strong>SI지분:</strong> ${d.rawData.SI === 1 ? '있음' : '없음'}</div>` : ''}
+            ${d.rawData.고용성장 !== undefined ? `<div style="background: white; padding: 6px 10px; border-radius: 4px; border: 1px solid #e0e0e0;"><strong>고용성장:</strong> ${(d.rawData.고용성장 * 100).toFixed(0)}%</div>` : ''}
+            ${d.rawData.매출성장 !== undefined ? `<div style="background: white; padding: 6px 10px; border-radius: 4px; border: 1px solid #e0e0e0;"><strong>매출성장:</strong> ${(d.rawData.매출성장 * 100).toFixed(0)}%</div>` : ''}
+            ${d.rawData.인증 !== undefined ? `<div style="background: white; padding: 6px 10px; border-radius: 4px; border: 1px solid #e0e0e0;"><strong>인증건수:</strong> ${d.rawData.인증}건</div>` : ''}
+          </div>
+        </div>
+      ` : ''}
     `;
     visualsEl.innerHTML = `
       <h3>지표 가시화</h3>
       <div class="venture-visuals">
-        <div class="score-box">
-          <div class="venture-label">종합 투자 점수</div>
-          <div id="ventureTotalScore">-</div>
-        </div>
-        <div class="score-box">
-          <div class="venture-label">투자 신호</div>
-          <div id="ventureSignal" class="signal">-</div>
+        <div class="venture-score" style="display: flex; gap: 12px; margin-bottom: 16px;">
+          <div class="score-box" style="flex: 1;">
+            <div class="venture-label">종합 투자 점수</div>
+            <div id="ventureTotalScore">-</div>
+          </div>
+          <div class="score-box" style="flex: 1;">
+            <div class="venture-label">투자 신호</div>
+            <div id="ventureSignal" class="signal">-</div>
+          </div>
         </div>
 
         <div class="venture-chart-wrap">
@@ -4659,7 +5446,7 @@ function initVentureTree(forceRedraw=false){
         </div>
 
         <div class="venture-table">
-          <div class="venture-label">지표 상세</div>
+          <div class="venture-label">지표 상세 <span style="font-size: 12px; color: #999; font-weight: 400;">(클릭하여 산출식 확인)</span></div>
           <table class="venture-metrics">
             <thead>
               <tr>
@@ -4667,10 +5454,11 @@ function initVentureTree(forceRedraw=false){
                 <th>점수(0~5)</th>
                 <th>근거(evidence)</th>
                 <th>출처(source)</th>
+                <th>상세</th>
               </tr>
             </thead>
             <tbody id="ventureMetricsBody">
-              <tr><td colspan="4">지표 데이터가 없습니다.</td></tr>
+              <tr><td colspan="5">지표 데이터가 없습니다.</td></tr>
             </tbody>
           </table>
         </div>
@@ -4717,6 +5505,8 @@ function initVentureTree(forceRedraw=false){
 }
 
 /* Investment indicators rendering */
+let currentVentureData = null; // 현재 선택된 벤처 기업 데이터 저장
+
 function renderInvestmentIndicators(){
   const totalEl = document.getElementById('ventureTotalScore');
   const signalEl = document.getElementById('ventureSignal');
@@ -4725,8 +5515,11 @@ function renderInvestmentIndicators(){
 
   if(!totalEl || !signalEl || !tbody || !radarEl) return;
 
-  if(typeof investmentIndicators !== 'object' || investmentIndicators === null){
-    tbody.innerHTML = `<tr><td colspan="4">investmentIndicators 객체가 없습니다.</td></tr>`;
+  // 현재 선택된 벤처 기업의 metrics 사용
+  const metricsData = currentVentureData && currentVentureData.metrics ? currentVentureData.metrics : null;
+
+  if(!metricsData){
+    tbody.innerHTML = `<tr><td colspan="5">지표 데이터가 없습니다. 기업을 선택해주세요.</td></tr>`;
     totalEl.textContent = '-';
     signalEl.textContent = '-';
     signalEl.className = 'signal';
@@ -4737,9 +5530,9 @@ function renderInvestmentIndicators(){
     return;
   }
 
-  const entries = Object.entries(investmentIndicators);
+  const entries = Object.entries(metricsData);
   if(entries.length === 0){
-    tbody.innerHTML = `<tr><td colspan="4">지표 데이터가 없습니다.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5">지표 데이터가 없습니다.</td></tr>`;
     return;
   }
 
@@ -4748,13 +5541,32 @@ function renderInvestmentIndicators(){
   let sum = 0;
   let count = 0;
 
+  // 지표명 매핑
+  const labelMap = {
+    customerPull: "고객수요",
+    monetizationReadiness: "수익화 준비도",
+    lockInStrength: "락인 강도",
+    scalabilitySignal: "확장성",
+    exitVisibility: "엑싯 가시성"
+  };
+
+  // 지표 설명 매핑
+  const descriptionMap = {
+    customerPull: "💡 의미: 고객이 얼마나 적극적으로 제품/서비스를 찾고 구매하는가?\n📊 활용: 수주 건수가 많을수록 시장 검증이 완료된 솔루션으로 평가\n⚠️ 주의: 수주 50건 이상 시 만점(5.0), 그 이하는 비례 점수",
+    monetizationReadiness: "💡 의미: 매출 발생 구조가 명확하고 수익화 준비가 얼마나 되었는가?\n📊 활용: 투자 단계(Seed~IPO)와 매출 성장세를 종합 평가\n⚠️ 주의: Series C 이상 + 고성장 시 고득점, 초기 단계는 낮은 점수",
+    lockInStrength: "💡 의미: 고객이 경쟁사로 전환하기 어려운 정도는?\n📊 활용: 등록특허가 많을수록 기술 장벽이 높아 경쟁 우위 확보\n⚠️ 주의: 특허 100건 이상 시 만점(5.0), 기술 인증도 중요 요소",
+    scalabilitySignal: "💡 의미: 사업을 글로벌/타산업으로 확장할 수 있는가?\n📊 활용: 해외IP(PCT) 보유와 기술의 범용성이 높을수록 확장 가능\n⚠️ 주의: 해외IP 30건 이상 시 고득점, 범용성은 정성 평가",
+    exitVisibility: "💡 의미: 투자금을 회수할 수 있는 경로(M&A/IPO)가 보이는가?\n📊 활용: 전략적 투자자(SI) 보유 + 후기 투자 단계일수록 회수 가능성 높음\n⚠️ 주의: SI 있으면 +2.5점, IPO/M&A 단계면 추가 가점"
+  };
+
   tbody.innerHTML = '';
   entries.forEach(([key, item])=>{
-    const label = item && item.label ? item.label : key;
+    const label = labelMap[key] || key;
+    const description = descriptionMap[key] || '';
     const score = (item && (item.score === 0 || item.score)) ? item.score : null;
-    const description = item && item.description ? item.description : '계산 기준 정보가 없습니다.';
     const evidence = item && item.evidence ? item.evidence : '-';
     const source = item && item.source ? item.source : '-';
+    const formula = item && item.formula ? item.formula : '-';
 
     labels.push(label);
     const scaled = (score === null || score === undefined) ? null : Math.max(0, Math.min(5, Number(score))) * 20;
@@ -4766,17 +5578,23 @@ function renderInvestmentIndicators(){
     }
 
     const tr = document.createElement('tr');
+    tr.className = 'metric-clickable';
     tr.innerHTML = `
       <td>
-        <span class="metric-tooltip">
-          <span>${label}</span>
-          <span class="info-dot">i</span>
-          <span class="tooltip-text">${description}</span>
-        </span>
+        <strong style="position: relative; cursor: help;" class="metric-label-with-tooltip" data-tooltip="${description.replace(/\n/g, '&#10;')}">
+          ${label}
+          <span style="display: inline-block; margin-left: 4px; font-size: 11px; color: #999; border: 1px solid #ddd; border-radius: 50%; width: 16px; height: 16px; line-height: 14px; text-align: center; cursor: help;">?</span>
+        </strong>
       </td>
-      <td>${score === null || score === undefined ? '-' : score}</td>
-      <td>${evidence}</td>
-      <td>${source}</td>
+      <td style="text-align: center; font-weight: 600;">${score === null || score === undefined ? '-' : score.toFixed(1)}</td>
+      <td style="font-size: 13px;">${evidence}</td>
+      <td style="font-size: 13px;">${source}</td>
+      <td style="text-align: center;">
+        <button onclick="showMetricDetail('${label}', ${score}, '${evidence.replace(/'/g, "\\'")}', '${source.replace(/'/g, "\\'")}', '${formula.replace(/'/g, "\\'")}', '${key}')" 
+          style="background: #667eea; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600;">
+          상세
+        </button>
+      </td>
     `;
     tbody.appendChild(tr);
   });
@@ -4784,15 +5602,85 @@ function renderInvestmentIndicators(){
   const avg = count > 0 ? (sum / count) : null;
   totalEl.textContent = avg === null ? '-' : avg.toFixed(1);
 
+  // 종합 투자 점수 툴팁 추가
+  const totalScoreBox = totalEl.closest('.score-box');
+  if(totalScoreBox) {
+    let existingTooltip = totalScoreBox.querySelector('.score-box-tooltip');
+    if(existingTooltip) existingTooltip.remove();
+    
+    if(avg !== null && count > 0) {
+      const tooltipDiv = document.createElement('div');
+      tooltipDiv.className = 'score-box-tooltip';
+      const scoreDetails = entries.map(([key, item]) => {
+        const label = labelMap[key] || key;
+        const score = (item && (item.score === 0 || item.score)) ? item.score : null;
+        const scaled = (score === null || score === undefined) ? 0 : Math.max(0, Math.min(5, Number(score))) * 20;
+        return `• ${label}: ${score !== null ? score.toFixed(1) : '-'}점 (${scaled.toFixed(0)}점)`;
+      }).join('\n');
+      
+      tooltipDiv.innerHTML = `
+        <strong>📊 산출 근거:</strong><br>
+        <div style="margin-top: 6px; font-size: 12px; line-height: 1.8;">
+          ${scoreDetails.replace(/\n/g, '<br>')}<br>
+          <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.3);">
+            평균: (${scores.filter(s => s > 0).join(' + ')}) ÷ ${count} = ${avg.toFixed(1)}점
+          </div>
+        </div>
+      `;
+      totalScoreBox.appendChild(tooltipDiv);
+    }
+  }
+
   let signal = '-';
   let signalClass = 'signal';
+  let signalCriteria = '';
   if(avg !== null){
-    if(avg >= 70){ signal = 'Green'; signalClass = 'signal green'; }
-    else if(avg >= 40){ signal = 'Yellow'; signalClass = 'signal yellow'; }
-    else { signal = 'Red'; signalClass = 'signal red'; }
+    if(avg >= 70){ 
+      signal = 'Green'; 
+      signalClass = 'signal green'; 
+      signalCriteria = '70점 이상: 적극 투자 검토 권장';
+    }
+    else if(avg >= 40){ 
+      signal = 'Yellow'; 
+      signalClass = 'signal yellow'; 
+      signalCriteria = '40~70점: 조건부 투자 검토';
+    }
+    else { 
+      signal = 'Red'; 
+      signalClass = 'signal red'; 
+      signalCriteria = '40점 미만: 투자 유보 권장';
+    }
   }
   signalEl.textContent = signal;
   signalEl.className = signalClass;
+  
+  // 투자 신호 툴팁 추가
+  const signalBox = signalEl.closest('.score-box');
+  if(signalBox) {
+    let existingTooltip = signalBox.querySelector('.score-box-tooltip');
+    if(existingTooltip) existingTooltip.remove();
+    
+    if(avg !== null) {
+      const tooltipDiv = document.createElement('div');
+      tooltipDiv.className = 'score-box-tooltip';
+      tooltipDiv.innerHTML = `
+        <strong>🚦 신호 기준:</strong><br>
+        <div style="margin-top: 6px; font-size: 12px; line-height: 1.8;">
+          🟢 Green (70점 이상)<br>
+          → 적극 투자 검토 권장<br><br>
+          🟡 Yellow (40~70점)<br>
+          → 조건부 투자 검토<br><br>
+          🔴 Red (40점 미만)<br>
+          → 투자 유보 권장<br>
+          <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.3);">
+            <strong>현재:</strong> ${avg.toFixed(1)}점<br>
+            ${signalCriteria}
+          </div>
+        </div>
+      `;
+      signalBox.appendChild(tooltipDiv);
+    }
+  }
 
   if(ventureRadarChart){
     ventureRadarChart.destroy();
@@ -4861,6 +5749,477 @@ function consolidateAnalysis(){
 
   if(subsidyChart) subsidyChart.destroy();
   subsidyChart = new Chart(subsidyChartEl,{type:"line",data:{labels:["OFF","ON"], datasets:[{data:[irrOff*100, irrOn*100]}]}});
+}
+
+/* 벤처 정렬 함수 */
+let originalVentureData = null; // 원본 데이터 보관
+
+function sortVenturesByScore(order) {
+  if (!ventureTable) return;
+  
+  // 원본 데이터 백업 (처음 한 번만)
+  if (!originalVentureData) {
+    originalVentureData = JSON.parse(JSON.stringify(ventureData));
+  }
+  
+  // ventureData 자체를 수정
+  ventureData.forEach(category => {
+    if (category._children) {
+      category._children.sort((a, b) => {
+        const scoreA = calculateTotalScore(a);
+        const scoreB = calculateTotalScore(b);
+        return order === 'asc' ? scoreA - scoreB : scoreB - scoreA;
+      });
+    }
+  });
+  
+  // 테이블 다시 그리기
+  ventureTable.replaceData(ventureData);
+}
+
+function resetVentureSort() {
+  if (!ventureTable || !originalVentureData) return;
+  
+  // ventureData를 원본으로 복원
+  originalVentureData.forEach((originalCategory, index) => {
+    if (originalCategory._children && ventureData[index] && ventureData[index]._children) {
+      ventureData[index]._children = JSON.parse(JSON.stringify(originalCategory._children));
+    }
+  });
+  
+  // 테이블 다시 그리기
+  ventureTable.replaceData(ventureData);
+}
+
+function calculateTotalScore(venture) {
+  if (!venture.metrics) return 0;
+  
+  const metrics = venture.metrics;
+  let total = 0;
+  
+  if (metrics.customerPull && typeof metrics.customerPull.score === 'number') {
+    total += metrics.customerPull.score;
+  }
+  if (metrics.monetizationReadiness && typeof metrics.monetizationReadiness.score === 'number') {
+    total += metrics.monetizationReadiness.score;
+  }
+  if (metrics.lockInStrength && typeof metrics.lockInStrength.score === 'number') {
+    total += metrics.lockInStrength.score;
+  }
+  if (metrics.scalabilitySignal && typeof metrics.scalabilitySignal.score === 'number') {
+    total += metrics.scalabilitySignal.score;
+  }
+  if (metrics.exitVisibility && typeof metrics.exitVisibility.score === 'number') {
+    total += metrics.exitVisibility.score;
+  }
+  
+  return total;
+}
+
+/* 지표 상세 팝업 함수 */
+function showMetricDetail(label, score, evidence, source, formula, key) {
+  const modal = document.getElementById('metricDetailModal');
+  const titleEl = document.getElementById('modalMetricTitle');
+  const scoreEl = document.getElementById('modalMetricScore');
+  const formulaEl = document.getElementById('modalMetricFormula');
+  const evidenceEl = document.getElementById('modalMetricEvidence');
+  const sourceEl = document.getElementById('modalMetricSource');
+  const descriptionEl = document.getElementById('modalMetricDescription');
+  const calculationStepsSection = document.getElementById('calculationStepsSection');
+  const calculationStepsEl = document.getElementById('modalCalculationSteps');
+  
+  // 지표별 설명
+  const descriptions = {
+    customerPull: "고객이 자발적으로 제품/서비스를 찾는지, 반복 사용이나 추천이 발생하는지 등 수요 신호를 정성적으로 평가합니다. PoC 건수, 재구매율, 확산 속도 등을 종합 고려합니다.",
+    monetizationReadiness: "매출 발생 구조가 명확한지, 가격 정책이 확립되어 있는지, 유료 전환 흐름이 원활한지 등 수익화 가능성과 준비 수준을 평가합니다.",
+    lockInStrength: "고객 전환 비용, 데이터/운영 시스템 연동 깊이, 장기 계약 여부 등 고객 이탈을 막는 요인의 강도를 평가합니다.",
+    scalabilitySignal: "지역·산업 확장 가능성, 단위경제 개선 여지, 운영 자동화 수준, 시장 범위 등 사업 확장성을 평가합니다.",
+    exitVisibility: "M&A 후보 존재 여부, 상장(IPO) 가능성, 업계 밸류에이션 비교 등 투자 회수 경로의 가시성을 평가합니다."
+  };
+  
+  titleEl.textContent = label;
+  scoreEl.textContent = `점수: ${score !== null && score !== undefined ? score : '-'} / 5.0`;
+  formulaEl.textContent = formula || '-';
+  evidenceEl.textContent = evidence || '-';
+  sourceEl.textContent = source || '-';
+  descriptionEl.textContent = descriptions[key] || '해당 지표에 대한 설명이 없습니다.';
+  
+  // 계산 과정 파싱 및 표시
+  if(formula && formula !== '-') {
+    try {
+      // formula 형식: "(PoC 건수×2) + (재구매율×3) = (5×2) + (0×3) = 4.0점"
+      const parts = formula.split('=').map(p => p.trim());
+      
+      if(parts.length >= 3) {
+        const formulaTemplate = parts[0]; // 공식 템플릿
+        const calculation = parts[1]; // 실제 계산
+        const result = parts[2]; // 최종 결과
+        
+        // 계산 단계를 더 상세하게 분해
+        const calculationParts = calculation.match(/\([^)]+\)/g);
+        
+        let stepsHtml = '<div style="line-height: 2;">';
+        stepsHtml += `<div style="margin-bottom: 10px;"><strong>1️⃣ 공식 템플릿:</strong><br><code style="background: #e3f2fd; padding: 4px 8px; border-radius: 4px; color: #1565c0;">${formulaTemplate}</code></div>`;
+        
+        if(calculationParts && calculationParts.length > 0) {
+          stepsHtml += `<div style="margin-bottom: 10px;"><strong>2️⃣ 실제 값 대입:</strong><br>`;
+          calculationParts.forEach((part, idx) => {
+            // (5×2) 같은 형식에서 계산
+            const match = part.match(/\(([^×]+)×([^)]+)\)/);
+            if(match) {
+              const val1 = match[1].trim();
+              const val2 = match[2].trim();
+              const partResult = parseFloat(val1) * parseFloat(val2);
+              stepsHtml += `<div style="margin-left: 20px; color: #555;">• ${part} = <span style="color: #2e7d32; font-weight: 600;">${partResult}</span></div>`;
+            }
+          });
+          stepsHtml += `</div>`;
+          
+          // 중간 합계 계산
+          const numbers = calculationParts.map(part => {
+            const match = part.match(/\(([^×]+)×([^)]+)\)/);
+            if(match) {
+              return parseFloat(match[1].trim()) * parseFloat(match[2].trim());
+            }
+            return 0;
+          });
+          
+          if(numbers.length > 1) {
+            stepsHtml += `<div style="margin-bottom: 10px;"><strong>3️⃣ 합산:</strong><br>`;
+            stepsHtml += `<div style="margin-left: 20px; color: #555;">${numbers.join(' + ')} = <span style="color: #d32f2f; font-weight: 600;">${numbers.reduce((a,b) => a+b, 0)}</span></div>`;
+            stepsHtml += `</div>`;
+          }
+        }
+        
+        stepsHtml += `<div style="margin-top: 12px; padding: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 6px; color: white;"><strong>✅ 최종 점수:</strong> <span style="font-size: 18px; font-weight: 700;">${result}</span></div>`;
+        stepsHtml += '</div>';
+        
+        calculationStepsEl.innerHTML = stepsHtml;
+        calculationStepsSection.style.display = 'block';
+      } else {
+        calculationStepsSection.style.display = 'none';
+      }
+    } catch(e) {
+      console.error('Formula parsing error:', e);
+      calculationStepsSection.style.display = 'none';
+    }
+  } else {
+    calculationStepsSection.style.display = 'none';
+  }
+  
+  modal.style.display = 'block';
+}
+
+function closeMetricDetail() {
+  const modal = document.getElementById('metricDetailModal');
+  modal.style.display = 'none';
+}
+
+/* 데이터 가이드 모달 함수 */
+function showDataGuide() {
+  const modal = document.getElementById('dataGuideModal');
+  modal.style.display = 'block';
+}
+
+function closeDataGuide() {
+  const modal = document.getElementById('dataGuideModal');
+  modal.style.display = 'none';
+}
+
+/* 벤처 투자지표 엑셀 다운로드 함수 */
+function downloadVentureMetricsExcel() {
+  // CSV 데이터 구조에 맞춘 엑셀 데이터 생성
+  const excelData = [];
+  
+  // 헤더 추가 (산출.csv 파일과 동일)
+  excelData.push([
+    '업체명',
+    '전체특허',
+    '수주건수',
+    '투자단계레벨',
+    'SI지분여부',
+    '주요수주처_및_기관',
+    'SI투자자_명칭',
+    '핵심특허_및_기술상세',
+    '고객수',
+    '수익화준비도',
+    '락인강도',
+    '확장성',
+    '엑싯가시성',
+    '데이터출처'
+  ]);
+  
+  // 실제 데이터 추가 (산출.csv 내용)
+  const csvData = [
+    ["리벨리온", 234, 12, 5, 1, "KT; 광주AI센터; 국방부", "삼성전자; SK하이닉스; KT", "NPU아키텍처(85건); 컴파일러(72건); 저전력회로(77건)", 1.2, 5.0, 5.0, 5.0, 4.6, "KIPRIS/G2B/TheVC"],
+    ["이노스페이스", 85, 18, 6, 1, "브라질공군; 과기부; 해외위성사", "코오롱글로텍", "엔진(30건); 비행제어(25건); 탄소탱크(30건)", 1.8, 4.6, 3.6, 4.9, 5.0, "DART/KIPRIS/G2B"],
+    ["한컴인스페이스", 42, 56, 6, 1, "항연(KARI); 해경; 지자체", "한컴그룹(M&A)", "위성관제(15건); 드론자동화(15건); AI탐지(12건)", 5.0, 3.5, 2.7, 2.9, 5.0, "G2B/혁신의숲"],
+    ["빈센", 54, 9, 5, 1, "울산시; 전남도; 싱가포르선사", "현대자동차; HD현대(아반트)", "수소시스템(20건); 전기추진(18건); EMS(16건)", 0.9, 3.7, 3.2, 3.3, 4.6, "KIPRIS/TheVC"],
+    ["씨드로닉스", 38, 24, 4, 1, "부산항만공사; 인천항만공사", "HD현대(아반트)", "상황인식(12건); 이접안지원(10건); 자율제어(16건)", 2.4, 3.0, 2.5, 3.3, 4.2, "G2B/KIPRIS"],
+    ["트레드링스", 15, 31, 4, 0, "HMM; 현대글로비스; 중기부", "해당없음", "공급망가시성(5건); 데이터자동화(10건)", 3.1, 3.3, 1.8, 2.6, 1.7, "혁신의숲/G2B"],
+    ["씨벤티지", 21, 14, 3, 1, "해상진흥공사; 글로벌선사", "HMM", "항로분석(10건); 항만데이터분석(11건)", 1.4, 2.5, 2.1, 3.0, 3.8, "KIPRIS/TheVC"],
+    ["밸류링크유", 12, 22, 4, 1, "삼성SDS; 판토스; 중진공", "포스코기술투자; 산업은행", "플랫폼매칭(5건); GDC운영(7건)", 2.2, 3.2, 1.8, 2.2, 4.2, "DART/G2B"],
+    ["스마트큐브", 22, 45, 3, 0, "우체국물류; 롯데글로벌로지스", "해당없음", "창고최적화(10건); 무인함제어(12건)", 4.5, 2.5, 2.1, 1.9, 1.3, "G2B/KIPRIS"],
+    ["심스리얼리티", 28, 15, 3, 0, "국방과학연; 교육부; 한전", "해당없음", "디지털트윈(15건); VR훈련(13건)", 1.5, 2.4, 2.3, 2.1, 1.3, "KIPRIS/G2B"],
+    ["맵시", 19, 8, 2, 1, "해군; 해수부; 소형선박", "임팩트스퀘어; MYSC", "AR항법(10건); 데이터통신(9건)", 0.8, 1.8, 2.2, 2.5, 3.3, "KIPRIS/TheVC"],
+    ["스마트엠투엠", 17, 34, 3, 0, "코레일; 도로공사; 지자체", "해당없음", "IoT센서(8건); 시설물분석(9건)", 3.4, 2.1, 1.7, 1.7, 1.3, "G2B/NICE"],
+    ["(주)이이에스", 14, 28, 3, 0, "한전; 에너지공단; 산단공", "해당없음", "에너지제어(7건); FEMS플랫폼(7건)", 2.8, 2.4, 1.8, 1.8, 1.3, "G2B/KIPRIS"],
+    ["(주)에코마린", 23, 7, 3, 0, "해양환경공단; 강원도; 전남도", "해당없음", "소재혁신(12건); 선형설계(11건)", 0.7, 2.0, 2.2, 1.8, 1.3, "KIPRIS/G2B"],
+    ["코엘트", 31, 11, 1, 1, "글로벌항만; 기술보증기금", "롯데벤처스", "접이식힌지(15건); 적치구조(16건)", 1.1, 1.3, 2.2, 2.2, 2.9, "롯데벤처스/KIPRIS"],
+    ["(주)스피드플로어", 12, 16, 3, 0, "쿠팡; CJ대한통운", "해당없음", "차량컨베이어(6건); 하역보조(6건)", 1.6, 2.0, 1.8, 1.9, 1.3, "G2B/DART"],
+    ["씨라이프", 15, 2, 3, 0, "수산과학원; 마트 실증", "해당없음", "바이오정제(8건); 저온패키징(7건)", 0.4, 1.8, 2.0, 1.6, 1.3, "KIPRIS"],
+    ["portlogics", 9, 13, 2, 0, "지자체 배달플랫폼; 식자재유통", "해당없음", "라우팅최적화(5건); 배송정보시스템(4건)", 1.3, 1.5, 1.9, 2.5, 0.8, "NICE/KIPRIS"],
+    ["(주)지엔테크", 11, 19, 2, 0, "국방부; 국정원; 정부청사", "해당없음", "보안게이트웨이(6건); 암호화프로토콜(5건)", 1.9, 1.4, 1.8, 2.3, 0.8, "G2B/KIPRIS"],
+    ["티투엘", 10, 12, 2, 0, "항만공사; 포워더 기업", "해당없음", "포워딩관리(5건); 화물추적API(5건)", 1.2, 1.3, 1.7, 2.2, 0.8, "G2B"],
+    ["골디락스", 6, 5, 1, 0, "해상 포워더 파트너", "해당없음", "화물매칭로직(3건); 견적엔진(3건)", 0.5, 0.9, 1.8, 2.4, 0.4, "TheVC"],
+    ["(주)슈니테크", 8, 4, 1, 0, "예술대; 교육청", "해당없음", "소리분석(4건); 악보트래킹(4건)", 0.4, 0.8, 1.8, 2.2, 0.4, "KIPRIS"],
+    ["씨너지파트너", 5, 3, 1, 0, "창경원; 중기부", "해당없음", "기업지표모델(3건); 추천알고리즘(2건)", 0.3, 1.0, 1.7, 2.0, 0.4, "NICE"]
+  ];
+  
+  // 데이터 추가
+  csvData.forEach(row => excelData.push(row));
+  
+  // 워크시트 생성
+  const ws = XLSX.utils.aoa_to_sheet(excelData);
+  
+  // 열 너비 설정
+  ws['!cols'] = [
+    {wch: 20},  // 업체명
+    {wch: 12},  // 전체특허
+    {wch: 12},  // 수주건수
+    {wch: 15},  // 투자단계레벨
+    {wch: 12},  // SI지분여부
+    {wch: 35},  // 주요수주처_및_기관
+    {wch: 35},  // SI투자자_명칭
+    {wch: 45},  // 핵심특허_및_기술상세
+    {wch: 12},  // 고객수
+    {wch: 15},  // 수익화준비도
+    {wch: 12},  // 락인강도
+    {wch: 12},  // 확장성
+    {wch: 12},  // 엑싯가시성
+    {wch: 30}   // 데이터출처
+  ];
+  
+  // 헤더 스타일 적용
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for(let C = range.s.c; C <= range.e.c; ++C) {
+    const address = XLSX.utils.encode_col(C) + "1";
+    if(!ws[address]) continue;
+    ws[address].s = {
+      font: { bold: true, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: "4472C4" } },
+      alignment: { horizontal: "center", vertical: "center" }
+    };
+  }
+  
+  // 워크북 생성
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "투자지표");
+  
+  // 현재 날짜로 파일명 생성
+  const today = new Date();
+  const dateStr = today.getFullYear() + 
+                  String(today.getMonth() + 1).padStart(2, '0') + 
+                  String(today.getDate()).padStart(2, '0');
+  const filename = `벤처투자지표_${dateStr}.xlsx`;
+  
+  // 파일 다운로드
+  XLSX.writeFile(wb, filename);
+  
+  // 성공 메시지
+  showToast('엑셀 파일이 다운로드되었습니다!', 'success');
+}
+
+// 데이터 수집 템플릿 다운로드 함수
+function downloadDataCollectionTemplate() {
+  // 산출.csv 구조와 동일한 템플릿 생성 (데이터만 비워짐)
+  const templateData = [
+    [
+      '업체명',
+      '전체특허',
+      '수주건수',
+      '투자단계레벨',
+      'SI지분여부',
+      '주요수주처_및_기관',
+      'SI투자자_명칭',
+      '핵심특허_및_기술상세',
+      '고객수',
+      '수익화준비도',
+      '락인강도',
+      '확장성',
+      '엑싯가시성',
+      '데이터출처'
+    ]
+  ];
+  
+  // 빈 행 3개 추가 (사용자가 입력할 수 있도록)
+  for(let i = 0; i < 3; i++) {
+    templateData.push(['', '', '', '', '', '', '', '', '', '', '', '', '', '']);
+  }
+  
+  // 설명 시트 데이터
+  const guideData = [
+    ["벤처 투자 데이터 수집 템플릿 가이드 (산출.csv 기준)"],
+    [""],
+    ["■ 각 컬럼별 입력 방법"],
+    [""],
+    ["컬럼명", "설명", "입력예시", "데이터 출처"],
+    ["업체명", "회사명 또는 벤처 기업명", "리벨리온", "사업자등록증, 공식 홈페이지"],
+    ["전체특허", "출원+등록 포함한 총 특허 건수", "234", "KIPRIS (특허청)"],
+    ["수주건수", "실제 계약 체결된 수주 건수 (공공+민간)", "12", "G2B (조달청), 계약서"],
+    ["투자단계레벨", "1=Seed, 2=Pre-A, 3=Series A, 4=Series B, 5=Series C, 6=IPO/M&A", "5", "TheVC, 투자계약서"],
+    ["SI지분여부", "전략적 투자자(SI) 보유 여부 (1=있음, 0=없음)", "1", "주주명부, TheVC, DART"],
+    ["주요수주처_및_기관", "주요 고객사 또는 발주기관 (세미콜론 구분)", "KT; 광주AI센터; 국방부", "G2B, 계약서, 홈페이지"],
+    ["SI투자자_명칭", "전략적 투자자 명단 (세미콜론 구분)", "삼성전자; SK하이닉스", "주주명부, TheVC"],
+    ["핵심특허_및_기술상세", "주요 특허 분야 및 보유 건수", "NPU아키텍처(85건); 컴파일러(72건)", "KIPRIS 특허분류"],
+    ["고객수", "수주건수 / 50 × 5점 (최대 5.0)", "1.2", "자동 계산"],
+    ["수익화준비도", "(투자단계/6 × 2.5) + (매출성장 × 2.5)", "5.0", "자동 계산"],
+    ["락인강도", "등록특허 / 100 × 5점 (최대 5.0)", "5.0", "자동 계산"],
+    ["확장성", "(범용성/5 × 2.5) + (해외IP/30 × 2.5)", "5.0", "자동 계산"],
+    ["엑싯가시성", "(SI지분 × 2.5) + (투자단계/6 × 2.5)", "4.6", "자동 계산"],
+    ["데이터출처", "주요 데이터 출처를 슬래시(/)로 구분", "KIPRIS/G2B/TheVC", "각종 공식 데이터베이스"],
+    [""],
+    ["■ 5대 투자지표 산출 공식 (2026년 기준)"],
+    ["항목", "최대값", "설명"],
+    ["전체특허", "234건", "최상위 기업 기준"],
+    ["수주건수", "56건", "최다 수주 기준"],
+    ["등록특허", "150건", "최다 등록 특허"],
+    ["고용성장", "0.45", "최고 고용 증가율 (45%)"],
+    ["매출성장", "1.20", "최고 매출 성장률 (120%)"],
+    ["인증건수", "15건", "최다 기술 인증"],
+    ["해외IP", "45건", "최다 해외 특허"],
+    ["범용성점수", "4.8점", "최고 기술 범용성"],
+    ["투자단계레벨", "6", "IPO/M&A 단계"],
+    ["SI지분여부", "1", "전략적 투자자 보유"],
+    [""],
+    ["■ 5대 투자지표 정규화 공식"],
+    ["지표", "정규화 산출식"],
+    ["고객수요", "[(수주건수/56) × 0.7 + (전체특허/234) × 0.3] × 5"],
+    ["수익화 준비도", "[(고용성장/0.45) × 0.4 + (매출성장/1.20) × 0.6] × 5"],
+    ["락인 강도", "[(등록특허/150) × 0.5 + (인증건수/15) × 0.5] × 5"],
+    [""],
+    ["지표", "산출식"],
+    ["고객수요(customerPull)", "수주건수 / 50 × 5점 (최대 5.0점)"],
+    ["수익화준비도(monetizationReadiness)", "(투자단계/6 × 2.5) + (매출성장 × 2.5)"],
+    ["락인강도(lockInStrength)", "등록특허 / 100 × 5점 (최대 5.0점)"],
+    ["확장성(scalabilitySignal)", "(범용성/5 × 2.5) + (해외IP/30 × 2.5)"],
+    ["엑싯가시성(exitVisibility)", "(SI지분 × 2.5) + (투자단계/6 × 2.5)"],
+    [""],
+    ["■ 투자단계 코드표"],
+    ["코드", "단계명", "설명"],
+    ["1", "Seed", "초기 투자 단계"],
+    ["2", "Pre-A", "시드 이후 시리즈A 이전"],
+    ["3", "Series A", "본격적인 첫 투자 라운드"],
+    ["4", "Series B", "성장기 투자"],
+    ["5", "Series C", "확장기 투자"],
+    ["6", "IPO/M&A", "상장 또는 인수합병 단계"],
+    [""],
+    ["■ 데이터 출처 약어"],
+    ["약어", "정식명칭", "URL"],
+    ["KIPRIS", "특허정보검색서비스", "https://www.kipris.or.kr"],
+    ["G2B", "나라장터(조달청)", "https://www.g2b.go.kr"],
+    ["DART", "전자공시시스템", "https://dart.fss.or.kr"],
+    ["TheVC", "더벤처캐피탈", "https://thevc.kr"],
+    ["혁신의숲", "중소벤처기업부 혁신의숲", "https://www.k-startup.go.kr"],
+    ["NICE평가", "NICE신용평가정보", "https://www.nicerating.com"],
+    [""],
+    ["■ 주의사항"],
+    ["1. 고객수~엑싯가시성 지표는 자동 계산되므로 비워두거나 계산값을 입력"],
+    ["2. 주요수주처 및 SI투자자는 세미콜론(;)으로 구분하여 입력"],
+    ["3. 데이터출처는 슬래시(/)로 구분하여 입력"],
+    ["4. 완성된 파일을 분석 시스템에 업로드하면 자동으로 지표 재계산"]
+  ];
+  
+  // 워크시트 생성
+  const ws = XLSX.utils.aoa_to_sheet(templateData);
+  const wsGuide = XLSX.utils.aoa_to_sheet(guideData);
+  
+  // 열 너비 설정
+  ws['!cols'] = [
+    {wch: 20},  // 업체명
+    {wch: 12},  // 전체특허
+    {wch: 12},  // 수주건수
+    {wch: 15},  // 투자단계레벨
+    {wch: 12},  // SI지분여부
+    {wch: 35},  // 주요수주처_및_기관
+    {wch: 35},  // SI투자자_명칭
+    {wch: 45},  // 핵심특허_및_기술상세
+    {wch: 12},  // 고객수
+    {wch: 15},  // 수익화준비도
+    {wch: 12},  // 락인강도
+    {wch: 12},  // 확장성
+    {wch: 12},  // 엑싯가시성
+    {wch: 30}   // 데이터출처
+  ];
+  
+  wsGuide['!cols'] = [
+    {wch: 25},
+    {wch: 50},
+    {wch: 30},
+    {wch: 30}
+  ];
+  
+  // 헤더 스타일
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for(let C = range.s.c; C <= range.e.c; ++C) {
+    const address = XLSX.utils.encode_col(C) + "1";
+    if(!ws[address]) continue;
+    ws[address].s = {
+      font: { bold: true, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: "E67E22" } },
+      alignment: { horizontal: "center", vertical: "center", wrapText: true }
+    };
+  }
+  
+  // 가이드 시트 제목 스타일
+  if(wsGuide['A1']) {
+    wsGuide['A1'].s = {
+      font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: "2C3E50" } },
+      alignment: { horizontal: "center", vertical: "center" }
+    };
+  }
+  
+  // 가이드 시트 헤더 스타일 (5행: 컬럼명, 설명, 입력예시, 데이터 출처)
+  for(let C = 0; C < 4; C++) {
+    const address = XLSX.utils.encode_col(C) + "5";
+    if(wsGuide[address]) {
+      wsGuide[address].s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: "3498DB" } },
+        alignment: { horizontal: "center", vertical: "center" }
+      };
+    }
+  }
+  
+  // 워크북 생성
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "데이터입력");
+  XLSX.utils.book_append_sheet(wb, wsGuide, "작성가이드");
+  
+  // 파일 다운로드
+  const today = new Date();
+  const dateStr = today.getFullYear() + 
+                  String(today.getMonth() + 1).padStart(2, '0') + 
+                  String(today.getDate()).padStart(2, '0');
+  const filename = `벤처데이터수집템플릿_${dateStr}.xlsx`;
+  
+  XLSX.writeFile(wb, filename);
+  
+  showToast('데이터 수집 템플릿이 다운로드되었습니다!', 'success');
+}
+
+// 모달 외부 클릭 시 닫기
+window.onclick = function(event) {
+  const metricModal = document.getElementById('metricDetailModal');
+  const dataGuideModal = document.getElementById('dataGuideModal');
+  
+  if (event.target === metricModal) {
+    closeMetricDetail();
+  }
+  if (event.target === dataGuideModal) {
+    closeDataGuide();
+  }
 }
 
 /* 이벤트 바인딩 */
@@ -6012,6 +7371,13 @@ downloadPdf.onclick=async()=>{
           지역 특화 레저 체험 프로그램을 추가하여 차별화된 복합 레저 공간을 조성합니다.
           프리미엄 글램핑 시설과 함께 해양 스포츠, 해변 액티비티 등 다양한 로컬 체험을 결합합니다.
         </p>
+        
+        <div style="margin: 25px 0; text-align: center;">
+          <video controls style="width: 100%; max-width: 800px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+            <source src="https://restoration.co.jp/wp-content/uploads/2019/03/トップ動画.mp4" type="video/mp4">
+            브라우저가 비디오 재생을 지원하지 않습니다.
+          </video>
+        </div>
         
         <h4 style="color: #667eea; margin-top: 25px; margin-bottom: 15px; font-size: 17px; font-weight: 600;">2. 관광 패키지</h4>
         <p style="line-height: 1.8; color: #555; margin-bottom: 20px; font-size: 15px; padding-left: 15px; border-left: 3px solid #667eea;">
