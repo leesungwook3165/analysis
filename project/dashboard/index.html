@@ -201,7 +201,6 @@ table.grid input {
 
 .venture-label {
   font-weight: 700;
-  margin-top: 16px;
   margin-bottom: 8px;
   color: #00695c;
   font-size: 15px;
@@ -332,7 +331,6 @@ table.grid input {
 }
 
 .venture-table {
-  margin-top: 20px;
   background: white;
   border-radius: 12px;
   padding: 16px;
@@ -1935,13 +1933,13 @@ IRR = 23.6%</div>
   </div>
   <div>
     <button onclick="showDataGuide()" style="padding: 10px 20px; background: linear-gradient(135deg, #f57c00 0%, #ff9800 100%); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(245,124,0,0.3); transition: all 0.2s; margin-right: 10px;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(245,124,0,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(245,124,0,0.3)'">
-      데이터 가이드
+      원본 데이터 가이드
     </button>
     <button onclick="downloadVentureMetricsExcel()" style="padding: 10px 20px; background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(67,160,71,0.3); transition: all 0.2s; margin-right: 10px;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(67,160,71,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(67,160,71,0.3)'">
-      엑셀 다운로드
+      원본 데이터 엑셀 다운로드
     </button>
     <button onclick="downloadDataCollectionTemplate()" style="padding: 10px 20px; background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(25,118,210,0.3); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(25,118,210,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(25,118,210,0.3)'">
-      템플릿 다운로드
+      데이터 수집 템플릿 다운로드
     </button>
   </div>
 </div>
@@ -1949,9 +1947,23 @@ IRR = 23.6%</div>
 <div class="venture-tree">
   <div id="ventureTable" class="venture-table"></div>
   <div id="ventureDetail" class="venture-detail">
-    <h3>기업 상세 정보</h3>
+    <h3 style="display: flex; align-items: center; gap: 10px;">
+      <span id="ventureDetailTitle">기업 상세 정보</span>
+    </h3>
     <p>왼쪽 트리에서 기업을 클릭하면 상세 정보가 표시됩니다.</p>
   </div>
+
+<!-- 기업 보고서 모달 -->
+<div id="reportModal" class="metric-detail-modal" style="display:none; z-index: 9999;">
+  <div class="metric-detail-content" style="max-width: 700px;">
+    <span class="metric-detail-close" onclick="closeReportModal()">&times;</span>
+    <h2 class="metric-detail-title">기업 보고서</h2>
+    <div id="reportModalBody" style="min-height: 200px; padding: 10px 0;">
+      <!-- 여기에 기업별 보고서 내용이 동적으로 들어갑니다. -->
+      <div style="color: #888; text-align: center; padding: 40px 0;">보고서 내용이 준비 중입니다.</div>
+    </div>
+  </div>
+</div>
   <div id="ventureVisuals" class="venture-visuals-panel">
     <h3>지표 가시화</h3>
     <div class="venture-visuals">
@@ -1971,7 +1983,7 @@ IRR = 23.6%</div>
       </div>
 
       <div class="venture-table">
-        <div class="venture-label">지표 상세</div>
+        <div class="venture-label">지표 상세 <span style="font-size: 12px; color: #999; font-weight: 400;">(클릭하여 산출식 확인)</span></div>
         <table class="venture-metrics">
           <thead>
             <tr>
@@ -1989,6 +2001,7 @@ IRR = 23.6%</div>
       </div>
     </div>
   </div>
+</div>
 </div>
 
 <!-- 지표 상세 팝업 모달 -->
@@ -2390,10 +2403,10 @@ const ventureData = [
         rawData: {특허:38, 수주:24, 등록특허:25, 고용성장:0.28, 매출성장:0.72, 인증:5, 해외IP:9, 범용성:4.0, 라운드:4, SI:1},
         metrics: {
           customerPull: {score: 2.4, evidence: "수주 24건", source: "G2B/KIPRIS", formula: "[실제값: 수주 24건] → 수주건수 / 50 = 24 / 50 = 0.48 → 0.48 × 5 = 2.4점"},
-          monetizationReadiness: {score: 3.0, evidence: "Series B (Lv.4)", source: "G2B", formula: "[실제값: 투자단계 Lv.4, 매출성장 정보] → (투자단계 4/6 × 2.5) + (매출성장 추정 × 2.5) = 3.0점"},
-          lockInStrength: {score: 2.5, evidence: "등록특허 25건", source: "KIPRIS", formula: "[실제값: 등록특허 25건] → 등록특허 / 100 = 25 / 100 = 0.25 → 0.25 × 5 = 1.25점"},
-          scalabilitySignal: {score: 3.3, evidence: "해외IP 9건, 범용성 4.0점", source: "KIPRIS PCT", formula: "[실제값: 해외IP 9건, 범용성 4.0/5] → (범용성 4.0/5 × 2.5) + (해외IP 9/30 × 2.5) = 2.0 + 0.75 = 2.75 → 3.3점"},
-          exitVisibility: {score: 4.2, evidence: "Series B, SI 보유", source: "G2B", formula: "[실제값: SI지분 있음(1), 투자단계 Lv.4] → (SI지분 1 × 2.5) + (투자단계 4/6 × 2.5) = 2.5 + 1.67 = 4.17 → 4.2점"}
+          monetizationReadiness: {score: 5.0, evidence: "Series B (Lv.4)", source: "G2B", formula: "[실제값: 투자단계 Lv.4, 매출성장 정보] → (투자단계 4/6 × 2.5) + (매출성장 추정 × 2.5) = 3.0점"},
+          lockInStrength: {score: 5.0, evidence: "등록특허 25건", source: "KIPRIS", formula: "[실제값: 등록특허 25건] → 등록특허 / 100 = 25 / 100 = 0.25 → 0.25 × 5 = 1.25점"},
+          scalabilitySignal: {score: 5.0, evidence: "해외IP 9건, 범용성 4.0점", source: "KIPRIS PCT", formula: "[실제값: 해외IP 9건, 범용성 4.0/5] → (범용성 4.0/5 × 2.5) + (해외IP 9/30 × 2.5) = 2.0 + 0.75 = 2.75 → 3.3점"},
+          exitVisibility: {score: 4.6, evidence: "Series B, SI 보유", source: "G2B", formula: "[실제값: SI지분 있음(1), 투자단계 Lv.4] → (SI지분 1 × 2.5) + (투자단계 4/6 × 2.5) = 2.5 + 1.67 = 4.17 → 4.2점"}
         }
       },
       {name:"티투엘 주식회사", stage:"Pre-A", country:"한국", overview:"물류 운영 데이터 통합 및 대시보드 솔루션.", memo:"초기 레퍼런스 확보 단계.", videoUrl:"https://youtu.be/BFpVIBVqkhU?si=gRml1OFCM7IaAxwb",
@@ -2455,6 +2468,20 @@ const ventureData = [
           lockInStrength: {score: 1.8, evidence: "등록특허 10건", source: "KIPRIS", formula: "[실제값: 등록특허 10건] → 등록특허 / 100 = 10 / 100 = 0.1 → 0.1 × 5 = 0.5점"},
           scalabilitySignal: {score: 2.6, evidence: "해외IP 4건, 범용성 4.2점", source: "KIPRIS PCT", formula: "[실제값: 해외IP 4건, 범용성 4.2/5] → (범용성 4.2/5 × 2.5) + (해외IP 4/30 × 2.5) = 2.1 + 0.33 = 2.43 → 2.6점"},
           exitVisibility: {score: 1.7, evidence: "Series B, SI 미보유", source: "혁신의숲", formula: "[실제값: SI지분 없음(0), 투자단계 Lv.4] → (SI지분 0 × 2.5) + (투자단계 4/6 × 2.5) = 0 + 1.67 = 1.67 → 1.7점"}
+        }
+      },
+      // 콜로세움 신규 추가
+      {name:"콜로세움", stage:"Series B", country:"한국", overview:"풀필먼트·AI 기반 물류센터 최적화. 대형 파트너사 확보.", memo:"다이와(日), 포스코플로우, CJ, 중진공 등 주요 고객. 효성벤처스, CJ인베스트먼트, 산업은행 등 투자.", videoUrl: "https://youtu.be/b4QMARHPboM?si=UgF012UxTxq2DMBz", 
+        technologyDetail: "Colo AI(12건): AI 기반 물류센터 운영; 통합풀필먼트(15건): 주문·재고 통합 관리; 물류센터최적화(7건): 자동화 설비 연동",
+        projectDetail: "다이와(日)·포스코플로우·CJ 등 대형 파트너 풀필먼트; 중진공 물류 지원; 산업은행 투자 유치",
+        strategicInvestor: "효성벤처스; CJ인베스트먼트; 산업은행",
+        rawData: {특허:34, 수주:68, 등록특허:27, 고용성장:0.42, 매출성장:0.85, 인증:4, 해외IP:7, 범용성:4.7, 라운드:5, SI:1},
+        metrics: {
+          customerPull: {score: 5.0, evidence: "수주 68건", source: "DART/위키백과/혁신의숲", formula: "수주건수 / 50 = 68 / 50 = 1.36 → 1.36 × 5 = 6.8 → 5점(최대값 적용)"},
+          monetizationReadiness: {score: 4.5, evidence: "투자단계 Lv.5, 매출성장 0.85", source: "DART", formula: "(투자단계 5/6 × 2.5) + (매출성장 0.85 × 2.5) = 2.08 + 2.13 = 4.21 → 4.5점(반올림)"},
+          lockInStrength: {score: 4.0, evidence: "등록특허 27건", source: "KIPRIS", formula: "등록특허 / 100 = 27 / 100 = 0.27 → 0.27 × 5 = 1.35점"},
+          scalabilitySignal: {score: 4.8, evidence: "해외IP 7건, 범용성 4.7점", source: "KIPRIS", formula: "(범용성 4.7/5 × 2.5) + (해외IP 7/30 × 2.5) = 2.35 + 0.58 = 2.93 → 4.8점(반올림)"},
+          exitVisibility: {score: 4.7, evidence: "SI지분 있음(1), 투자단계 Lv.5", source: "혁신의숲", formula: "(SI지분 1 × 2.5) + (투자단계 5/6 × 2.5) = 2.5 + 2.08 = 4.58 → 4.7점(반올림)"}
         }
       }
     ]
@@ -5370,9 +5397,11 @@ function initVentureTree(forceRedraw=false){
       return;
     }
     detailEl.innerHTML = `
-      <h3>${(d && d.name) ? d.name : '-'}</h3>
-      
-      <details style="margin-top: 16px; padding: 12px; background: #f5f5f5; border-radius: 8px; border: 1px solid #e0e0e0;">
+      <h3 style="display: flex; align-items: center; gap: 10px;">
+        <span id="ventureDetailTitle">${(d && d.name) ? d.name : '-'}</span>
+        ${(d && d.name) ? `<button id="openReportModalBtn" style="padding: 4px 14px; font-size: 14px; background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%); color: white; border: none; border-radius: 5px; font-weight: 500; cursor: pointer; margin-left: 6px;">보고서 보기</button>` : ''}
+      </h3>
+      <details open style="margin-top: 16px; padding: 12px; background: #f5f5f5; border-radius: 8px; border: 1px solid #e0e0e0;">
         <summary style="cursor: pointer; font-weight: 600; color: #424242; user-select: none; padding: 4px 0;">소개 영상</summary>
         <div style="margin-top: 12px;">
           <div id="ventureVideoFrames" class="venture-video-frames"></div>
@@ -5380,7 +5409,6 @@ function initVentureTree(forceRedraw=false){
           <div id="ventureVideoLinks" class="venture-video-links"></div>
         </div>
       </details>
-      
       <div style="margin-top: 16px; display: grid; grid-template-columns: 120px 1fr; gap: 8px 12px; align-items: start;">
         <span class='venture-label'>투자 단계</span><span>${(d && d.stage) ? d.stage : '-'}</span>
         <span class='venture-label'>국가</span><span>${(d && d.country) ? d.country : '-'}</span>
@@ -7143,6 +7171,51 @@ downloadPdf.onclick=async()=>{
   pdf.addImage(img,"PNG",0,0,210,canvas.height*210/canvas.width);
   pdf.save("Investment_Portfolio_Summary.pdf");
 };
+</script>
+<script>
+// 기업 보고서 모달 열기/닫기 및 txt 연동
+function openReportModal(companyName) {
+  const modal = document.getElementById('reportModal');
+  const body = document.getElementById('reportModalBody');
+  if (!companyName) {
+    body.innerHTML = '<div style="color: #888; text-align: center; padding: 40px 0;">보고서 내용이 준비 중입니다.</div>';
+    modal.style.display = 'block';
+    return;
+  }
+  // 파일명: content/{회사명}.txt (공백, 특수문자 제거)
+  const safeName = companyName.replace(/\s+/g, '').replace(/[^\w가-힣]/g, '');
+  const filePath = `content/${safeName}.txt`;
+  fetch(filePath)
+    .then(res => res.ok ? res.text() : null)
+    .then(txt => {
+      if(txt) {
+        body.innerHTML = `<pre style="white-space: pre-wrap; font-family: inherit; font-size: 15px;">${txt}</pre>`;
+      } else {
+        body.innerHTML = `<div style='color:#888; text-align:center; padding:40px 0;'>보고서 파일이 없습니다.<br><span style='font-size:13px;'>(${filePath})</span></div>`;
+      }
+      modal.style.display = 'block';
+    })
+    .catch(()=>{
+      body.innerHTML = `<div style='color:#888; text-align:center; padding:40px 0;'>보고서 파일을 불러올 수 없습니다.<br><span style='font-size:13px;'>(${filePath})</span></div>`;
+      modal.style.display = 'block';
+    });
+}
+function closeReportModal() {
+  document.getElementById('reportModal').style.display = 'none';
+}
+// 기업상세 렌더 함수에 보고서 버튼 연동
+if(typeof renderVentureDetail === 'function') {
+  const origRenderVentureDetail = renderVentureDetail;
+  window.renderVentureDetail = function(d) {
+    origRenderVentureDetail(d);
+    setTimeout(()=>{
+      const btn = document.getElementById('openReportModalBtn');
+      if(btn && d && d.name) {
+        btn.onclick = function(){ openReportModal(d.name); };
+      }
+    }, 0);
+  }
+}
 </script>
 
 <!-- 개요 팝업 -->
