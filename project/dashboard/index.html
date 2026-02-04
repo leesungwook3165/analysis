@@ -6107,9 +6107,145 @@ async function loadMetricFormulas() {
   }
 }
 
-// 페이지 로드 시 산출방식 로드
-window.addEventListener('load', () => {
-  loadMetricFormulas();
+/* 산출.csv에서 metrics 데이터 동기화 함수 */
+async function syncMetricsFromCSV() {
+  try {
+    const response = await fetch('산출.csv');
+    if (!response.ok) {
+      console.error('산출.csv 파일을 읽을 수 없습니다.');
+      return;
+    }
+    
+    const csvText = await response.text();
+    const lines = csvText.split('\n').filter(line => line.trim());
+    
+    // CSV 파싱 함수
+    const parseCSVLine = (line) => {
+      const row = [];
+      let current = '';
+      let inQuotes = false;
+      
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+          if (inQuotes && line[i + 1] === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          row.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      row.push(current.trim());
+      return row;
+    };
+    
+    // 헤더 파싱
+    const headers = parseCSVLine(lines[0]);
+    const 업체명_idx = headers.indexOf('업체명');
+    const 등록특허_idx = headers.indexOf('등록특허');
+    const 수주건수_idx = headers.indexOf('수주건수');
+    const 투자단계레벨_idx = headers.indexOf('투자단계레벨');
+    const SI지분여부_idx = headers.indexOf('SI지분여부');
+    const 매출성장_idx = headers.indexOf('매출성장');
+    const 범용성점수_idx = headers.indexOf('범용성점수');
+    const 해외IP_idx = headers.indexOf('해외IP');
+    const 고객수_idx = headers.indexOf('고객수');
+    const 수익화준비도_idx = headers.indexOf('수익화준비도');
+    const 락인강도_idx = headers.indexOf('락인강도');
+    const 확장성_idx = headers.indexOf('확장성');
+    const 엑싯가시성_idx = headers.indexOf('엑싯가시성');
+    const 데이터출처_idx = headers.indexOf('데이터출처');
+    
+    // CSV 데이터를 Map으로 변환
+    const csvDataMap = new Map();
+    for (let i = 1; i < lines.length; i++) {
+      const row = parseCSVLine(lines[i]);
+      const 업체명 = row[업체명_idx];
+      csvDataMap.set(업체명, {
+        등록특허: parseFloat(row[등록특허_idx]) || 0,
+        수주건수: parseFloat(row[수주건수_idx]) || 0,
+        투자단계레벨: parseFloat(row[투자단계레벨_idx]) || 0,
+        SI지분여부: parseFloat(row[SI지분여부_idx]) || 0,
+        매출성장: parseFloat(row[매출성장_idx]) || 0,
+        범용성점수: parseFloat(row[범용성점수_idx]) || 0,
+        해외IP: parseFloat(row[해외IP_idx]) || 0,
+        고객수: parseFloat(row[고객수_idx]) || 0,
+        수익화준비도: parseFloat(row[수익화준비도_idx]) || 0,
+        락인강도: parseFloat(row[락인강도_idx]) || 0,
+        확장성: parseFloat(row[확장성_idx]) || 0,
+        엑싯가시성: parseFloat(row[엑싯가시성_idx]) || 0,
+        데이터출처: row[데이터출처_idx] || ''
+      });
+    }
+    
+    // ventureData의 각 업체 metrics 업데이트
+    ventureData.forEach(category => {
+      if (category._children) {
+        category._children.forEach(company => {
+          const csvData = csvDataMap.get(company.name);
+          if (csvData && company.metrics) {
+            // customerPull 업데이트
+            if (company.metrics.customerPull) {
+              company.metrics.customerPull.score = csvData.고객수;
+              company.metrics.customerPull.evidence = `수주 ${csvData.수주건수}건`;
+              company.metrics.customerPull.source = csvData.데이터출처;
+              company.metrics.customerPull.formula = `수주건수 / 50 = ${csvData.수주건수} / 50 = ${(csvData.수주건수 / 50).toFixed(2)} → ${(csvData.수주건수 / 50).toFixed(2)} × 5 = ${csvData.고객수.toFixed(1)}점`;
+            }
+            
+            // monetizationReadiness 업데이트
+            if (company.metrics.monetizationReadiness) {
+              company.metrics.monetizationReadiness.score = csvData.수익화준비도;
+              const 투자단계명 = ['', 'Seed', 'Pre-A', 'Series A', 'Series B', 'Series C', 'IPO/M&A'][csvData.투자단계레벨] || `Lv.${csvData.투자단계레벨}`;
+              company.metrics.monetizationReadiness.evidence = `${투자단계명} (Lv.${csvData.투자단계레벨}), 매출성장 ${(csvData.매출성장 * 100).toFixed(0)}%`;
+              company.metrics.monetizationReadiness.source = csvData.데이터출처;
+              company.metrics.monetizationReadiness.formula = `(투자단계 ${csvData.투자단계레벨}/6 × 2.5) + (매출성장 ${csvData.매출성장} × 2.5) = ${(csvData.투자단계레벨 / 6 * 2.5).toFixed(2)} + ${(csvData.매출성장 * 2.5).toFixed(2)} = ${csvData.수익화준비도.toFixed(1)}점`;
+            }
+            
+            // lockInStrength 업데이트
+            if (company.metrics.lockInStrength) {
+              company.metrics.lockInStrength.score = csvData.락인강도;
+              company.metrics.lockInStrength.evidence = `등록특허 ${csvData.등록특허}건`;
+              company.metrics.lockInStrength.source = csvData.데이터출처;
+              company.metrics.lockInStrength.formula = `등록특허 / 100 = ${csvData.등록특허} / 100 = ${(csvData.등록특허 / 100).toFixed(2)} → ${(csvData.등록특허 / 100).toFixed(2)} × 5 = ${csvData.락인강도.toFixed(1)}점`;
+            }
+            
+            // scalabilitySignal 업데이트
+            if (company.metrics.scalabilitySignal) {
+              company.metrics.scalabilitySignal.score = csvData.확장성;
+              company.metrics.scalabilitySignal.evidence = `해외IP ${csvData.해외IP}건, 범용성 ${csvData.범용성점수.toFixed(1)}점`;
+              company.metrics.scalabilitySignal.source = csvData.데이터출처;
+              company.metrics.scalabilitySignal.formula = `(범용성 ${csvData.범용성점수}/5 × 2.5) + (해외IP ${csvData.해외IP}/30 × 2.5) = ${(csvData.범용성점수 / 5 * 2.5).toFixed(2)} + ${(csvData.해외IP / 30 * 2.5).toFixed(2)} = ${csvData.확장성.toFixed(1)}점`;
+            }
+            
+            // exitVisibility 업데이트
+            if (company.metrics.exitVisibility) {
+              company.metrics.exitVisibility.score = csvData.엑싯가시성;
+              company.metrics.exitVisibility.evidence = `투자단계 Lv.${csvData.투자단계레벨}, SI ${csvData.SI지분여부 ? '보유' : '미보유'}`;
+              company.metrics.exitVisibility.source = csvData.데이터출처;
+              company.metrics.exitVisibility.formula = `(SI지분 ${csvData.SI지분여부} × 2.5) + (투자단계 ${csvData.투자단계레벨}/6 × 2.5) = ${(csvData.SI지분여부 * 2.5).toFixed(2)} + ${(csvData.투자단계레벨 / 6 * 2.5).toFixed(2)} = ${csvData.엑싯가시성.toFixed(1)}점`;
+            }
+          }
+        });
+      }
+    });
+    
+    console.log('✅ 산출.csv에서 metrics 데이터 동기화 완료');
+    
+  } catch (error) {
+    console.error('❌ metrics 동기화 오류:', error);
+  }
+}
+
+// 페이지 로드 시 산출방식 로드 및 metrics 동기화
+window.addEventListener('load', async () => {
+  await syncMetricsFromCSV();  // metrics 먼저 동기화
+  loadMetricFormulas();         // 그 다음 산출방식 표시
 });
 
 /* 벤처 투자지표 엑셀 다운로드 함수 (CSV 파일 기반) */
