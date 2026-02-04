@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>전략적 투자 검토 보고서 - 콜로세움(Colosseum)</title>
+    <style>
+        /* A4 프린트 최적화 */
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+        
+        @media print {
+            body { background: white; padding: 0; }
+            .container { max-width: none; padding: 0; box-shadow: none; border-radius: 0; page-break-after: always; }
+            .section { page-break-inside: avoid; }
+            .header { page-break-after: avoid; }
+            .executive-box { page-break-inside: avoid; }
+        }
+        
+        body { font-family: 'Malgun Gothic', sans-serif; line-height: 1.5; color: #333; margin: 0; padding: 20px; background-color: #f5f7f9; }
+        .container { max-width: 800px; margin: auto; background: #fff; padding: 50px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .header { border-bottom: 3px solid #004b93; padding-bottom: 15px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .header h1 { color: #004b93; margin: 0; font-size: 24px; letter-spacing: -0.5px; }
+        .tag { background: #e8f0f8; color: #004b93; padding: 5px 15px; border-radius: 15px; font-size: 12px; font-weight: bold; }
+        
+        .section { margin-bottom: 50px; page-break-inside: avoid; }
+        .section-title { font-size: 18px; font-weight: bold; color: #004b93; border-left: 5px solid #004b93; padding-left: 12px; margin-bottom: 18px; background: #f8f9fa; padding: 8px 12px; }
+        
+        /* 관점별 카드 */
+        .perspective-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; page-break-inside: avoid; }
+        .p-card { padding: 18px; border-radius: 8px; border: 1px solid #ddd; height: 100%; }
+        .operator { border-top: 4px solid #004b93; background: #f0f7ff; }
+        .investor { border-top: 4px solid #d32f2f; background: #fff5f5; }
+        .p-card h3 { margin-top: 0; font-size: 16px; margin-bottom: 12px; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 8px; }
+        .p-card ul { padding-left: 18px; margin: 0; font-size: 12px; }
+        .p-card li { margin-bottom: 8px; line-height: 1.5; }
+        .point { color: #d32f2f; font-weight: bold; }
+
+        /* 업무 프로세스 */
+        .flow-container { display: flex; align-items: center; justify-content: space-between; background: #fff; padding: 20px 15px; border: 1px solid #e1e8ed; border-radius: 8px; margin: 15px 0; page-break-inside: avoid; }
+        .flow-step { flex: 1; text-align: center; }
+        .flow-icon { font-size: 20px; margin-bottom: 6px; display: block; }
+        .flow-label { font-weight: bold; font-size: 12px; color: #004b93; }
+        .flow-desc { font-size: 11px; color: #666; display: block; margin-top: 3px; }
+        .connector { color: #004b93; font-weight: bold; font-size: 16px; }
+
+        /* 경영진 제언 박스 */
+        .executive-box { background: #fdfdfd; border: 2px solid #004b93; padding: 20px; border-radius: 8px; position: relative; page-break-inside: avoid; }
+        .executive-box::before { content: "TOP MANAGEMENT ONLY"; position: absolute; top: -10px; right: 15px; background: #004b93; color: #fff; font-size: 9px; padding: 2px 8px; border-radius: 3px; }
+
+        /* 등급 점수 */
+        .rating-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; text-align: center; page-break-inside: avoid; }
+        .rating-item { background: #f0f4f8; padding: 15px 8px; border-radius: 6px; border: 1px solid #dce4ec; }
+        .rating-val { display: block; font-size: 20px; font-weight: bold; color: #004b93; }
+        .rating-label { font-size: 11px; color: #4a5568; font-weight: bold; margin-top: 4px; display: block; }
+        .final-score { background: #004b93 !important; color: #fff !important; }
+        .final-score .rating-val, .final-score .rating-label { color: #fff !important; }
+
+        .footer { text-align: right; font-size: 11px; color: #777; margin-top: 30px; border-top: 1px solid #eee; padding-top: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>기업 투자 검토 보고서</h1>
+        <div class="tag">부관훼리 전략적 투자(SI) - 최종 승인안</div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">01. 글로벌 플랫폼 및 파트너 인프라</div>
+        <table style="width:100%; border-collapse:collapse; font-size:12px; border:1px solid #dee2e6;">
+            <tr style="background:#f8f9fa;">
+                <th style="padding:10px; border:1px solid #dee2e6; width:20%; text-align:left;">투자 대상</th>
+                <td style="padding:10px; border:1px solid #dee2e6;">콜로세움 (Colosseum) <br>AI 기반 이커머스 통합 물류 플랫폼</td>
+                <th style="padding:10px; border:1px solid #dee2e6; width:20%; text-align:left;">핵심 파트너</th>
+                <td style="padding:10px; border:1px solid #dee2e6;">다이와코퍼레이션<br>(일본 전역 풀필먼트 거점)</td>
+            </tr>
+            <tr>
+                <th style="padding:10px; border:1px solid #dee2e6; text-align:left; background:#f0f7ff;">국내 화주</th>
+                <td colspan="3" style="padding:10px; border:1px solid #dee2e6;">
+                    <strong>[수출]</strong> 한국 이커머스 업체, 제조업체, OEM 수출상, 소상공인 판매자<br>
+                    <strong>[수입]</strong> 국내 역직구 대행업체, 일본 상품 수입업체
+                </td>
+            </tr>
+            <tr>
+                <th style="padding:10px; border:1px solid #dee2e6; text-align:left; background:#f0f7ff;">국내 플랫폼</th>
+                <td colspan="3" style="padding:10px; border:1px solid #dee2e6;">
+                    네이버 쇼핑, 쿠팡, 이베이 한국, 옥션, G마켓, 카페24, 스마트스토어 등 국내 마켓플레이스
+                </td>
+            </tr>
+            <tr>
+                <th style="padding:5px; border:1px solid #dee2e6; text-align:left; background:#fff5f5;">일본 수출 플랫폼</th>
+                <td colspan="3" style="padding:10px; border:1px solid #dee2e6;">
+                    <strong>아마존 재팬(Amazon JP), Qoo10 Japan, 라쿠텐(Rakuten), 야후쇼핑(Yahoo!Shop), 메르카리(Mercari)</strong> 등
+                </td>
+            </tr>
+            <tr>
+                <th style="padding:10px; border:1px solid #dee2e6; text-align:left; background:#fff5f5;">일본 수입 채널</th>
+                <td colspan="3" style="padding:10px; border:1px solid #dee2e6;">
+                    <strong>반품 수집</strong> (B2B/개별 판매자의 반품 물품), <strong>역직구 물량</strong> (일본 현지 소비자의 직접 배송 요청), <strong>일본 현지 판매자</strong> (한국 수입업체와의 거래)
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="section-title">02. 데이터 기반 양방향 통합 프로세스</div>
+        <div class="flow-container">
+            <div class="flow-step">
+                <span class="flow-icon">💻</span>
+                <span class="flow-label">플랫폼(콜로세움)</span>
+                <span class="flow-desc">글로벌 오더 자동 수집</span>
+            </div>
+            <span class="connector">▶</span>
+            <div class="flow-step">
+                <span class="flow-icon">🚢</span>
+                <span class="flow-label">운송(부관훼리)</span>
+                <span class="flow-desc">독점 운송 및 자동 B/L</span>
+            </div>
+            <span class="connector">▶</span>
+            <div class="flow-step">
+                <span class="flow-icon">🏠</span>
+                <span class="flow-label">거점(다이와)</span>
+                <span class="flow-desc">일본 배송 및 수입 집하</span>
+            </div>
+        </div>
+        
+        <p style="font-size: 11px; color: #666; text-align: center; margin-top: 8px;">
+            ※ <strong>수익 가속화:</strong> 다이와 거점에 집하된 일본발 역직구 물량(Inbound)의 부관훼리 선적 의무화로 <br> 상/하행 수익 동시 창출
+        </p>
+
+        <div style="margin-top: 25px; padding: 18px; background: #f5f5f5; border-radius: 8px; border-left: 5px solid #d32f2f;">
+            <div style="font-size: 14px; font-weight: bold; color: #333; margin-bottom: 15px;">📋 End-to-End 업무 흐름 상세</div>
+            
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <tr style="background: #fff;">
+                    <td style="padding: 12px; border: 1px solid #ddd; width: 5%; text-align: center; font-weight: bold; background: #d32f2f; color: #fff; border-radius: 4px 0 0 4px;">1</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">
+                        <strong>오더 발생 & 데이터 수집</strong><br>
+                        <span style="color: #666; font-size: 11px;"><strong>[국내]</strong> 한국 화주가 쿠팡·네이버·이베이 등에서 판매하는 상품의 주문 수집<br>
+                        <strong>[해외]</strong> 화주가 아마존 재팬·큐텐·라쿠텐 등에 등록한 상품의 주문 발생 시, 콜로세움이 API로 실시간 자동 수집</span>
+                    </td>
+                </tr>
+                <tr style="background: #f9f9f9;">
+                    <td colspan="2" style="padding: 6px; text-align: center; color: #d32f2f; font-weight: bold; font-size: 14px; border: none;">▼</td>
+                </tr>
+                <tr style="background: #fff;">
+                    <td style="padding: 12px; border: 1px solid #ddd; width: 5%; text-align: center; font-weight: bold; background: #d32f2f; color: #fff;">2</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">
+                        <strong>창고 입고 & 운송 요청</strong><br>
+                        <span style="color: #666; font-size: 11px;">화주가 국내 콜로세움 센터에 입고 → 플랫폼이 입고 정보와 주문을 결합하여 부관훼리에 운송 요청</span>
+                    </td>
+                </tr>
+                <tr style="background: #f9f9f9;">
+                    <td colspan="2" style="padding: 6px; text-align: center; color: #d32f2f; font-weight: bold; font-size: 14px; border: none;">▼</td>
+                </tr>
+                <tr style="background: #fff;">
+                    <td style="padding: 12px; border: 1px solid #ddd; width: 5%; text-align: center; font-weight: bold; background: #d32f2f; color: #fff;">3</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">
+                        <strong>해상 운송 & B/L 발행 (이중 프로세스)</strong><br>
+                        <span style="color: #666; font-size: 11px;">
+                        <strong>[콜로세움 물량]</strong> 플랫폼 연동분은 데이터 기반으로 <strong>자동 B/L 발행</strong> → 통관·선적 시간 단축<br>
+                        <strong>[기존 화주]</strong> 팩스/메일로 SR(Shipping Request) 수신 → 기존 B/L 담당자가 수기 처리<br>
+                        → 추가 자동화로 신규 물량 수용 가능, 기존 업무는 유지
+                        </span>
+                    </td>
+                </tr>
+                <tr style="background: #f9f9f9;">
+                    <td colspan="2" style="padding: 6px; text-align: center; color: #d32f2f; font-weight: bold; font-size: 14px; border: none;">▼</td>
+                </tr>
+                <tr style="background: #fff;">
+                    <td style="padding: 12px; border: 1px solid #ddd; width: 5%; text-align: center; font-weight: bold; background: #d32f2f; color: #fff;">4</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">
+                        <strong>일본 내륙 운송 & 거점 입고</strong><br>
+                        <span style="color: #666; font-size: 11px;">시모노세키 항 도착 후 다이와코퍼레이션 거점으로 이동 → 현지 라스트마일 배송 또는 임시 보관·분류</span>
+                    </td>
+                </tr>
+                <tr style="background: #f9f9f9;">
+                    <td colspan="2" style="padding: 6px; text-align: center; color: #d32f2f; font-weight: bold; font-size: 14px; border: none;">▼</td>
+                </tr>
+                <tr style="background: #fff;">
+                    <td style="padding: 12px; border: 1px solid #ddd; width: 5%; text-align: center; font-weight: bold; background: #d32f2f; color: #fff;">5</td>
+                    <td style="padding: 12px; border: 1px solid #ddd; border-radius: 0 0 4px 4px;">
+                        <strong>수입 & 반품 (역방향 물류)</strong><br>
+                        <span style="color: #666; font-size: 11px;"><strong>[반품]</strong> 일본 소비자의 반품 물건 및 판매자 반품이 다이와 거점에 집하<br>
+                        <strong>[역직구]</strong> 일본 현지에서 한국 고객이 요청한 직구 물량 수집 → 콜로세움이 인식 → 부관훼리 선박에 우선 선적 <strong>→ 양방향 물동 완성 & 수익 극대화</strong></span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="margin-top: 25px; padding: 18px; background: #fff5f5; border-radius: 8px; border-left: 5px solid #d32f2f;">
+            <div style="font-size: 14px; font-weight: bold; color: #333; margin-bottom: 12px;">🎯 투자 전후 배송 방식 비교</div>
+            
+            <table style="width: 100%; border-collapse: collapse; font-size: 11.5px; margin-bottom: 12px;">
+                <tr style="background: #f8f9fa;">
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left; font-weight: bold; width: 25%;">구분</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background: #ffe8e8;">현행 (투자 전)</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background: #e8f0f8;">투자 후 목표</th>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold; color: #004b93;">콜로세움의 역할</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">
+                        포워더(자체 또는 기존 포워더와 연동)<br>
+                        화주→콜로세움 창고 입고
+                    </td>
+                    <td style="padding: 10px; border: 1px solid #ddd; background: #f0f7ff;">
+                        포워더 (동일 유지)
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold; color: #d32f2f;">운송사 선택</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">
+                        <strong>자유 선택</strong><br>
+                        그때그때 상황에 맞춰 부관훼리/팬스타/카멜리아 등 선사 결정
+                    </td>
+                    <td style="padding: 10px; border: 1px solid #ddd; background: #f0f7ff;">
+                        <strong style="color: #d32f2f;">자동 배정</strong><br>
+                        시스템이 부관훼리 노선을 최우선으로 Lock-in<br>
+                        (기술적·지분적 빗장)
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold; color: #004b93;">부관훼리 입장</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">
+                        콜로세움의 협력 선사 중 하나<br>
+                        물량 보장 없음
+                    </td>
+                    <td style="padding: 10px; border: 1px solid #ddd; background: #f0f7ff;">
+                        한-일 항로의 <strong>"Preferred Carrier"</strong><br>
+                        독점적 물량 수주권 보장
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold; color: #d32f2f;">경쟁사 진입</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">
+                        콜로세움 물량의 50% 이상이 경쟁사로 분산 가능
+                    </td>
+                    <td style="padding: 10px; border: 1px solid #ddd; background: #f0f7ff;">
+                        콜로세움 플랫폼 접근 차단<br>
+                        (지분 기반 거부권)
+                    </td>
+                </tr>
+            </table>
+
+            <div style="font-size: 12px; color: #555; padding: 12px; background: #fff; border-left: 3px solid #d32f2f;">
+                <strong>💡 핵심 개념:</strong> 콜로세움이 포워더 역할을 하든 안 하든 상관없습니다. 중요한 것은 <strong>"마지막 배송 수단은 무조건 부관훼리"</strong>라는 기술적·지분적 빗장을 설치하는 것입니다.
+            </div>
+
+            <div style="margin-top: 20px; padding: 18px; background: #f5f5f5; border-radius: 8px; border-left: 5px solid #1976d2;">
+                <div style="font-size: 14px; font-weight: bold; color: #333; margin-bottom: 15px;">🚚 구간별 운송 주체 및 책임</div>
+                
+                <div style="margin-bottom: 18px; padding: 12px; background: #fff; border: 1px solid #ddd; border-radius: 6px;">
+                    <div style="font-size: 13px; font-weight: bold; color: #1976d2; margin-bottom: 8px;">1구간: 화주 공장/창고 → 콜로세움 물류센터 (입고)</div>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 11.5px;">
+                        <tr style="background: #f9f9f9;">
+                            <td style="padding: 8px; border: 1px solid #eee; width: 25%; font-weight: bold;">운송 주체</td>
+                            <td style="padding: 8px; border: 1px solid #eee;">화주 직송 또는 콜로세움의 국내 밀크런(Milk-Run) 트럭 순회 수집</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #eee; font-weight: bold;">책임</td>
+                            <td style="padding: 8px; border: 1px solid #eee;">화주 또는 콜로세움 (주로 화주 물류비에 포함)</td>
+                        </tr>
+                        <tr style="background: #f0f7ff;">
+                            <td style="padding: 8px; border: 1px solid #eee; font-weight: bold; color: #1976d2;">부관훼리 역할</td>
+                            <td style="padding: 8px; border: 1px solid #eee;">해당 없음 (콜로세움의 영역)</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="margin-bottom: 18px; padding: 12px; background: #fff; border: 1px solid #ddd; border-radius: 6px; border-left: 3px solid #ff6f00;">
+                    <div style="font-size: 13px; font-weight: bold; color: #ff6f00; margin-bottom: 8px;">2구간: 콜로세움 물류센터 → 부산항 (수출 운송) ⭐ 우리의 기회</div>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 11.5px;">
+                        <tr style="background: #f9f9f9;">
+                            <td style="padding: 8px; border: 1px solid #eee; width: 25%; font-weight: bold;">운송 주체</td>
+                            <td style="padding: 8px; border: 1px solid #eee;"><strong>콜로세움의 협력 운송사</strong>(트럭/컨테이너 전문사)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #eee; font-weight: bold;">책임</td>
+                            <td style="padding: 8px; border: 1px solid #eee;">콜로세움이 포워더처럼 운송사 섭외 및 관리</td>
+                        </tr>
+                        <tr style="background: #fff5e6;">
+                            <td style="padding: 8px; border: 1px solid #eee; font-weight: bold; color: #ff6f00;">우리의 기회</td>
+                            <td style="padding: 8px; border: 1px solid #eee;">
+                                <strong>우리가 주주로 참여하면</strong>, 이 구간의 운송사를 <span class="point">부관훼리 협력사(또는 우리측 네트워크)</span>로 우선 지정할 수 있습니다.<br>
+                                → 전체 패키지 가격 경쟁력 강화 & 물류비 효율화<br>
+                                → <strong>부산항 집결 물량의 100% 우리 선박에 적재 보장</strong>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="margin-bottom: 15px; padding: 12px; background: #fff; border: 1px solid #ddd; border-radius: 6px;">
+                    <div style="font-size: 13px; font-weight: bold; color: #1976d2; margin-bottom: 8px;">3구간: 시모노세키 항 → 다이와 창고 (일본 내륙 운송)</div>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 11.5px;">
+                        <tr style="background: #f9f9f9;">
+                            <td style="padding: 8px; border: 1px solid #eee; width: 25%; font-weight: bold;">운송 주체</td>
+                            <td style="padding: 8px; border: 1px solid #eee;">다이와코퍼레이션의 자회사 또는 협력 운송사</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #eee; font-weight: bold;">책임</td>
+                            <td style="padding: 8px; border: 1px solid #eee;">다이와가 자체 트럭 네트워크 및 JR화물 연계 운영</td>
+                        </tr>
+                        <tr style="background: #f0f7ff;">
+                            <td style="padding: 8px; border: 1px solid #eee; font-weight: bold; color: #1976d2;">부관훼리 역할</td>
+                            <td style="padding: 8px; border: 1px solid #eee;">선박 도착 후 물량 인수 → 다이와 창고로 인수인계 (운영 리스크 없음)</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="padding: 12px; background: #fff9e6; border: 2px solid #ff9800; border-radius: 6px;">
+                    <strong style="color: #ff6f00; font-size: 13px;">📊 임원진 보고 최적화 메시지</strong>
+                    <div style="margin-top: 10px; font-size: 12px; color: #333; line-height: 1.7;">
+                        <strong>"운송은 콜로세움과 다이와가 이미 보유한 트럭 네트워크를 그대로 활용합니다.</strong><br>
+                        부관훼리는 차량을 직접 운영하는 리스크 없이, 플랫폼이 배정하는 물량만<br>
+                        우리 선박에 싣기만 하면 되는 구조입니다.<br><br>
+                        <strong>특히 부산항까지의 운송과 일본 내륙 운송 주체를 콜로세움이 결정하기 때문에,</strong><br>
+                        우리가 주주로서 관여한다면 <span class="point">경쟁 선사가 아닌 오직 우리 항로로만 물량이 모이도록</span><br>
+                        <strong>'운송의 길목'을 차단할 수 있습니다."</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">03. 부문별 투자 실익 요약</div>
+        <div class="perspective-container">
+            <div class="p-card operator">
+                <h3>🚢 선사 운영 관점</h3>
+                <ul>
+                    <li><strong>선복 가동률 혁신:</strong> 수출뿐 아니라 일본 현지 집하 물량 및 반품 화물 확보로 선복 효율 극대화</li>
+                    <li><strong>업무 최적화:</strong> <span class="point">콜로세움 연동분에 한정한 자동화</span>로 현장 부담 없이 신규 물량 수용</li>
+                    <li><strong>정기선 우위:</strong> Daily 운항 강점을 살린 저비용·고효율 콜드체인/이커머스 물류 구현</li>
+                </ul>
+            </div>
+            <div class="p-card investor">
+                <h3>💰 전략적 투자 관점</h3>
+                <ul>
+                    <li><strong>포워딩 구조 독점화:</strong> 콜로세움이 자체 포워더이든 기존 포워더와 연동하든 관계없이, <span class="point">시스템 레벨에서 "부관훼리 우선 배정" 로직을 Lock-in</span>하여 모든 물량이 우리 선박으로 자동 집결</li>
+                    <li><strong>한-일 항로 독점권 확보:</strong> 콜로세움 물량이 <strong>'Preferred Carrier'</strong>로 부관훼리를 자동 선택하도록 기술적 빗장 설치 → 글로벌 이커머스 물류의 표준 경로화</li>
+                    <li><strong>경쟁사 진입 차단:</strong> 지분 기반 거부권으로 팬스타·카멜리아 등 경쟁사의 콜로세움 플랫폼 접근 원천 차단 → 물량 독점</li>
+                    <li><strong>리스크 외주화:</strong> 직접 이커머스 사업 진출의 CS/재고/규제 리스크를 콜로세움이 전담 → 당사는 순수 운송수익만 창출</li>
+                    <li><strong>확장성 보증:</strong> 향후 추가 글로벌 플랫폼 파트너십 시 당사 노선 우선 배치 의무화</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">04. 경영적 판단 및 결언 (Executive Summary)</div>
+        <div class="executive-box">
+            <p style="font-size: 17px; font-weight: bold; color: #004b93; margin-top: 0; margin-bottom: 20px;">
+                "콜로세움 투자의 진정한 목표는 '한-일 항로의 표준 운송사' 지위 확보입니다."
+            </p>
+
+            <div style="background: #fff9e6; padding: 20px; border-radius: 8px; border-left: 4px solid #ff9800; margin-bottom: 25px; font-size: 15px; line-height: 1.9; color: #333;">
+                <strong style="color: #ff6f00;">📊 임원진 설득 핵심 비유:</strong><br><br>
+                "임원님, 현재 콜로세움은 '자유 계약 선수'와 같습니다.<br><br>
+                <strong>지금:</strong> 콜로세움이 물량을 모으면 → 부관훼리, 팬스타, 카멜리아 중 가장 싼 배를 선택해서 그때그때 배송<br>
+                (우리 입장에서는 물량 보장이 없음)<br><br>
+                <strong>투자 후:</strong> 콜로세움이 물량을 모으면 → 시스템이 자동으로 부관훼리 노선을 최우선 배정<br>
+                (기술적·지분적 빗장으로 Lock-in, 경쟁사는 원천 차단)<br><br>
+                즉, 우리는 콜로세움이라는 '거대한 물량 저장고'에 <strong>'부관훼리 전용 출구'</strong>를 설계하는 것입니다."
+            </div>
+
+            <ul style="font-size: 15px; line-height: 2.0; color: #333; padding-left: 20px;">
+                <li>
+                    <strong>포워딩 구조 독점화:</strong> 콜로세움이 포워더로 활동하든 기존 포워더와 협력하든 상관없이, <span class="point">"마지막 배송 수단은 무조건 부관훼리"</span>라는 기술적 빗장을 시스템에 내장합니다.
+                </li>
+                <li>
+                    <strong>한-일 항로 독점권 확보:</strong> 콜로세움이 아마존·큐텐·라쿠텐과 연동할 때, 부관훼리를 'Preferred Carrier'로 자동 설정 → 글로벌 이커머스 물류의 표준 경로화
+                </li>
+                <li>
+                    <strong>경쟁사 진입 차단 & 시장 독점:</strong> 지분 기반 거부권으로 팬스타·카멜리아 등이 콜로세움의 데이터 네트워크에 접근하지 못하게 합니다. <strong>한-일 이커머스 물류의 모든 통로가 부관훼리로 수렴</strong>되는 지배적 위치를 구축합니다.
+                </li>
+                <li>
+                    <strong>리스크 제로 운송사 모델:</strong> 직구·역직구 시장의 직접 진출은 고정비·CS·규제 리스크가 큽니다. 본 투자는 <strong>모든 운영 리스크를 콜로세움이 전담</strong>하고, 당사는 순수 운송수익과 데이터 주도권만 가져가는 최고효율 구조입니다.
+                </li>
+                <li>
+                    <strong>선복 가동률 혁신 & 수익성 극대화:</strong> 아마존 반품·역직구 물량의 수입(Inbound) 확보로 상/하행 양방향 물동을 완성합니다. 빈 배로 돌아오던 구간이 <strong>고수익 화물로 채워질</strong> 것입니다.
+                </li>
+                <li>
+                    <strong>현장 안정 + 조직 성장:</strong> 기존 화주의 팩스/메일 SR은 그대로 유지하고, 신규 콜로세움 물량만 자동화합니다. <strong>내부 저항 없는 단계적 성장</strong>으로 조직 안정성을 지키면서 급성장합니다.
+                </li>
+            </ul>
+            <div style="margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 15px; font-style: italic; color: #555; font-size: 12.5px; text-align: center;">
+                "이번 SI 투자는 부관훼리를 단순한 해상 운송사에서<br>
+                <strong>'한-일 이커머스 물류의 표준 경로'로 격상</strong>시키고,<br>
+                향후 10년간의 글로벌 이커머스 성장을 독점하는 <strong>결정적 포석</strong>입니다."
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">05. 투자 타당성 종합지표</div>
+        <div class="rating-grid">
+            <div class="rating-item"><span class="rating-val">4.8</span><span class="rating-label">시장 성장성</span></div>
+            <div class="rating-item"><span class="rating-val">5.0</span><span class="rating-label">수익 시너지</span></div>
+            <div class="rating-item"><span class="rating-val">5.0</span><span class="rating-label">리스크 방어</span></div>
+            <div class="rating-item"><span class="rating-val">5.0</span><span class="rating-label">독점 지배력</span></div>
+            <div class="rating-item final-score"><span class="rating-val">4.9</span><span class="rating-label">최종 투자 가치</span></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        부관훼리 재무회계팀 | 2026. 01. 30
+    </div>
+</div>
+
+</body>
+</html>

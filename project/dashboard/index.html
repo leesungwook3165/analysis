@@ -346,7 +346,7 @@ table.grid input {
 .venture-metrics th,
 .venture-metrics td {
   border: 1px solid #e8eaf0;
-  padding: 12px 10px;
+  padding: 12px 4px;
   font-size: 13px;
   text-align: left;
 }
@@ -356,6 +356,8 @@ table.grid input {
   color: white;
   font-weight: 600;
   letter-spacing: -0.2px;
+  position: relative;
+  z-index: 100;
 }
 
 .venture-metrics tbody tr:hover {
@@ -382,7 +384,7 @@ table.grid input {
   line-height: 1.6;
   white-space: pre-line;
   width: 320px;
-  z-index: 99999;
+  z-index: 9999999;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   font-weight: normal;
   letter-spacing: 0;
@@ -1953,14 +1955,24 @@ IRR = 23.6%</div>
     <p>왼쪽 트리에서 기업을 클릭하면 상세 정보가 표시됩니다.</p>
   </div>
 
-<!-- 기업 보고서 모달 -->
-<div id="reportModal" class="metric-detail-modal" style="display:none; z-index: 9999;">
-  <div class="metric-detail-content" style="max-width: 700px;">
-    <span class="metric-detail-close" onclick="closeReportModal()">&times;</span>
-    <h2 class="metric-detail-title">기업 보고서</h2>
-    <div id="reportModalBody" style="min-height: 200px; padding: 10px 0;">
+<!-- 기업 보고서 모달 (드래그 가능) -->
+<div id="reportModal" class="metric-detail-modal">
+  <div id="reportModalDraggable" class="metric-detail-content" style="max-width: 800px; max-height: 80vh; overflow-y: auto; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-sizing: border-box;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+      <h2 class="metric-detail-title" id="reportModalTitle" style="cursor: move; margin-top: 0; user-select: none; margin-bottom: 0;">기업 보고서</h2>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <label style="display: none; align-items: center; gap: 5px; font-size: 13px; color: #666; cursor: pointer; background: #f0f0f0; padding: 6px 12px; border-radius: 6px; user-select: none;" id="showDividerLabel">
+          <input type="checkbox" id="showDividerCheckbox" checked style="cursor: pointer; width: 16px; height: 16px;">
+          <span>구분선 표시</span>
+        </label>
+        <button id="printReportBtn" onclick="startPageBreakMode()" style="padding: 8px 18px; background: linear-gradient(135deg, #8e44ad 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s;">🖨️ 인쇄</button>
+        <button id="confirmPrintBtn" onclick="confirmAndPrint()" style="display: none; padding: 8px 18px; background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s;">✓ 인쇄 실행</button>
+        <button id="cancelBreakBtn" onclick="cancelPageBreakMode()" style="display: none; padding: 8px 18px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s;">✕ 취소</button>
+        <span class="metric-detail-close" onclick="closeReportModal()" style="cursor: pointer; font-size: 32px; margin-left: 4px;">&times;</span>
+      </div>
+    </div>
+    <div id="reportModalBody" style="padding: 0;">
       <!-- 여기에 기업별 보고서 내용이 동적으로 들어갑니다. -->
-      <div style="color: #888; text-align: center; padding: 40px 0;">보고서 내용이 준비 중입니다.</div>
     </div>
   </div>
 </div>
@@ -2207,7 +2219,7 @@ IRR = 23.6%</div>
     <div class="metric-detail-section" style="margin-top: 30px;">
       <h3 style="color: #667eea; margin-bottom: 15px;">5대 투자지표 산출 공식</h3>
       <p style="background: #fff3cd; padding: 12px; border-radius: 5px; border-left: 4px solid #ffc107; margin-bottom: 15px;">
-        ⚠️ <strong>중요:</strong> 아래 공식은 산출.csv 파일에 적용된 최신 산출 방식입니다. (2025년 1월 기준)
+        ⚠️ <strong>중요:</strong> 아래 공식은 산출.csv 파일에 적용된 최신 산출 방식입니다. (2026년 1월 기준)
       </p>
       <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
         <thead>
@@ -5492,6 +5504,15 @@ function initVentureTree(forceRedraw=false){
         </div>
       </div>
     `;
+    
+    // 보고서 보기 버튼에 이벤트 할당
+    setTimeout(() => {
+      const btn = document.getElementById('openReportModalBtn');
+      if (btn && d && d.name) {
+        btn.addEventListener('click', () => openReportModal(d.name));
+      }
+    }, 0);
+    
     renderInvestmentIndicators();
     renderVentureVideo(d && d.videoUrl);
   };
@@ -5619,7 +5640,7 @@ function renderInvestmentIndicators(){
       <td style="font-size: 13px;">${source}</td>
       <td style="text-align: center;">
         <button onclick="showMetricDetail('${label}', ${score}, '${evidence.replace(/'/g, "\\'")}', '${source.replace(/'/g, "\\'")}', '${formula.replace(/'/g, "\\'")}', '${key}')" 
-          style="background: #667eea; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600;">
+          style="background: #667eea; color: white; border: none; padding: 4px 15px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600;">
           상세
         </button>
       </td>
@@ -6001,7 +6022,8 @@ function downloadVentureMetricsExcel() {
     ["티투엘", 10, 12, 2, 0, "항만공사; 포워더 기업", "해당없음", "포워딩관리(5건); 화물추적API(5건)", 1.2, 1.3, 1.7, 2.2, 0.8, "G2B"],
     ["골디락스", 6, 5, 1, 0, "해상 포워더 파트너", "해당없음", "화물매칭로직(3건); 견적엔진(3건)", 0.5, 0.9, 1.8, 2.4, 0.4, "TheVC"],
     ["(주)슈니테크", 8, 4, 1, 0, "예술대; 교육청", "해당없음", "소리분석(4건); 악보트래킹(4건)", 0.4, 0.8, 1.8, 2.2, 0.4, "KIPRIS"],
-    ["씨너지파트너", 5, 3, 1, 0, "창경원; 중기부", "해당없음", "기업지표모델(3건); 추천알고리즘(2건)", 0.3, 1.0, 1.7, 2.0, 0.4, "NICE"]
+    ["씨너지파트너", 5, 3, 1, 0, "창경원; 중기부", "해당없음", "기업지표모델(3건); 추천알고리즘(2건)", 0.3, 1.0, 1.7, 2.0, 0.4, "NICE"],
+    ["콜로세움", 34, 68, 5, 1, "다이와(日); 포스코플로우; CJ; 중진공", "효성벤처스; CJ인베스트먼트; 산업은행", "Colo AI(12건); 통합풀필먼트(15건); 물류센터최적화(7건)", 4.2, 4.5, 4.0, 4.8, 4.7, "DART/위키백과/혁신의숲"]
   ];
   
   // 데이터 추가
@@ -7173,49 +7195,137 @@ downloadPdf.onclick=async()=>{
 };
 </script>
 <script>
-// 기업 보고서 모달 열기/닫기 및 txt 연동
+// 기업 보고서 모달 열기/닫기 및 html 연동
 function openReportModal(companyName) {
   const modal = document.getElementById('reportModal');
+  const titleEl = document.getElementById('reportModalTitle');
   const body = document.getElementById('reportModalBody');
+  
   if (!companyName) {
+    titleEl.textContent = '기업 보고서';
     body.innerHTML = '<div style="color: #888; text-align: center; padding: 40px 0;">보고서 내용이 준비 중입니다.</div>';
     modal.style.display = 'block';
     return;
   }
-  // 파일명: content/{회사명}.txt (공백, 특수문자 제거)
+  
+  titleEl.textContent = companyName + ' - 기업 보고서';
+  body.innerHTML = '<div style="color: #888; text-align: center; padding: 40px 0;">로딩 중...</div>';
+  modal.style.display = 'block';
+  
+  // 파일명: content/{회사명}.html (공백, 특수문자 제거)
   const safeName = companyName.replace(/\s+/g, '').replace(/[^\w가-힣]/g, '');
-  const filePath = `content/${safeName}.txt`;
+  const filePath = `content/${safeName}.html`;
+  
   fetch(filePath)
     .then(res => res.ok ? res.text() : null)
-    .then(txt => {
-      if(txt) {
-        body.innerHTML = `<pre style="white-space: pre-wrap; font-family: inherit; font-size: 15px;">${txt}</pre>`;
+    .then(html => {
+      if(html) {
+        body.innerHTML = html;
+        // .container에 ID 추가
+        const container = body.querySelector('.container');
+        if (container) {
+          container.id = 'reportContent';
+        }
       } else {
-        body.innerHTML = `<div style='color:#888; text-align:center; padding:40px 0;'>보고서 파일이 없습니다.<br><span style='font-size:13px;'>(${filePath})</span></div>`;
+        body.innerHTML = `<div style='color:#888; text-align:center; padding:40px 0;'>보고서 파일이 없습니다.<br><span style='font-size:13px; color:#aaa;'>(${filePath})</span></div>`;
       }
-      modal.style.display = 'block';
+      // HTML 로드 완료 후 드래그 기능 재활성화
+      makeModalDraggable();
     })
-    .catch(()=>{
-      body.innerHTML = `<div style='color:#888; text-align:center; padding:40px 0;'>보고서 파일을 불러올 수 없습니다.<br><span style='font-size:13px;'>(${filePath})</span></div>`;
-      modal.style.display = 'block';
+    .catch((e)=>{
+      console.error('보고서 로드 실패:', e);
+      body.innerHTML = `<div style='color:#888; text-align:center; padding:40px 0;'>보고서 파일을 불러올 수 없습니다.<br><span style='font-size:13px; color:#aaa;'>(${filePath})</span></div>`;
+      // 에러 발생 후에도 드래그 기능 활성화
+      makeModalDraggable();
     });
 }
+
 function closeReportModal() {
   document.getElementById('reportModal').style.display = 'none';
-}
-// 기업상세 렌더 함수에 보고서 버튼 연동
-if(typeof renderVentureDetail === 'function') {
-  const origRenderVentureDetail = renderVentureDetail;
-  window.renderVentureDetail = function(d) {
-    origRenderVentureDetail(d);
-    setTimeout(()=>{
-      const btn = document.getElementById('openReportModalBtn');
-      if(btn && d && d.name) {
-        btn.onclick = function(){ openReportModal(d.name); };
-      }
-    }, 0);
+  
+  // 가이드 메시지 제거
+  const guide = document.getElementById('pageBreakGuide');
+  if (guide) guide.remove();
+  
+  // 눈금자 제거
+  const ruler = document.getElementById('heightRuler');
+  if (ruler) ruler.remove();
+  
+  // 구분선 제거
+  const bodyEl = document.getElementById('reportContent');
+  if (bodyEl) {
+    bodyEl.querySelectorAll('.page-break-line').forEach(line => line.remove());
   }
+  
+  // 버튼 상태 초기화
+  document.getElementById('printReportBtn').style.display = 'block';
+  document.getElementById('confirmPrintBtn').style.display = 'none';
+  document.getElementById('cancelBreakBtn').style.display = 'none';
+  document.getElementById('showDividerLabel').style.display = 'none';
 }
+
+// 모달 드래그 기능
+function makeModalDraggable() {
+  const modal = document.getElementById('reportModal');
+  const modalContent = document.getElementById('reportModalDraggable');
+  const title = document.getElementById('reportModalTitle');
+  const body = document.getElementById('reportModalBody');
+  
+  if (!modalContent) return;
+  
+  let isMouseDown = false;
+  let mouseOffsetX = 0;
+  let mouseOffsetY = 0;
+  let dragDistance = 0; // 드래그 거리 추적
+  
+  // 제목과 본문 모두에서 마우스 다운 감지
+  const initiateDrag = (e) => {
+    // draggable 비활성화 상태 확인
+    if (modalContent.getAttribute('data-draggable-disabled') === 'true') {
+      return;
+    }
+    
+    isMouseDown = true;
+    dragDistance = 0;
+    const rect = modalContent.getBoundingClientRect();
+    mouseOffsetX = e.clientX - rect.left;
+    mouseOffsetY = e.clientY - rect.top;
+  };
+  
+  title.addEventListener('mousedown', initiateDrag);
+  body.addEventListener('mousedown', initiateDrag);
+  
+  document.addEventListener('mousemove', (e) => {
+    if (!isMouseDown) return;
+    
+    // draggable 비활성화 상태 확인
+    if (modalContent.getAttribute('data-draggable-disabled') === 'true') {
+      isMouseDown = false;
+      return;
+    }
+    
+    const x = e.clientX - mouseOffsetX;
+    const y = e.clientY - mouseOffsetY;
+    dragDistance += Math.abs(e.movementX) + Math.abs(e.movementY);
+    
+    // 드래그 거리가 5px 이상일 때만 이동 (작은 클릭은 무시)
+    if (dragDistance > 5) {
+      modalContent.style.left = x + 'px';
+      modalContent.style.top = y + 'px';
+      modalContent.style.transform = 'none';
+    }
+  });
+  
+  document.addEventListener('mouseup', () => {
+    isMouseDown = false;
+    dragDistance = 0;
+  });
+}
+
+// 페이지 로드 후 드래그 기능 활성화
+window.addEventListener('load', () => {
+  makeModalDraggable();
+});
 </script>
 
 <!-- 개요 팝업 -->
@@ -7905,9 +8015,1209 @@ if(typeof renderVentureDetail === 'function') {
     
     <!-- 푸터 -->
     <div style="padding: 15px 30px; background: #f8f9fa; border-top: 1px solid #e0e0e0; display: flex; justify-content: flex-end;">
+      <button onclick="printOverviewPopup()" style="margin-right: 12px; padding: 10px 24px; background: linear-gradient(135deg, #8e44ad 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)'">🖨️ 인쇄</button>
       <button onclick="closeOverviewPopup()" style="padding: 10px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)'">닫기</button>
     </div>
   </div>
 </div>
+
+<script>
+function printOverviewPopup() {
+  const popup = document.getElementById('overviewPopupContent');
+  if (!popup) return;
+  
+  const printWindow = window.open('', '', 'width=1000,height=800');
+  const doc = printWindow.document;
+  
+  // 기존 문서 완전히 비우기
+  doc.open();
+  doc.write('');
+  doc.close();
+  
+  // DOM API로만 구성
+  const html = doc.createElement('html');
+  const head = doc.createElement('head');
+  const body = doc.createElement('body');
+  
+  const meta = doc.createElement('meta');
+  meta.setAttribute('charset', 'UTF-8');
+  head.appendChild(meta);
+  
+  const title = doc.createElement('title');
+  title.textContent = '사업 개요 인쇄';
+  head.appendChild(title);
+  
+  // 스타일 복사
+  document.querySelectorAll('style,link[rel="stylesheet"]').forEach(node => {
+    head.appendChild(node.cloneNode(true));
+  });
+  
+  body.style.background = 'white';
+  body.innerHTML = popup.innerHTML;
+  
+  html.appendChild(head);
+  html.appendChild(body);
+  
+  // documentElement 교체
+  if (doc.documentElement) {
+    doc.removeChild(doc.documentElement);
+  }
+  doc.appendChild(html);
+  
+  // guide 즉시 복원 (인쇄 창에는 영향 없음)
+  if (guide && guideVisibility !== null) {
+    guide.style.visibility = guideVisibility || 'visible';
+    console.log('안내 메시지 복원');
+  }
+  
+  setTimeout(() => {
+    printWindow.focus();
+    printWindow.print();
+    
+    // 인쇄 완료 후 초기화
+    setTimeout(() => {
+      printWindow.close();
+      resetPageBreakMode();
+    }, 100);
+  }, 500);
+}
+
+// 페이지 구분 모드 초기화 함수
+function resetPageBreakMode() {
+  const bodyEl = document.getElementById('reportContent');
+  if (!bodyEl) return;
+  
+  console.log('인쇄 완료 - 페이지 구분 모드 초기화 시작');
+  
+  // 모든 하이라이트 제거
+  bodyEl.querySelectorAll('.section-highlight').forEach(h => h.remove());
+  
+  // 모든 요소의 축소 효과 제거
+  const allChildren = Array.from(bodyEl.children);
+  allChildren.forEach(child => {
+    if (child.getAttribute('data-scaled') === 'true') {
+      child.style.transform = '';
+      child.style.marginBottom = '';
+      child.removeAttribute('data-scaled');
+    }
+    
+    // wrapper DIV 내부 요소들도 복원
+    if (child.tagName === 'DIV') {
+      Array.from(child.children).forEach(innerChild => {
+        if (innerChild.getAttribute('data-scaled') === 'true') {
+          innerChild.style.transform = '';
+          innerChild.style.marginBottom = '';
+          innerChild.removeAttribute('data-scaled');
+        }
+      });
+    }
+  });
+  
+  // 모든 구분선 제거
+  bodyEl.querySelectorAll('.page-break-line').forEach(line => line.remove());
+  pageBreaks = [];
+  
+  // 안내 메시지 및 눈금자 제거 (이미 제거되었을 수도 있음)
+  const guide = document.getElementById('pageBreakGuide');
+  if (guide) guide.remove();
+  const ruler = document.getElementById('heightRuler');
+  if (ruler) ruler.remove();
+  
+  // 모드 상태 초기화
+  pageBreakMode = false;
+  
+  console.log('페이지 구분 모드 초기화 완료');
+}
+
+let pageBreakMode = false;
+let pageBreaks = [];
+
+window.startPageBreakMode = function startPageBreakMode() {
+  if (!confirm('A4 크기 기준으로 페이지를 자동 분할합니다.\n\n구분선을 드래그하여 위치를 조정할 수 있습니다.')) {
+    // 바로 인쇄
+    printReportModal();
+    return;
+  }
+  
+  const bodyEl = document.getElementById('reportContent');
+  if (!bodyEl) {
+    alert('보고서 컨텐츠를 찾을 수 없습니다.');
+    return;
+  }
+  
+  // 기존 구분선, 가이드, 눈금자 모두 제거 (중복 방지)
+  bodyEl.querySelectorAll('.page-break-line').forEach(line => line.remove());
+  const existingGuide = document.getElementById('pageBreakGuide');
+  if (existingGuide) existingGuide.remove();
+  const existingRuler = document.getElementById('heightRuler');
+  if (existingRuler) existingRuler.remove();
+  
+  pageBreakMode = true;
+  pageBreaks = [];
+  
+  // 모달에 position: relative 추가
+  bodyEl.style.position = 'relative';
+  bodyEl.style.cursor = 'default';
+  
+  // draggable 비활성화
+  const draggableModal = document.getElementById('reportModalDraggable');
+  if (draggableModal) {
+    draggableModal.setAttribute('data-draggable-disabled', 'true');
+  }
+  
+  // A4 인쇄 가능 높이 계산 (픽셀 단위)
+  // A4 = 297mm, 마진 40mm(20mm * 2) 제외 = 257mm
+  // 1mm ≈ 3.78px (96 DPI 기준)
+  const A4_HEIGHT_PX = 257 * 3.78; // 약 971px
+  
+  // reportContent의 실제 내용 높이
+  const contentHeight = bodyEl.scrollHeight;
+  
+  // 필요한 페이지 수
+  const pageCount = Math.ceil(contentHeight / A4_HEIGHT_PX);
+  
+  console.log(`전체 높이: ${contentHeight}px, A4 페이지당: ${A4_HEIGHT_PX.toFixed(0)}px, 필요 페이지: ${pageCount}`);
+  
+  // 안내 메시지 추가 (reportModalBody 외부에 배치)
+  const guide = document.createElement('div');
+  guide.id = 'pageBreakGuide';
+  guide.style.cssText = 'position: fixed; top: 120px; left: 50%; transform: translateX(-50%); background: #667eea; color: white; padding: 10px 20px; text-align: center; font-size: 13px; z-index: 10001; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);';
+  guide.innerHTML = `📄 페이지 구분선 자동 배치 완료 (총 ${pageCount}페이지)<br><small>구분선을 드래그하여 위치를 조정할 수 있습니다.</small>`;
+  document.body.appendChild(guide);
+  
+  // 높이 눈금자 추가
+  const ruler = document.createElement('div');
+  ruler.id = 'heightRuler';
+  ruler.style.cssText = `
+    position: absolute;
+    left: -60px;
+    top: 0;
+    width: 50px;
+    height: ${contentHeight}px;
+    background: linear-gradient(to bottom, #f0f0f0 0%, #ffffff 100%);
+    border-right: 2px solid #667eea;
+    font-size: 10px;
+    color: #666;
+    pointer-events: none;
+    z-index: 998;
+  `;
+  
+  // 100px 단위로 눈금 표시
+  for (let h = 0; h <= contentHeight; h += 100) {
+    const tick = document.createElement('div');
+    tick.style.cssText = `
+      position: absolute;
+      left: 10px;
+      top: ${h}px;
+      width: 100%;
+      height: 1px;
+      background: #ccc;
+      border-top: 1px solid #999;
+    `;
+    
+    const label = document.createElement('span');
+    label.style.cssText = `
+      position: absolute;
+      right: 5px;
+      top: -8px;
+      background: white;
+      padding: 0 2px;
+      font-weight: bold;
+      color: #333;
+    `;
+    label.textContent = `${h}`;
+    tick.appendChild(label);
+    ruler.appendChild(tick);
+  }
+  
+  bodyEl.appendChild(ruler);
+  
+  // 각 페이지 경계에 구분선 자동 배치
+  for (let i = 1; i < pageCount; i++) {
+    const position = A4_HEIGHT_PX * i;
+    createAutoPageBreakLine(position, i - 1, A4_HEIGHT_PX);
+  }
+  
+  // 버튼 및 체크박스 표시 전환
+  document.getElementById('printReportBtn').style.display = 'none';
+  document.getElementById('confirmPrintBtn').style.display = 'block';
+  document.getElementById('cancelBreakBtn').style.display = 'block';
+  document.getElementById('showDividerLabel').style.display = 'flex';
+}
+
+function createAutoPageBreakLine(position, index, pageHeight) {
+  const bodyEl = document.getElementById('reportContent');
+  if (!bodyEl) return;
+  
+  // reportContent의 padding 값 계산
+  const paddingTop = parseInt(window.getComputedStyle(bodyEl).paddingTop || 0);
+  
+  const line = document.createElement('div');
+  line.className = 'page-break-line';
+  line.style.cssText = `
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #ff4444 0%, #ff6666 50%, #ff4444 100%);
+    cursor: ns-resize;
+    z-index: 999;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    top: ${position}px;
+  `;
+  line.setAttribute('data-y-position', position);
+  line.setAttribute('data-page-index', index);
+  
+  // 라벨 추가 (절대 위치 정보 포함)
+  const label = document.createElement('span');
+  label.style.cssText = 'position: absolute; left: 10px; top: -20px; background: #ff4444; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: bold; pointer-events: none; white-space: nowrap;';
+  label.textContent = `페이지 ${index + 1} | 절대위치: ${position.toFixed(0)}px`;
+  line.appendChild(label);
+  
+  // 축소 비율 입력창 추가
+  const scaleInput = document.createElement('input');
+  scaleInput.type = 'number';
+  scaleInput.min = '50';
+  scaleInput.max = '100';
+  scaleInput.value = '100';
+  scaleInput.step = '5';
+  scaleInput.className = 'scale-input';
+  scaleInput.setAttribute('data-page-index', index);
+  scaleInput.style.cssText = 'position: absolute; right: 10px; top: -22px; width: 55px; padding: 3px 6px; border: 2px solid #ff4444; border-radius: 3px; font-size: 12px; font-weight: bold; text-align: center; background: white; cursor: text;';
+  scaleInput.title = '이 영역의 축소 비율 (%) - Enter로 적용';
+  scaleInput.placeholder = '100';
+  line.appendChild(scaleInput);
+  
+  // 축소 비율 라벨
+  const scaleLabel = document.createElement('span');
+  scaleLabel.style.cssText = 'position: absolute; right: 70px; top: -20px; background: #666; color: white; padding: 2px 5px; border-radius: 3px; font-size: 10px; pointer-events: none;';
+  scaleLabel.textContent = '% (Enter)';
+  line.appendChild(scaleLabel);
+  
+  // 입력창 클릭 시 이벤트 전파 중단
+  scaleInput.addEventListener('mousedown', (e) => {
+    e.stopPropagation();
+  });
+  
+  scaleInput.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+  
+  scaleInput.addEventListener('focus', (e) => {
+    e.stopPropagation();
+  });
+  
+  // Enter 키 또는 포커스를 잃을 때만 축소 적용
+  scaleInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const scale = parseFloat(e.target.value) / 100;
+      if (!isNaN(scale) && scale >= 0.5 && scale <= 1.0) {
+        applyScaleToSection(line, scale, bodyEl, paddingTop);
+        e.target.blur(); // 포커스 제거
+      } else {
+        alert('50~100 사이의 값을 입력하세요.');
+        e.target.value = '100';
+      }
+    }
+  });
+  
+  scaleInput.addEventListener('blur', (e) => {
+    const scale = parseFloat(e.target.value) / 100;
+    if (!isNaN(scale) && scale >= 0.5 && scale <= 1.0) {
+      applyScaleToSection(line, scale, bodyEl, paddingTop);
+    } else {
+      e.target.value = '100';
+      applyScaleToSection(line, 1.0, bodyEl, paddingTop);
+    }
+  });
+  
+  // 초기 영역 높이 체크
+  const checkAndUpdateColor = () => {
+    const allLines = Array.from(bodyEl.querySelectorAll('.page-break-line')).sort((a, b) => {
+      return parseFloat(a.getAttribute('data-y-position')) - parseFloat(b.getAttribute('data-y-position'));
+    });
+    const currentLineIndex = allLines.indexOf(line);
+    
+    const prevLinePos = currentLineIndex > 0 
+      ? parseFloat(allLines[currentLineIndex - 1].getAttribute('data-y-position'))
+      : 0;
+    const currentPos = parseFloat(line.getAttribute('data-y-position'));
+    const sectionHeight = currentPos - prevLinePos;
+    const percentage = ((sectionHeight / pageHeight) * 100).toFixed(0);
+    
+    // A4 크기를 넘으면 경고 색상 (라벨은 입력창 값 표시)
+    if (sectionHeight > pageHeight) {
+      line.style.background = 'linear-gradient(90deg, #ff0000 0%, #ff3333 50%, #ff0000 100%)';
+      label.style.background = '#ff0000';
+      scaleInput.style.borderColor = '#ff0000';
+      scaleInput.style.background = '#ffe0e0';
+      label.textContent = `페이지 ${index + 1} (${scaleInput.value}% ⚠️)`;
+    } else if (sectionHeight > pageHeight * 0.9) {
+      line.style.background = 'linear-gradient(90deg, #ff8800 0%, #ffaa00 50%, #ff8800 100%)';
+      label.style.background = '#ff8800';
+      scaleInput.style.borderColor = '#ff8800';
+      scaleInput.style.background = '#fff8e0';
+      label.textContent = `페이지 ${index + 1} (${scaleInput.value}%)`;
+    } else {
+      line.style.background = 'linear-gradient(90deg, #44ff44 0%, #66ff66 50%, #44ff44 100%)';
+      label.style.background = '#44aa44';
+      scaleInput.style.borderColor = '#44aa44';
+      scaleInput.style.background = 'white';
+      label.textContent = `페이지 ${index + 1} (${scaleInput.value}%)`;
+    }
+  };
+  
+  checkAndUpdateColor();
+  
+  // 드래그 기능
+  let isDragging = false;
+  let startY = 0;
+  let startTop = 0;
+  
+  line.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    startY = e.clientY;
+    startTop = parseFloat(line.getAttribute('data-y-position'));
+    line.style.zIndex = '1001';
+    e.preventDefault();
+  });
+  
+  document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    
+    const deltaY = e.clientY - startY;
+    let newPosition = startTop + deltaY;
+    
+    // 이전/다음 구분선과의 간격 확인
+    const allLines = Array.from(bodyEl.querySelectorAll('.page-break-line')).sort((a, b) => {
+      return parseFloat(a.getAttribute('data-y-position')) - parseFloat(b.getAttribute('data-y-position'));
+    });
+    const currentLineIndex = allLines.indexOf(line);
+    
+    // 이전 구분선 또는 시작점(0)으로부터 A4 크기 이내로 제한
+    let minPosition = 50; // 최소 50px
+    if (currentLineIndex > 0) {
+      const prevLinePos = parseFloat(allLines[currentLineIndex - 1].getAttribute('data-y-position'));
+      minPosition = prevLinePos + 50; // 이전 구분선으로부터 최소 50px
+    }
+    
+    // 이전 위치로부터 최대 A4 크기까지만 허용
+    const prevLinePos = currentLineIndex > 0 
+      ? parseFloat(allLines[currentLineIndex - 1].getAttribute('data-y-position'))
+      : 0;
+    const maxPosition = prevLinePos + pageHeight; // A4 크기만큼
+    
+    // 전체 컨텐츠 범위 내로 제한
+    const contentHeight = bodyEl.scrollHeight;
+    newPosition = Math.max(minPosition, Math.min(Math.min(maxPosition, contentHeight - 50), newPosition));
+    
+    line.style.top = `${newPosition}px`;
+    line.setAttribute('data-y-position', newPosition);
+    
+    // 실시간으로 다음 구분선들을 A4 간격으로 이동
+    let prevPos = newPosition;
+    for (let i = currentLineIndex + 1; i < allLines.length; i++) {
+      const nextIdealPos = prevPos + pageHeight;
+      const nextLine = allLines[i];
+      
+      // 컨텐츠 범위 체크
+      if (nextIdealPos < contentHeight - 50) {
+        nextLine.style.top = `${nextIdealPos}px`;
+        nextLine.setAttribute('data-y-position', nextIdealPos);
+        prevPos = nextIdealPos;
+      } else {
+        break; // 범위 초과하면 더 이상 이동 안 함
+      }
+    }
+    
+    // 현재 영역 높이 체크 및 색상 업데이트 (입력창 값은 변경하지 않음)
+    const sortedLines = Array.from(bodyEl.querySelectorAll('.page-break-line')).sort((a, b) => {
+      return parseFloat(a.getAttribute('data-y-position')) - parseFloat(b.getAttribute('data-y-position'));
+    });
+    const lineIndex2 = sortedLines.indexOf(line);
+    const prevLinePos2 = lineIndex2 > 0 
+      ? parseFloat(sortedLines[lineIndex2 - 1].getAttribute('data-y-position'))
+      : 0;
+    const sectionHeight = newPosition - prevLinePos2;
+    const percentage = ((sectionHeight / pageHeight) * 100).toFixed(0);
+    
+    // 페이지 라벨만 업데이트 (첫 번째 span)
+    const labels = line.querySelectorAll('span');
+    const pageLabel = labels[0]; // 첫 번째 span이 페이지 라벨
+    
+    // A4 크기에 따른 색상 변경 (라벨은 입력창 값 표시)
+    const currentScaleInput = line.querySelector('.scale-input');
+    const currentScale = currentScaleInput ? currentScaleInput.value : '100';
+    
+    // 절대 위치 정보 업데이트
+    const absolutePos = newPosition;
+    const prevAbsPos = prevLinePos2;
+    
+    if (sectionHeight > pageHeight) {
+      line.style.background = 'linear-gradient(90deg, #ff0000 0%, #ff3333 50%, #ff0000 100%)';
+      if (pageLabel) {
+        pageLabel.style.background = '#ff0000';
+        pageLabel.textContent = `페이지 ${index + 1} (${currentScale}% ⚠️) | ${prevAbsPos.toFixed(0)}~${absolutePos.toFixed(0)}px (${sectionHeight.toFixed(0)}px)`;
+      }
+      if (currentScaleInput) {
+        currentScaleInput.style.borderColor = '#ff0000';
+        currentScaleInput.style.background = '#ffe0e0';
+      }
+    } else if (sectionHeight > pageHeight * 0.9) {
+      line.style.background = 'linear-gradient(90deg, #ff8800 0%, #ffaa00 50%, #ff8800 100%)';
+      if (pageLabel) {
+        pageLabel.style.background = '#ff8800';
+        pageLabel.textContent = `페이지 ${index + 1} (${currentScale}%) | ${prevAbsPos.toFixed(0)}~${absolutePos.toFixed(0)}px (${sectionHeight.toFixed(0)}px)`;
+      }
+      if (currentScaleInput) {
+        currentScaleInput.style.borderColor = '#ff8800';
+        currentScaleInput.style.background = '#fff8e0';
+      }
+    } else {
+      line.style.background = 'linear-gradient(90deg, #44ff44 0%, #66ff66 50%, #44ff44 100%)';
+      if (pageLabel) {
+        pageLabel.style.background = '#44aa44';
+        pageLabel.textContent = `페이지 ${index + 1} (${currentScale}%) | ${prevAbsPos.toFixed(0)}~${absolutePos.toFixed(0)}px (${sectionHeight.toFixed(0)}px)`;
+      }
+      if (currentScaleInput) {
+        currentScaleInput.style.borderColor = '#44aa44';
+        currentScaleInput.style.background = 'white';
+      }
+    }
+  });
+  
+  document.addEventListener('mouseup', () => {
+    if (isDragging) {
+      isDragging = false;
+      line.style.zIndex = '999';
+      
+      // 드래그 종료 후 다음 구분선들 재배치
+      const finalLines = Array.from(bodyEl.querySelectorAll('.page-break-line')).sort((a, b) => {
+        return parseFloat(a.getAttribute('data-y-position')) - parseFloat(b.getAttribute('data-y-position'));
+      });
+      const currentLineIndex = finalLines.indexOf(line);
+      const currentPos = parseFloat(line.getAttribute('data-y-position'));
+      const contentHeight = bodyEl.scrollHeight;
+      
+      console.log(`드래그 종료: 구분선 ${currentLineIndex + 1}, 위치 ${currentPos.toFixed(0)}px, 컨텐츠 높이 ${contentHeight}px`);
+      
+      // 현재 구분선 이후의 모든 구분선 재배치
+      let prevPos = currentPos;
+      for (let i = currentLineIndex + 1; i < finalLines.length; i++) {
+        const newPos = prevPos + pageHeight;
+        const nextLine = finalLines[i];
+        
+        // 컨텐츠 범위 체크
+        if (newPos >= contentHeight - 50) {
+          // 범위를 벗어나면 해당 구분선과 이후 구분선들 제거
+          console.log(`  구분선 ${i + 1} 제거 (범위 초과: ${newPos.toFixed(0)}px > ${contentHeight - 50}px)`);
+          for (let j = i; j < finalLines.length; j++) {
+            finalLines[j].remove();
+            const idx = pageBreaks.indexOf(finalLines[j]);
+            if (idx > -1) pageBreaks.splice(idx, 1);
+          }
+          break;
+        }
+        
+        nextLine.style.top = `${newPos}px`;
+        nextLine.setAttribute('data-y-position', newPos);
+        console.log(`  구분선 ${i + 1} 재배치: ${newPos.toFixed(0)}px`);
+        prevPos = newPos;
+      }
+      
+      // 마지막 구분선 이후 A4 크기만큼 공간이 남았다면 구분선 추가
+      const updatedLines = Array.from(bodyEl.querySelectorAll('.page-break-line')).sort((a, b) => {
+        return parseFloat(a.getAttribute('data-y-position')) - parseFloat(b.getAttribute('data-y-position'));
+      });
+      
+      const lastLinePos = updatedLines.length > 0 ? parseFloat(updatedLines[updatedLines.length - 1].getAttribute('data-y-position')) : currentPos;
+      const remainingHeight = contentHeight - lastLinePos;
+      
+      console.log(`  마지막 구분선 위치: ${lastLinePos.toFixed(0)}px, 남은 높이: ${remainingHeight.toFixed(0)}px`);
+      
+      if (remainingHeight > pageHeight) {
+        const additionalPages = Math.floor(remainingHeight / pageHeight);
+        console.log(`  추가 구분선 필요: ${additionalPages}개`);
+        
+        for (let i = 1; i <= additionalPages; i++) {
+          const newPosition = lastLinePos + (pageHeight * i);
+          if (newPosition < contentHeight - 50) {
+            const newIndex = updatedLines.length + i - 1;
+            createAutoPageBreakLine(newPosition, newIndex, pageHeight);
+            console.log(`  구분선 ${newIndex + 2} 추가: ${newPosition.toFixed(0)}px`);
+          }
+        }
+      }
+      
+      // 안내 메시지 업데이트
+      const guide = document.getElementById('pageBreakGuide');
+      if (guide) {
+        const totalPages = bodyEl.querySelectorAll('.page-break-line').length + 1;
+        guide.innerHTML = `📄 페이지 구분선 배치 완료 (총 ${totalPages}페이지)<br><small>구분선을 드래그하여 위치를 조정할 수 있습니다.</small>`;
+      }
+      
+      console.log(`구분선 ${index + 1} 위치 조정 완료: ${line.getAttribute('data-y-position')}px`);
+    }
+  });
+  
+  // 더블클릭으로 제거
+  line.addEventListener('dblclick', () => {
+    if (confirm('이 구분선을 제거하시겠습니까?')) {
+      line.remove();
+      const idx = pageBreaks.indexOf(line);
+      if (idx > -1) pageBreaks.splice(idx, 1);
+    }
+  });
+  
+  bodyEl.appendChild(line);
+  pageBreaks.push(line);
+}
+
+// 특정 섹션에 축소 비율 적용 (실시간 미리보기)
+function applyScaleToSection(line, scale, bodyEl, paddingTop) {
+  const reportContent = document.getElementById('reportContent');
+  if (!reportContent) {
+    console.error('reportContent를 찾을 수 없습니다.');
+    return;
+  }
+  
+  const allLines = Array.from(bodyEl.querySelectorAll('.page-break-line')).sort((a, b) => {
+    return parseFloat(a.getAttribute('data-y-position')) - parseFloat(b.getAttribute('data-y-position'));
+  });
+  const currentLineIndex = allLines.indexOf(line);
+  
+  // 이 구분선의 이전 구분선부터 현재 구분선까지의 영역
+  const sectionStart = currentLineIndex > 0 
+    ? parseFloat(allLines[currentLineIndex - 1].getAttribute('data-y-position'))
+    : 0;
+  const sectionEnd = parseFloat(line.getAttribute('data-y-position'));
+  
+  console.log(`섹션 ${currentLineIndex + 1}: ${sectionStart}px ~ ${sectionEnd}px, 배율 ${(scale * 100).toFixed(0)}%`);
+  
+  // reportContent의 모든 직접 자식 요소들을 대상으로 (구분선, 하이라이트 등 제외)
+  const contentElements = Array.from(reportContent.children).filter(child => 
+    !child.classList.contains('page-break-line') &&
+    !child.classList.contains('section-highlight') &&
+    !child.classList.contains('scale-wrapper') &&
+    child.id !== 'pageBreakGuide' &&
+    child.id !== 'heightRuler'
+  );
+  
+  // 기존 하이라이트 및 wrapper 제거
+  bodyEl.querySelectorAll('.section-highlight, .scale-wrapper').forEach(el => el.remove());
+  
+  // 해당 섹션에 속하는 요소들 찾기
+  const elementsInSection = [];
+  contentElements.forEach(child => {
+    const rect = child.getBoundingClientRect();
+    const contentRect = reportContent.getBoundingClientRect();
+    const childTop = child.offsetTop;
+    const childBottom = childTop + child.offsetHeight;
+    
+    // 요소가 섹션 범위와 겹치는지 확인
+    if (childBottom > sectionStart && childTop < sectionEnd) {
+      elementsInSection.push(child);
+    }
+  });
+  
+  console.log(`섹션 내 요소 개수: ${elementsInSection.length}`);
+  
+  if (elementsInSection.length > 0 && scale < 1.0) {
+    // 섹션의 실제 영역 계산
+    const firstElement = elementsInSection[0];
+    const lastElement = elementsInSection[elementsInSection.length - 1];
+    const sectionTopAbsolute = Math.max(sectionStart, firstElement.offsetTop);
+    const sectionBottomAbsolute = Math.min(sectionEnd, lastElement.offsetTop + lastElement.offsetHeight);
+    
+    // 하이라이트 영역 생성
+    const highlight = document.createElement('div');
+    highlight.className = 'section-highlight';
+    highlight.style.cssText = `
+      position: absolute;
+      left: ${paddingTop}px;
+      right: ${paddingTop}px;
+      top: ${sectionTopAbsolute + paddingTop}px;
+      height: ${sectionBottomAbsolute - sectionTopAbsolute}px;
+      background: rgba(100, 150, 255, 0.1);
+      border: 2px dashed rgba(100, 150, 255, 0.4);
+      pointer-events: none;
+      z-index: 998;
+      transition: all 0.3s ease;
+    `;
+    bodyEl.appendChild(highlight);
+    
+    // 배율 표시 라벨
+    const scaleLabel = document.createElement('div');
+    scaleLabel.style.cssText = `
+      position: absolute;
+      left: ${paddingTop + 10}px;
+      top: ${sectionTopAbsolute + paddingTop + 5}px;
+      background: rgba(100, 150, 255, 0.8);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      z-index: 999;
+      pointer-events: none;
+    `;
+    scaleLabel.textContent = `${(scale * 100).toFixed(0)}%`;
+    bodyEl.appendChild(scaleLabel);
+    scaleLabel.className = 'section-highlight';
+    
+    // 각 요소에 축소 적용
+    elementsInSection.forEach((child, idx) => {
+      // 이미 축소된 상태라면 먼저 초기화
+      if (child.getAttribute('data-scaled') === 'true') {
+        child.style.transform = '';
+        child.style.marginBottom = '';
+      }
+      
+      child.style.transformOrigin = 'top left';
+      child.style.transform = `scale(${scale})`;
+      // 축소로 인해 줄어든 높이만큼 마진 조정
+      const scaledHeightReduction = child.offsetHeight * (1 - scale);
+      child.style.marginBottom = `${-scaledHeightReduction}px`;
+      child.setAttribute('data-scaled', 'true');
+      child.setAttribute('data-scale-value', scale);
+      console.log(`  요소 ${idx + 1} 축소 적용: ${child.tagName} (${child.offsetHeight}px → ${(child.offsetHeight * scale).toFixed(0)}px)`);
+    });
+    
+    // 축소 적용 후 다음 구분선들을 A4 크기 기준으로 재배치
+    setTimeout(() => {
+      repositionFollowingLines(line, bodyEl, paddingTop);
+    }, 100);
+  } else {
+    // 축소 비율이 100%이면 모든 축소 효과 제거
+    contentElements.forEach(child => {
+      if (child.getAttribute('data-scaled') === 'true') {
+        child.style.transform = '';
+        child.style.marginBottom = '';
+        child.style.transformOrigin = '';
+        child.removeAttribute('data-scaled');
+        child.removeAttribute('data-scale-value');
+      }
+    });
+    
+    // 100%로 복원 후에도 재배치
+    setTimeout(() => {
+      repositionFollowingLines(line, bodyEl, paddingTop);
+    }, 100);
+  }
+}
+
+// 구분선 재배치 함수 (축소 적용 후)
+function repositionFollowingLines(changedLine, bodyEl, paddingTop) {
+  const A4_HEIGHT_PX = 257 * 3.78;
+  
+  // 강제 reflow로 scrollHeight 업데이트
+  bodyEl.offsetHeight;
+  
+  const allLines = Array.from(bodyEl.querySelectorAll('.page-break-line')).sort((a, b) => {
+    return parseFloat(a.getAttribute('data-y-position')) - parseFloat(b.getAttribute('data-y-position'));
+  });
+  
+  const changedIndex = allLines.indexOf(changedLine);
+  if (changedIndex === -1) {
+    console.log('재배치 실패: 구분선을 찾을 수 없음');
+    return;
+  }
+  
+  const contentHeight = bodyEl.scrollHeight - paddingTop - parseInt(window.getComputedStyle(bodyEl).paddingBottom || 0);
+  const currentPos = parseFloat(changedLine.getAttribute('data-y-position'));
+  
+  console.log(`구분선 재배치 시작: 구분선 ${changedIndex + 1} (${currentPos.toFixed(0)}px), 컨텐츠 높이: ${contentHeight.toFixed(0)}px`);
+  
+  // 다음 구분선들을 A4 간격으로 재배치 (이전 구분선 기준)
+  let prevLinePos = currentPos;
+  let repositionedCount = 0;
+  
+  for (let i = changedIndex + 1; i < allLines.length; i++) {
+    const newPosition = prevLinePos + A4_HEIGHT_PX;
+    
+    // 컨텐츠 범위를 벗어나면 구분선 제거
+    if (newPosition >= contentHeight - 50) {
+      console.log(`  구분선 ${i + 1} 제거 (범위 초과: ${newPosition.toFixed(0)}px >= ${(contentHeight - 50).toFixed(0)}px)`);
+      for (let j = i; j < allLines.length; j++) {
+        allLines[j].remove();
+        const idx = pageBreaks.indexOf(allLines[j]);
+        if (idx > -1) pageBreaks.splice(idx, 1);
+      }
+      break;
+    }
+    
+    allLines[i].style.top = `${newPosition + paddingTop}px`;
+    allLines[i].setAttribute('data-y-position', newPosition);
+    console.log(`  구분선 ${i + 1} 재배치: ${newPosition.toFixed(0)}px`);
+    prevLinePos = newPosition;
+    repositionedCount++;
+  }
+  
+  console.log(`재배치 완료: ${repositionedCount}개 구분선 이동`);
+  
+  // 마지막 구분선 이후 A4 크기만큼 공간이 남았다면 구분선 추가
+  const updatedLines = Array.from(bodyEl.querySelectorAll('.page-break-line')).sort((a, b) => {
+    return parseFloat(a.getAttribute('data-y-position')) - parseFloat(b.getAttribute('data-y-position'));
+  });
+  
+  const lastLinePos = updatedLines.length > 0 ? parseFloat(updatedLines[updatedLines.length - 1].getAttribute('data-y-position')) : 0;
+  const remainingHeight = contentHeight - lastLinePos;
+  
+  if (remainingHeight > A4_HEIGHT_PX) {
+    const additionalPages = Math.floor(remainingHeight / A4_HEIGHT_PX);
+    console.log(`추가 구분선 필요: ${additionalPages}개`);
+    
+    for (let i = 1; i <= additionalPages; i++) {
+      const newPosition = lastLinePos + (A4_HEIGHT_PX * i);
+      if (newPosition < contentHeight - 50) {
+        const newIndex = updatedLines.length + i - 1;
+        createAutoPageBreakLine(newPosition, newIndex, A4_HEIGHT_PX);
+        console.log(`  구분선 ${newIndex + 2} 추가: ${newPosition.toFixed(0)}px`);
+      }
+    }
+  }
+  
+  // 총 페이지 수 업데이트
+  const totalPages = bodyEl.querySelectorAll('.page-break-line').length + 1;
+  const guide = document.getElementById('pageBreakGuide');
+  if (guide) {
+    guide.innerHTML = `📄 페이지 구분선 재배치 완료 (총 ${totalPages}페이지)<br><small>구분선을 드래그하여 위치를 조정할 수 있습니다.</small>`;
+  }
+}
+
+window.cancelPageBreakMode = function cancelPageBreakMode() {
+  pageBreakMode = false;
+  const bodyEl = document.getElementById('reportContent');
+  
+  if (!bodyEl) return;
+  
+  // 모든 하이라이트 제거
+  bodyEl.querySelectorAll('.section-highlight').forEach(h => h.remove());
+  
+  // 모든 요소의 축소 효과 제거
+  const allChildren = Array.from(bodyEl.children);
+  allChildren.forEach(child => {
+    if (child.getAttribute('data-scaled') === 'true') {
+      child.style.transform = '';
+      child.style.marginBottom = '';
+      child.removeAttribute('data-scaled');
+    }
+    
+    // wrapper DIV 내부 요소들도 복원
+    if (child.tagName === 'DIV') {
+      Array.from(child.children).forEach(innerChild => {
+        if (innerChild.getAttribute('data-scaled') === 'true') {
+          innerChild.style.transform = '';
+          innerChild.style.marginBottom = '';
+          innerChild.removeAttribute('data-scaled');
+        }
+      });
+    }
+  });
+  
+  // 모든 구분선 제거
+  document.querySelectorAll('.page-break-line').forEach(line => line.remove());
+  pageBreaks = [];
+  
+  // 안내 메시지 및 눈금자 제거
+  const guide = document.getElementById('pageBreakGuide');
+  if (guide) guide.remove();
+  const ruler = document.getElementById('heightRuler');
+  if (ruler) ruler.remove();
+  
+  // 스타일 복원
+  bodyEl.style.cursor = '';
+  
+  // draggable 재활성화
+  const draggableModal = document.getElementById('reportModalDraggable');
+  if (draggableModal) {
+    draggableModal.removeAttribute('data-draggable-disabled');
+  }
+  
+  // 버튼 및 체크박스 표시 전환
+  document.getElementById('printReportBtn').style.display = 'block';
+  document.getElementById('confirmPrintBtn').style.display = 'none';
+  document.getElementById('cancelBreakBtn').style.display = 'none';
+  document.getElementById('showDividerLabel').style.display = 'none';
+}
+
+window.confirmAndPrint = function confirmAndPrint() {
+  const bodyEl = document.getElementById('reportContent');
+  
+  // 페이지 구분 모드 종료 전에 상태 저장
+  pageBreakMode = false;
+  bodyEl.style.cursor = '';
+  
+  // draggable 재활성화
+  const draggableModal = document.getElementById('reportModalDraggable');
+  if (draggableModal) {
+    draggableModal.removeAttribute('data-draggable-disabled');
+  }
+  
+  // guide는 printReportModal에서 임시로 제거하므로 여기서는 건드리지 않음
+  
+  console.log('페이지 구분선 개수:', pageBreaks.length);
+  
+  // 인쇄 실행 (버튼 전환은 printReportModal 내부에서)
+  setTimeout(() => printReportModal(), 50);
+}
+
+function printReportModal() {
+  const modal = document.getElementById('reportModalDraggable');
+  if (!modal) return;
+  
+  const titleEl = document.getElementById('reportModalTitle');
+  const bodyEl = document.getElementById('reportContent');
+  
+  if (!titleEl || !bodyEl) return;
+  
+  // 버튼 및 체크박스 표시 전환 후 약간의 딜레이를 두고 계산 시작
+  document.getElementById('printReportBtn').style.display = 'block';
+  document.getElementById('confirmPrintBtn').style.display = 'none';
+  document.getElementById('cancelBreakBtn').style.display = 'none';
+  document.getElementById('showDividerLabel').style.display = 'none';
+  
+  // DOM 업데이트 대기 후 인쇄 진행
+  setTimeout(() => {
+    proceedWithPrint(titleEl, bodyEl);
+  }, 100);
+}
+
+function proceedWithPrint(titleEl, bodyEl) {
+  
+  // 기존 iframe 제거
+  const existingIframe = document.getElementById('printIframe');
+  if (existingIframe) existingIframe.remove();
+  
+  // 숨겨진 iframe 생성
+  const iframe = document.createElement('iframe');
+  iframe.id = 'printIframe';
+  iframe.style.cssText = 'position: absolute; width: 0; height: 0; border: none; visibility: hidden;';
+  document.body.appendChild(iframe);
+  
+  const doc = iframe.contentWindow.document;
+  
+  doc.open();
+  doc.write('');
+  doc.close();
+  
+  const html = doc.createElement('html');
+  const head = doc.createElement('head');
+  const body = doc.createElement('body');
+  
+  const meta = doc.createElement('meta');
+  meta.setAttribute('charset', 'UTF-8');
+  head.appendChild(meta);
+  
+  const title = doc.createElement('title');
+  title.textContent = '기업 보고서 인쇄';
+  head.appendChild(title);
+  
+  document.querySelectorAll('style,link[rel="stylesheet"]').forEach(node => {
+    head.appendChild(node.cloneNode(true));
+  });
+  
+  // 페이지 브레이크 스타일 추가
+  const printStyle = doc.createElement('style');
+  printStyle.textContent = `
+    @page { 
+      size: A4;
+      margin: 20mm; 
+    }
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100%;
+      height: 100%;
+    }
+    .page-wrapper {
+      page-break-after: always !important;
+      page-break-inside: avoid !important;
+      break-after: page !important;
+      break-inside: avoid !important;
+      position: relative;
+      width: 100%;
+      box-sizing: border-box;
+      background: white;
+      margin: 0 auto !important;
+      overflow: hidden;
+    }
+    .page-wrapper:last-child {
+      page-break-after: auto !important;
+      break-after: auto !important;
+    }
+    @media print {
+      * { box-sizing: border-box; }
+      html, body { 
+        margin: 0 !important; 
+        padding: 0 !important; 
+        width: 100%;
+        height: 100%;
+      }
+      .page-wrapper {
+        page-break-after: always !important;
+        break-after: page !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        margin: 0 !important;
+        width: 100%;
+        overflow: visible;
+      }
+      .page-wrapper:last-child {
+        page-break-after: auto !important;
+        break-after: auto !important;
+      }
+      /* 인쇄 시 비율 유지하며 축소 */
+      @page {
+        size: A4;
+        margin: 20mm;
+      }
+      img {
+        max-width: 100% !important;
+        height: auto !important;
+        page-break-inside: avoid;
+      }
+      table {
+        max-width: 100% !important;
+        page-break-inside: auto;
+      }
+    }
+  `;
+  head.appendChild(printStyle);
+  
+  body.style.background = 'white';
+  body.style.padding = '0';
+  body.style.margin = '0';
+  
+  // 구분선 기준으로 실제 섹션으로 나누기
+  const originalBody = document.getElementById('reportContent');
+  
+  // guide를 임시로 숨김 (visibility로 공간은 유지)
+  const guide = originalBody.querySelector('#pageBreakGuide');
+  const guideVisibility = guide ? guide.style.visibility : null;
+  if (guide) {
+    guide.style.visibility = 'hidden';
+    console.log('안내 메시지 임시 숨김 (공간 유지)');
+  }
+  
+  const lines = Array.from(originalBody.querySelectorAll('.page-break-line')).map(line => ({
+    position: parseFloat(line.getAttribute('data-y-position')),
+    element: line,
+    scale: parseFloat(line.querySelector('.scale-input')?.value || 100) / 100
+  })).sort((a, b) => a.position - b.position);
+  
+  console.log('페이지 구분선 개수:', lines.length);
+  console.log('축소 비율:', lines.map((l, i) => `페이지 ${i + 1}: ${(l.scale * 100).toFixed(0)}%`));
+  
+  if (lines.length === 0) {
+    // 구분선이 없으면 전체 내용 하나의 페이지로
+    const pageWrapper = doc.createElement('div');
+    pageWrapper.className = 'page-wrapper';
+    
+    const h2 = doc.createElement('h2');
+    h2.textContent = titleEl.textContent;
+    h2.style.cssText = 'margin: 0 0 20px 0; padding: 10px 0; border-bottom: 2px solid #333;';
+    pageWrapper.appendChild(h2);
+    
+    const contentDiv = doc.createElement('div');
+    contentDiv.innerHTML = originalBody.innerHTML;
+    contentDiv.querySelectorAll('.page-break-line').forEach(l => l.remove());
+    pageWrapper.appendChild(contentDiv);
+    body.appendChild(pageWrapper);
+  } else {
+    // 구분선이 있으면 각 구분선 사이 영역을 독립된 페이지로
+    
+    // 모든 컨텐츠 요소 가져오기
+    const allContent = originalBody.cloneNode(true);
+    allContent.querySelectorAll('.page-break-line, #pageBreakGuide').forEach(el => el.remove());
+    
+    // 구분선 위치 배열 (reportContent 기준 절대 위치)
+    const positions = [0, ...lines.map(l => l.position)];
+    const totalHeight = originalBody.scrollHeight;
+    const contentHeight = totalHeight;
+    
+    console.log(`전체 높이: ${totalHeight}px, 컨텐츠 높이: ${contentHeight}px`);
+    console.log('구분선 절대 위치:', positions.map(p => p.toFixed(0)));
+    
+    // 각 구분선 사이 영역을 페이지로 생성
+    for (let i = 0; i < positions.length; i++) {
+      const startPos = positions[i];
+      const endPos = i < positions.length - 1 ? positions[i + 1] : contentHeight;
+      const sectionHeight = endPos - startPos;
+      
+      console.log(`페이지 ${i + 1}: ${startPos.toFixed(0)}px ~ ${endPos.toFixed(0)}px (높이: ${sectionHeight.toFixed(0)}px)`);
+      
+      // 페이지 래퍼 생성
+      const pageWrapper = doc.createElement('div');
+      pageWrapper.className = 'page-wrapper';
+      
+      // 컨텐츠 컨테이너 생성 (잘라내기 영역)
+      const contentContainer = doc.createElement('div');
+      contentContainer.style.cssText = `
+        position: relative;
+        width: 100%;
+        height: ${sectionHeight}px;
+        overflow: hidden;
+      `;
+      
+      // 컨텐츠 복제
+      const contentClone = allContent.cloneNode(true);
+      contentClone.style.cssText = `
+        position: absolute;
+        top: ${-startPos}px;
+        left: 0;
+        width: 100%;
+      `;
+      
+      contentContainer.appendChild(contentClone);
+      
+      // 체크박스 상태 확인
+      const showDivider = document.getElementById('showDividerCheckbox').checked;
+      
+      // 미리보기용 구분선 추가 - 컨텐츠 컨테이너 내부에 배치
+      if (i < positions.length - 1 && showDivider) {
+        const dividerLine = doc.createElement('div');
+        // 구분선은 contentContainer 내부에서 endPos 위치에 표시
+        dividerLine.style.cssText = `
+          position: absolute;
+          top: ${endPos - startPos}px;
+          left: 0;
+          width: 100%;
+          height: 3px;
+          background: linear-gradient(90deg, #ff4444 0%, #ff6666 50%, #ff4444 100%);
+          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          z-index: 9999;
+        `;
+        
+        // 위치 정보 라벨 추가
+        const infoLabel = doc.createElement('span');
+        infoLabel.style.cssText = `
+          position: absolute;
+          left: 10px;
+          top: -20px;
+          background: #ff4444;
+          color: white;
+          padding: 2px 8px;
+          border-radius: 3px;
+          font-size: 10px;
+          font-weight: bold;
+          white-space: nowrap;
+          z-index: 10000;
+        `;
+        infoLabel.textContent = `페이지 ${i + 1} 끝 | 절대위치: ${endPos.toFixed(0)}px`;
+        dividerLine.appendChild(infoLabel);
+        
+        contentContainer.appendChild(dividerLine);
+      }
+      
+      pageWrapper.appendChild(contentContainer);
+      
+      // 축소 비율 적용
+      const scale = i < lines.length ? lines[i].scale : (lines.length > 0 ? lines[lines.length - 1].scale : 1);
+      pageWrapper.setAttribute('data-manual-scale', 'true');
+      
+      if (scale < 1) {
+        pageWrapper.style.transformOrigin = 'top left';
+        pageWrapper.style.transform = `scale(${scale})`;
+        console.log(`  페이지 ${i + 1}에 수동 축소 ${(scale * 100).toFixed(0)}% 적용`);
+      } else {
+        console.log(`  페이지 ${i + 1}는 100% (자동 축소 방지)`);
+      }
+      
+      body.appendChild(pageWrapper);
+    }
+    
+    console.log('총 페이지 수:', body.querySelectorAll('.page-wrapper').length);
+  }
+  
+  html.appendChild(head);
+  html.appendChild(body);
+  
+  if (doc.documentElement) {
+    doc.removeChild(doc.documentElement);
+  }
+  doc.appendChild(html);
+  
+  // 각 페이지의 높이를 확인하고 수동 축소 비율이 없으면 자동 축소
+  setTimeout(() => {
+    const A4_HEIGHT_PX = 257 * 3.78; // 약 971px (A4 - 마진)
+    const pages = doc.querySelectorAll('.page-wrapper');
+    
+    pages.forEach((page, idx) => {
+      // 이미 수동 축소가 적용되었는지 확인
+      const hasManualScale = page.getAttribute('data-manual-scale') === 'true' || 
+                             (page.style.transform && page.style.transform.includes('scale'));
+      
+      // 페이지의 실제 컨텐츠 높이 계산 (padding 포함)
+      const contentHeight = page.scrollHeight;
+      
+      if (!hasManualScale && contentHeight > A4_HEIGHT_PX) {
+        // 수동 축소가 없고 A4를 넘으면 자동 축소
+        const scale = A4_HEIGHT_PX / contentHeight;
+        const scalePercent = (scale * 100).toFixed(1);
+        
+        console.log(`페이지 ${idx + 1}: 높이 ${contentHeight}px → 자동 축소 (${scalePercent}%)`);
+        
+        page.style.transformOrigin = 'top left';
+        page.style.transform = `scale(${scale})`;
+        page.style.height = `${contentHeight}px`;
+        page.style.marginBottom = `${-(contentHeight * (1 - scale))}px`;
+        
+        // 자동 축소 정보 표시
+        const scaleInfo = doc.createElement('div');
+        scaleInfo.style.cssText = 'position: absolute; top: 5px; left: 5px; background: rgba(255, 165, 0, 0.8); color: white; padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: bold; z-index: 10000;';
+        scaleInfo.textContent = `자동 축소: ${scalePercent}%`;
+        scaleInfo.className = 'scale-info-label';
+        page.style.position = 'relative';
+        page.insertBefore(scaleInfo, page.firstChild);
+      } else if (hasManualScale) {
+        console.log(`페이지 ${idx + 1}: 수동 축소 적용됨`);
+        
+        // 수동 축소 정보 표시
+        const scaleMatch = page.style.transform.match(/scale\(([\d.]+)\)/);
+        if (scaleMatch) {
+          const scale = parseFloat(scaleMatch[1]);
+          const scalePercent = (scale * 100).toFixed(0);
+          
+          const scaleInfo = doc.createElement('div');
+          scaleInfo.style.cssText = 'position: absolute; top: 5px; left: 5px; background: rgba(76, 175, 80, 0.8); color: white; padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: bold; z-index: 10000;';
+          scaleInfo.textContent = `수동 축소: ${scalePercent}%`;
+          scaleInfo.className = 'scale-info-label';
+          page.style.position = 'relative';
+          page.insertBefore(scaleInfo, page.firstChild);
+        }
+      } else {
+        console.log(`페이지 ${idx + 1}: 높이 ${contentHeight}px (축소 불필요)`);
+      }
+    });
+    
+    // 인쇄 시 축소 라벨 숨기기
+    const hideScaleLabels = doc.createElement('style');
+    hideScaleLabels.textContent = `
+      @media print {
+        .scale-info-label {
+          display: none !important;
+        }
+      }
+    `;
+    head.appendChild(hideScaleLabels);
+    
+    // 인쇄 실행
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+    
+    // 인쇄 후 iframe 제거 (약간의 딜레이 후)
+    setTimeout(() => {
+      iframe.remove();
+      document.querySelectorAll('.print-page-break').forEach(marker => marker.remove());
+      resetPageBreakMode();
+    }, 1000);
+  }, 500);
+}
+</script>
 
 </body></html>
