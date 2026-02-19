@@ -17,6 +17,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
+html.modal-open {
+  overflow: hidden;
+}
+
+html.modal-open body {
+  padding-right: var(--scrollbar-width, 0px);
+}
+
 body {
   font-family: "Segoe UI", Arial, sans-serif;
   background: #f4f6f9;
@@ -1965,6 +1973,7 @@ IRR = 23.6%</div>
           <input type="checkbox" id="showDividerCheckbox" checked style="cursor: pointer; width: 16px; height: 16px;">
           <span>구분선 표시</span>
         </label>
+        <button id="reportFullscreenBtn" onclick="toggleReportFullscreen()" style="padding: 8px 15px; background: linear-gradient(135deg, #00897b 0%, #26a69a 100%); color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 18px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s; line-height: 1;">⛶</button>
         <button id="printReportBtn" onclick="startPageBreakMode()" style="padding: 8px 18px; background: linear-gradient(135deg, #8e44ad 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s;">🖨️ 인쇄</button>
         <button id="confirmPrintBtn" onclick="confirmAndPrint()" style="display: none; padding: 8px 18px; background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s;">✓ 인쇄 실행</button>
         <button id="cancelBreakBtn" onclick="cancelPageBreakMode()" style="display: none; padding: 8px 18px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s;">✕ 취소</button>
@@ -2386,6 +2395,19 @@ const ventureData = [
           exitVisibility: {score: 4.2, evidence: "Series B, SI 보유", source: "G2B", formula: "[실제값: SI지분 있음(1), 투자단계 Lv.4] → (SI지분 1 × 2.5) + (투자단계 4/6 × 2.5) = 2.5 + 1.67 = 4.17 → 4.2점"}
         }
       },
+      {name:"싸이버로지텍", stage:"상장급", country:"한국", overview:"글로벌 TOS 및 스마트포트 플랫폼. AI 기반 터미널 자동화.", memo:"15개 선사, 36개 터미널, 140개 물류사. 해외 매출 90%.", videoUrl:"https://youtu.be/7iTrKhqT-L4?si=eahXme5VFiTpmxXy",
+        technologyDetail: "OPUS Terminal(40건): TOS 최적화 및 자동화; OPUS DigiPort(35건): IoT/AI 플랫폼; AI안전관제(18건): 실시간 위험 감지; ECS(12건): 장비 제어 시스템",
+        projectDetail: "부산항만공사 AI 안전관제; 동원글로벌터미널(DGT) 한국 최초 완전자동화; BNCT 부산신항 AI 시스템; 진해신항 ECS 및 디지털트윈; HMM, Maersk 등 글로벌 선사",
+        strategicInvestor: "유수홀딩스(모회사)",
+        rawData: {특허:130, 수주:87, 등록특허:105, 고용성장:0.35, 매출성장:0.35, 인증:8, 해외IP:38, 범용성:5.0, 라운드:6, SI:1},
+        metrics: {
+          customerPull: {score: 5.0, evidence: "수주 87건 (15개 선사, 36개 터미널, 140개 물류사)", source: "CyberLogitec/BPA", formula: "[실제값: 수주 87건] → 수주건수 / 50 = 87 / 50 = 1.74 → 1.74 × 5 = 8.7점 → 상한 5.0점"},
+          monetizationReadiness: {score: 4.6, evidence: "상장급 (Lv.6), 매출성장 35%", source: "CyberLogitec", formula: "[실제값: 투자단계 Lv.6, 매출성장 0.35] → (투자단계 6/6 × 2.5) + (매출성장 0.35 × 2.5) = 2.5 + 0.875 = 3.375 → 상장급 보정 4.6점"},
+          lockInStrength: {score: 5.0, evidence: "등록특허 105건", source: "KIPRIS", formula: "[실제값: 등록특허 105건] → 등록특허 / 100 = 105 / 100 = 1.05 → 1.05 × 5 = 5.25점 → 상한 5.0점"},
+          scalabilitySignal: {score: 5.0, evidence: "해외IP 38건, 범용성 5.0점 (30개국, 해외 매출 90%)", source: "CyberLogitec/KIPRIS", formula: "[실제값: 해외IP 38건, 범용성 5.0/5] → (범용성 5.0/5 × 2.5) + (해외IP 38/30 × 2.5) = 2.5 + 3.17 = 5.67점 → 상한 5.0점"},
+          exitVisibility: {score: 5.0, evidence: "상장급, 유수홀딩스 자회사", source: "CyberLogitec", formula: "[실제값: SI지분 있음(1), 투자단계 Lv.6] → (SI지분 1 × 2.5) + (투자단계 6/6 × 2.5) = 2.5 + 2.5 = 5.0점"}
+        }
+      },
       {name:"티투엘 주식회사", stage:"Pre-A", country:"한국", overview:"물류 운영 데이터 통합 및 대시보드 솔루션.", memo:"초기 레퍼런스 확보 단계.", videoUrl:"https://youtu.be/BFpVIBVqkhU?si=gRml1OFCM7IaAxwb",
         technologyDetail: "시스템(5건): 포워딩 통합 관리 모듈; 화물추적(5건): 수출입 화물 가시성 API",
         projectDetail: "항만공사 정보 시스템 고도화; 정부 물류 IT 고도화 사업단 협업; 중소 포워더 ERP",
@@ -2448,7 +2470,7 @@ const ventureData = [
         }
       },
       // 콜로세움 신규 추가
-      {name:"콜로세움", stage:"Series B", country:"한국", overview:"풀필먼트·AI 기반 물류센터 최적화. 대형 파트너사 확보.", memo:"다이와(日), 포스코플로우, CJ, 중진공 등 주요 고객. 효성벤처스, CJ인베스트먼트, 산업은행 등 투자.", videoUrl: "https://youtu.be/b4QMARHPboM?si=UgF012UxTxq2DMBz", 
+      {name:"콜로세움", stage:"Series B", country:"한국", overview:"풀필먼트·AI 기반 물류센터 최적화. 대형 파트너사 확보.", memo:"다이와(日), 포스코플로우, CJ, 중진공 등 주요 고객. 효성벤처스, CJ인베스트먼트, 산업은행 등 투자.", videoUrl: ["https://youtu.be/b4QMARHPboM?si=UgF012UxTxq2DMBz", "https://www.youtube.com/watch?v=1fVz_rSJfmQ&si=3ywyGcQ-4JR1ov7u"], 
         technologyDetail: "Colo AI(12건): AI 기반 물류센터 운영; 통합풀필먼트(15건): 주문·재고 통합 관리; 물류센터최적화(7건): 자동화 설비 연동",
         projectDetail: "다이와(日)·포스코플로우·CJ 등 대형 파트너 풀필먼트; 중진공 물류 지원; 산업은행 투자 유치",
         strategicInvestor: "효성벤처스; CJ인베스트먼트; 산업은행",
@@ -2459,6 +2481,20 @@ const ventureData = [
           lockInStrength: {score: 1.7, evidence: "등록특허 34건", source: "KIPRIS", formula: "등록특허 / 100 = 34 / 100 = 0.34 → 1.7점(정규화)"},
           scalabilitySignal: {score: 2.9, evidence: "해외IP 7건, 범용성 4.7점", source: "KIPRIS", formula: "(범용성 4.7/5 × 2.5) + (해외IP 7/30 × 2.5) = 2.35 + 0.58 = 2.93 → 2.9점"},
           exitVisibility: {score: 4.6, evidence: "SI지분 있음(1), 투자단계 Lv.5", source: "혁신의숲", formula: "(SI지분 1 × 2.5) + (투자단계 5/6 × 2.5) = 2.5 + 2.08 = 4.58 → 4.6점"}
+        }
+      },
+      // 토탈소프트뱅크 신규 추가
+      {name:"토탈소프트뱅크", stage:"상장", country:"한국", overview:"항만 TOS 및 물류 최적화 알고리즘. 코스닥 상장 기업.", memo:"K-Mega Port 프로젝트 핵심 기술사. 30년 항만 물류 노하우. 매출 207억(↑29%), 영업이익 52억.", videoUrl: "https://youtu.be/QeJeFG0Nsd4?si=8XGDcSRJkSNX--0x", 
+        technologyDetail: "TOS최적화(25건): 터미널 운영 시스템 로직; 항만물류알고리즘(22건): 야드 관리 최적화; 스마트포트시스템(23건): 디지털 트윈 기반 항만 자동화",
+        projectDetail: "부산항만공사 K-Mega Port 디지털 트윈; 인천항만공사 스마트포트; 글로벌 항만 TOS 솔루션 공급",
+        strategicInvestor: "이즈파크(컨소시엄); 부산항만공사",
+        rawData: {특허:85, 수주:45, 등록특허:70, 고용성장:0.15, 매출성장:0.29, 인증:8, 해외IP:18, 범용성:4.8, 라운드:6, SI:1},
+        metrics: {
+          customerPull: {score: 4.5, evidence: "수주 45건", source: "DART/KIPRIS/K-MegaPort", formula: "(수주건수 / 50) × 5 = (45 / 50) × 5 = 4.5점"},
+          monetizationReadiness: {score: 3.2, evidence: "투자단계 Lv.6(상장), 매출성장 0.29", source: "DART", formula: "(투자단계 6/6 × 2.5) + (매출성장 0.29 × 2.5) = 2.5 + 0.725 = 3.225 → 3.2점"},
+          lockInStrength: {score: 3.5, evidence: "등록특허 70건", source: "KIPRIS", formula: "(등록특허 / 100) × 5 = (70 / 100) × 5 = 3.5점"},
+          scalabilitySignal: {score: 3.9, evidence: "해외IP 18건, 범용성 4.8점", source: "KIPRIS", formula: "(범용성 4.8/5 × 2.5) + (해외IP 18/30 × 2.5) = 2.4 + 1.5 = 3.9점"},
+          exitVisibility: {score: 5.0, evidence: "코스닥 상장, SI지분 있음(1), 투자단계 Lv.6", source: "DART/KRX", formula: "(SI지분 1 × 2.5) + (투자단계 6/6 × 2.5) = 2.5 + 2.5 = 5.0점"}
         }
       }
     ]
@@ -7478,6 +7514,13 @@ function openReportModal(companyName) {
   const titleEl = document.getElementById('reportModalTitle');
   const body = document.getElementById('reportModalBody');
   
+  // 스크롤바 너비 계산 및 CSS 변수 설정
+  const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+  document.documentElement.style.setProperty('--scrollbar-width', scrollbarWidth + 'px');
+  
+  // modal-open 클래스를 html 요소에 추가
+  document.documentElement.classList.add('modal-open');
+  
   if (!companyName) {
     titleEl.textContent = '기업 보고서';
     body.innerHTML = '<div style="color: #888; text-align: center; padding: 40px 0;">보고서 내용이 준비 중입니다.</div>';
@@ -7497,7 +7540,23 @@ function openReportModal(companyName) {
     .then(res => res.ok ? res.text() : null)
     .then(html => {
       if(html) {
-        body.innerHTML = html;
+        // HTML을 파싱하여 body 내용만 추출하고 style의 body 선택자를 컨테이너로 변경
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        // style 태그에서 body 선택자를 .report-body-content로 변경
+        const styles = doc.querySelectorAll('style');
+        styles.forEach(style => {
+          style.textContent = style.textContent.replace(/\bbody\s*{/g, '.report-body-content {');
+        });
+        
+        // body 내용을 래퍼로 감싸기
+        const wrapper = document.createElement('div');
+        wrapper.className = 'report-body-content';
+        wrapper.innerHTML = Array.from(styles).map(s => s.outerHTML).join('') + doc.body.innerHTML;
+        
+        body.innerHTML = wrapper.outerHTML;
+        
         // .container에 ID 추가
         const container = body.querySelector('.container');
         if (container) {
@@ -7520,6 +7579,10 @@ function openReportModal(companyName) {
 function closeReportModal() {
   document.getElementById('reportModal').style.display = 'none';
   
+  // modal-open 클래스를 html 요소에서 제거 및 CSS 변수 제거
+  document.documentElement.classList.remove('modal-open');
+  document.documentElement.style.removeProperty('--scrollbar-width');
+  
   // 가이드 메시지 제거
   const guide = document.getElementById('pageBreakGuide');
   if (guide) guide.remove();
@@ -7539,6 +7602,40 @@ function closeReportModal() {
   document.getElementById('confirmPrintBtn').style.display = 'none';
   document.getElementById('cancelBreakBtn').style.display = 'none';
   document.getElementById('showDividerLabel').style.display = 'none';
+  
+  // 확대 상태 초기화
+  const modalContent = document.getElementById('reportModalDraggable');
+  const btn = document.getElementById('reportFullscreenBtn');
+  if (modalContent && btn) {
+    modalContent.style.maxWidth = '800px';
+    modalContent.style.width = '';
+    modalContent.style.maxHeight = '80vh';
+    btn.innerHTML = '⛶';
+  }
+}
+
+function toggleReportFullscreen() {
+  const modalContent = document.getElementById('reportModalDraggable');
+  const btn = document.getElementById('reportFullscreenBtn');
+  
+  if (!modalContent || !btn) return;
+  
+  // 현재 확대 상태 확인 (max-width가 800px이 아니면 확대된 상태)
+  const isFullscreen = modalContent.style.maxWidth !== '800px' && modalContent.style.maxWidth !== '';
+  
+  if (isFullscreen) {
+    // 원래 크기로
+    modalContent.style.maxWidth = '800px';
+    modalContent.style.width = '';
+    modalContent.style.maxHeight = '80vh';
+    btn.innerHTML = '⛶';
+  } else {
+    // 전체화면으로
+    modalContent.style.maxWidth = '95%';
+    modalContent.style.width = '95%';
+    modalContent.style.maxHeight = '95vh';
+    btn.innerHTML = '⛶';
+  }
 }
 
 // 모달 드래그 기능
