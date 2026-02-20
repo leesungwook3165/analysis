@@ -41,7 +41,7 @@ maxResolution:7.00111653806549,
                 style: style__2,
                 popuplayertitle: '부산명소 국문 정보',
                 interactive: true,
-                title: '<img src="styles/legend/_2.png" /> 부산명소 국문 정보'
+                title: '<img src="styles/legend/layer2.png" /> 부산명소 국문 정보'
             });
 var format_20251223212456__3 = new ol.format.GeoJSON();
 var features_20251223212456__3 = format_20251223212456__3.readFeatures(json_20251223212456__3, 
@@ -79,7 +79,7 @@ var lyr__4 = new ol.layer.Vector({
                 style: style__4,
                 popuplayertitle: '글램핑후보지',
                 interactive: true,
-                title: '<img src="styles/legend/_4.png" /> 글램핑후보지'
+                title: '<img src="styles/legend/layer4.png" /> 글램핑후보지'
             });
 var format__5 = new ol.format.GeoJSON();
 var features__5 = format__5.readFeatures(json__5, 
