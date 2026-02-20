@@ -8,7 +8,7 @@ var wms_layers = [];
             
             source: new ol.source.XYZ({
             attributions: ' ',
-                url: 'http://xdworld.vworld.kr:8080/2d/Satellite/201710/{z}/{x}/{y}.jpeg'
+                url: 'https://xdworld.vworld.kr/2d/Satellite/201710/{z}/{x}/{y}.jpeg'
             })
         });
 var format_yeongdolsmd_adm_sect_umd_26_202512_1 = new ol.format.GeoJSON();
