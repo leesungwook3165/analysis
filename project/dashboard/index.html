@@ -56,6 +56,105 @@ header {
   color: #fff;
 }
 
+.usedship-subtabs {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 16px;
+  flex-wrap: wrap;
+}
+
+.usedship-tab-btn {
+  margin-top: 0;
+  padding: 8px 14px;
+  border: none;
+  background: #ddd;
+  color: #2c3e50;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.usedship-tab-btn.active {
+  background: #2c3e50;
+  color: #fff;
+}
+
+.usedship-tab-panel {
+  display: none;
+  border: 1px solid #e6e9ef;
+  border-radius: 6px;
+  background: #fafbfc;
+  padding: 14px;
+}
+
+.usedship-tab-panel.active {
+  display: block;
+}
+
+.usedship-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.usedship-info-grid table {
+  background-color: #fff;
+  width: 100%;
+  border: 2px solid #9b111e;
+  border-collapse: collapse;
+}
+
+.usedship-info-grid td {
+  border: 1px solid #d7deea;
+  padding: 6px 8px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.usedship-info-header {
+  background-color: #9b111e;
+  text-align: center;
+  color: #fff;
+}
+
+.usedship-info-photo {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.korea-ferry-embed {
+  overflow: auto;
+  max-height: 78vh;
+  border: 1px solid #d7deea;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fff;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.korea-ferry-embed table {
+  border-collapse: collapse;
+}
+
+.korea-ferry-embed td,
+.korea-ferry-embed th {
+  padding: 6px 8px;
+  vertical-align: top;
+}
+
+.korea-ferry-embed summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.korea-ferry-embed details {
+  margin: 2px 0;
+}
+
 .panel {
   display: none;
   background: #fff;
@@ -998,6 +1097,7 @@ table.large th, table.large td {
   <div class="tabs">
     <button class="active" data-tab="glamping">글램핑</button>
     <button data-tab="venture" class="">신규 벤처</button>
+    <button data-tab="usedship">중고선매입</button>
     <button data-tab="ferry">여객선</button>
     <button data-tab="total">통합 분석</button>
   </div>
@@ -1147,6 +1247,463 @@ IRR = 23.6%</div>
     <div class="kpi-unit">%</div>
   </div>
 </div>
+
+<!-- 중고선매입 -->
+<section id="usedship" class="panel">
+<h2>중고선 매입 검토</h2>
+
+<div class="usedship-subtabs">
+  <button class="usedship-tab-btn active" data-usedship-tab="overview" onclick="switchUsedShipTab('overview')">개요</button>
+  <button class="usedship-tab-btn" data-usedship-tab="background" onclick="switchUsedShipTab('background')">추진배경 및 분석</button>
+  <button class="usedship-tab-btn" data-usedship-tab="market" onclick="switchUsedShipTab('market')">시장분석</button>
+  <button class="usedship-tab-btn" data-usedship-tab="growth" onclick="switchUsedShipTab('growth')">미래성장</button>
+  <button class="usedship-tab-btn" data-usedship-tab="korea-ferry-list" onclick="switchUsedShipTab('korea-ferry-list')">대한민국 화객선목록</button>
+</div>
+
+<div id="usedship-overview" class="usedship-tab-panel active">
+  <h3>울릉썬플라워크루즈 개요</h3>
+  <p class="note">아래는 공개 보도 기준으로 정리한 주요 사건입니다. 확정 사실과 확인 필요 항목을 분리해 의사결정 리스크를 낮추는 목적입니다.</p>
+
+  <div style="border:2px solid #1f4f8f; border-radius:8px; background:#f3f8ff; padding:12px; margin-top:10px;">
+    <div style="font-weight:700; color:#1f3b73; margin-bottom:8px;">분석 전개 포인트 (핵심 비교군)</div>
+    <div style="line-height:1.7; word-break:keep-all;">
+      이번 개요의 <strong>핵심 비교군은 ‘뉴씨다오’와 ‘울릉썬플라워크루즈’</strong>입니다.<br>
+      이후 설명은 두 선박의 <strong>규모·운항 안정성·원가 구조·정책 대응력</strong>을 중심으로 전개하며,
+      성희호·엘도라도는 보조 레퍼런스로 활용합니다.
+    </div>
+  </div>
+
+  <div style="font-weight:700; color:#2c3e50; margin-top: 10px;">울릉도 운항 선박 정보 테이블 (4척)</div>
+  <div id="newSeaTableGrid" class="usedship-info-grid"></div>
+
+  <template id="newSeaTableTemplate">
+    <table class="xQA9yHdZ _f2cf7a1b34fedcf234e84ad6985aa304" style="background-color:#fff; width:100%; border:2px solid #9b111e;">
+      <tbody>
+        <tr>
+          <td colspan="2" class="usedship-info-header"><strong>__SHIP_NAME__</strong><br><strong>__SHIP_SUBTITLE__</strong></td>
+        </tr>
+        <tr>
+          <td colspan="2" style="text-align:center; padding:0;">
+            <a href="__SOURCE_URL__" target="_blank" rel="noopener noreferrer" title="출처 열기">
+              <img class="usedship-info-photo" src="__SHIP_IMAGE__" alt="__SHIP_NAME__">
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" class="usedship-info-header"><strong>선박정보</strong></td>
+        </tr>
+        <tr><td style="width:30%; text-align:center;"><strong>종류</strong></td><td>__TYPE__</td></tr>
+        <tr><td style="text-align:center;"><strong>운항 노선</strong></td><td>__ROUTE__</td></tr>
+        <tr><td style="text-align:center;"><strong>선급</strong></td><td>__CLASS__</td></tr>
+        <tr><td style="text-align:center;"><strong>건조</strong></td><td>__BUILDER__</td></tr>
+        <tr><td style="text-align:center;"><strong>진수일</strong></td><td>__LAUNCH__</td></tr>
+        <tr><td style="text-align:center;"><strong>취역일</strong></td><td>__COMMISSION__</td></tr>
+        <tr><td style="text-align:center;"><strong>여객 정원</strong></td><td>__PAX__</td></tr>
+        <tr><td style="text-align:center;"><strong>적재용량</strong></td><td>__CAPACITY__</td></tr>
+        <tr><td style="text-align:center;"><strong>운항사</strong></td><td>__OPERATOR__</td></tr>
+        <tr>
+          <td colspan="2" class="usedship-info-header"><strong>제원</strong></td>
+        </tr>
+        <tr><td style="text-align:center;"><strong>전장</strong></td><td>__LENGTH__</td></tr>
+        <tr><td style="text-align:center;"><strong>선폭</strong></td><td>__BEAM__</td></tr>
+        <tr><td style="text-align:center;"><strong>흘수</strong></td><td>__DRAFT__</td></tr>
+        <tr><td style="text-align:center;"><strong>추진력</strong></td><td>__POWER__</td></tr>
+        <tr><td style="text-align:center;"><strong>서비스 속도</strong></td><td>__SPEED__</td></tr>
+        <tr><td style="text-align:center;"><strong>총톤수</strong></td><td>__TONNAGE__</td></tr>
+      </tbody>
+    </table>
+  </template>
+
+  <div style="margin: 14px 0 4px 0; overflow-x: auto; padding-bottom: 6px;">
+    <div style="display: flex; align-items: stretch; gap: 10px; min-width: max-content;">
+      <div style="width: 230px; border: 1px solid #d7deea; border-radius: 8px; background: #fff; padding: 10px 12px; line-height: 1.5;">
+        <div style="font-weight:700; color:#2c3e50; margin-bottom: 6px;">2018.08</div>
+        <div>연안여객선 현대화펀드 지원 대상에 에이치해운 포함(카페리 1척 건조 지원 결정).</div>
+        <div style="margin-top:6px; font-size:12px;"><a href="https://n.news.naver.com/mnews/article/016/0001453047" target="_blank" rel="noopener noreferrer">출처 링크</a></div>
+      </div>
+      <div style="display:flex; align-items:center; color:#2c3e50; font-weight:700;">→</div>
+
+      <div style="width: 230px; border: 1px solid #d7deea; border-radius: 8px; background: #fff; padding: 10px 12px; line-height: 1.5;">
+        <div style="font-weight:700; color:#2c3e50; margin-bottom: 6px;">2018~2020</div>
+        <div>에이치해운 대상 선박 건조 추진(건조비 약 476억원, 정부 펀드 50%=238억원 융자 지원), 건조는 대선조선이 수행.</div>
+        <div style="margin-top:6px; font-size:12px;"><a href="https://n.news.naver.com/mnews/article/277/0004707867" target="_blank" rel="noopener noreferrer">출처 링크</a></div>
+      </div>
+      <div style="display:flex; align-items:center; color:#2c3e50; font-weight:700;">→</div>
+
+      <div style="width: 230px; border: 1px solid #d7deea; border-radius: 8px; background: #fff; padding: 10px 12px; line-height: 1.5;">
+        <div style="font-weight:700; color:#2c3e50; margin-bottom: 6px;">2020</div>
+        <div>선박 건조·진수 시기(보도별로 2020.02 진수 / 2020.07 건조 표기 차이 존재).</div>
+        <div style="margin-top:6px; font-size:12px;"><a href="https://n.news.naver.com/mnews/article/421/0006350773" target="_blank" rel="noopener noreferrer">출처 링크</a></div>
+      </div>
+      <div style="display:flex; align-items:center; color:#2c3e50; font-weight:700;">→</div>
+
+      <div style="width: 230px; border: 1px solid #d7deea; border-radius: 8px; background: #fff; padding: 10px 12px; line-height: 1.5;">
+        <div style="font-weight:700; color:#2c3e50; margin-bottom: 6px;">2020.07 전후</div>
+        <div>해당 선박이 '썬라이즈제주' 명칭으로 녹동~성산포(제주) 항로 투입 단계에 있었다는 보도 확인.</div>
+        <div style="margin-top:6px; font-size:12px;"><a href="https://n.news.naver.com/mnews/article/277/0004707867" target="_blank" rel="noopener noreferrer">출처 링크</a></div>
+      </div>
+      <div style="display:flex; align-items:center; color:#2c3e50; font-weight:700;">→</div>
+
+      <div style="width: 230px; border: 1px solid #d7deea; border-radius: 8px; background: #fff; padding: 10px 12px; line-height: 1.5;">
+        <div style="font-weight:700; color:#2c3e50; margin-bottom: 6px;">2022.09.29</div>
+        <div>에이치해운, 1만5천톤급 썬플라워크루즈를 후포~울릉(사동) 항로에 취항(제주 항로 단계 이후 운영 축 이동).</div>
+        <div style="margin-top:6px; font-size:12px;"><a href="https://n.news.naver.com/mnews/article/421/0006350773" target="_blank" rel="noopener noreferrer">출처 링크</a></div>
+      </div>
+      <div style="display:flex; align-items:center; color:#2c3e50; font-weight:700;">→</div>
+
+      <div style="width: 230px; border: 1px solid #d7deea; border-radius: 8px; background: #fff; padding: 10px 12px; line-height: 1.5;">
+        <div style="font-weight:700; color:#2c3e50; margin-bottom: 6px;">2023~2025</div>
+        <div>운항·할인 연계 운영 지속(에이치해운, 울릉대아리조트, 대아고속해운 씨플라워호 연계 언급) 및 2025년 운항중단 이슈 보도.</div>
+        <div style="margin-top:6px; font-size:12px;"><a href="https://n.news.naver.com/mnews/article/629/0000245111" target="_blank" rel="noopener noreferrer">출처 링크</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; margin-top: 12px;">
+    <div style="border: 1px solid #d7deea; border-radius: 8px; background: #ffffff; padding: 12px;">
+      <div style="font-weight:700; color:#2c3e50; margin-bottom: 8px;">① 선명·항로 전환 상세</div>
+      <div style="line-height: 1.6; word-break: keep-all;">
+        - 현대화펀드 3호 지원 선박으로 2020년 건조된 카페리는 초기에
+        '썬라이즈제주' 계열 명칭으로 보도됨.<br>
+        - 같은 선박이 녹동~성산포(제주) 항로 단계에서 운항/투입 보도된 뒤,
+        2022년에는 후포~울릉(사동) 항로로 취항함.<br>
+        - 결과적으로 선명 변경과 함께 항로의 중심이
+        제주권에서 울릉권으로 이동한 흐름이 확인됨.
+        <div style="margin-top:8px; font-size:12px;">
+          출처: <a href="https://n.news.naver.com/mnews/article/277/0004707867" target="_blank" rel="noopener noreferrer">아시아경제(2020)</a>,
+          <a href="https://n.news.naver.com/mnews/article/421/0006350773" target="_blank" rel="noopener noreferrer">뉴스1(2022)</a>
+        </div>
+      </div>
+    </div>
+
+    <div style="border: 1px solid #d7deea; border-radius: 8px; background: #ffffff; padding: 12px;">
+      <div style="font-weight:700; color:#2c3e50; margin-bottom: 8px;">② 누적적자 및 법적 분쟁(정확 분리)</div>
+      <div style="line-height: 1.6; word-break: keep-all;">
+        - 2025년 보도에서 에이치해운 측은 여행객 감소·운항원가 부담으로
+        최근 3년 누적 손실이 200억원을 넘었다고 밝힘.<br>
+        - 확인된 소송 키워드는 보조금 반환소송이 아니라,
+        "사업자 신청 반려처분 취소" 및 "사업자 선정 지연" 관련 보도가 중심임.<br>
+        - 따라서 보조금 이슈는 "지원정책·예산 소진 논의"와 "법적 소송"을 분리해
+        해석하는 것이 보수적이며, 현재 쟁점은 항로 지속 가능성과 공공교통 기능의 균형.
+        <div style="margin-top:8px; font-size:12px;">
+          출처: <a href="https://v.daum.net/v/20250829103635661" target="_blank" rel="noopener noreferrer">경북매일(2025)</a>,
+          <a href="https://n.news.naver.com/mnews/article/001/0012301537" target="_blank" rel="noopener noreferrer">연합뉴스(2021)</a>,
+          <a href="https://n.news.naver.com/mnews/article/001/0012248344" target="_blank" rel="noopener noreferrer">연합뉴스(2021)</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="border: 1px solid #d7deea; border-radius: 8px; background: #f9fbff; padding: 12px; margin-top: 12px;">
+    <div style="font-weight:700; color:#2c3e50; margin-bottom: 8px;">③ 476억원 구성·소송 성격: 현재 판정</div>
+    <div style="line-height: 1.6; word-break: keep-all;">
+      - <strong>확정:</strong> 다수 보도에서 건조금액 476억원, 현대화펀드 50%(238억원 융자) 수치는 일관됨.<br>
+      - <strong>확인 필요:</strong> 476억원이 선가+의장(Outfitting)+금융비용까지 포함한 총사업비인지, 순수 건조계약가인지는 본문 보도만으로 단정 어려움.<br>
+      - <strong>실무 제안:</strong> 매입 검토 시 "선가/의장/개조/금융비"를 분리한 CAPEX 테이블을 별도 작성해 비교해야 함.
+      <div style="margin-top:8px; font-size:12px;">
+        출처: <a href="https://n.news.naver.com/mnews/article/277/0004707867" target="_blank" rel="noopener noreferrer">아시아경제(2020)</a>,
+        <a href="https://n.news.naver.com/mnews/article/421/0004722749" target="_blank" rel="noopener noreferrer">뉴스1(2020)</a>,
+        <a href="https://n.news.naver.com/mnews/article/003/0009938984" target="_blank" rel="noopener noreferrer">뉴시스(2020)</a>
+      </div>
+    </div>
+  </div>
+
+  <div style="border: 1px solid #d7deea; border-radius: 8px; background: #ffffff; padding: 12px; margin-top: 12px;">
+    <div style="font-weight:700; color:#2c3e50; margin-bottom: 8px;">④ 투자자 관점 핵심 결론(초안)</div>
+    <div style="line-height: 1.6; word-break: keep-all;">
+      - 신조는 통상 1천억원 내외 이상 자금·리드타임 부담이 커서, 단기 선대 교체 수단으로는 중고선 인수의 현실성이 높음.<br>
+      - 울릉공항 개항 이후 여객 패턴 변화 가능성, 포항 출발 2만톤급 뉴씨다오펄호(직접 경쟁선) 중심의
+      경쟁 구도, 연료/탄소 규제 강화는 모두 수요·원가의 변동 요인임.<br>
+      - 따라서 "지금 인수"보다는 "가격 하방+운영권 안정+정책확정" 3조건 충족 시 매입하는 조건부 전략이 합리적.
+    </div>
+  </div>
+
+  <div style="margin-top:10px; font-size:12px; color:#4a5568; line-height:1.7;">
+    <strong>출처 모음:</strong>
+    <a href="https://n.news.naver.com/mnews/article/016/0001453047" target="_blank" rel="noopener noreferrer">헤럴드경제(2018)</a> |
+    <a href="https://n.news.naver.com/mnews/article/277/0004707867" target="_blank" rel="noopener noreferrer">아시아경제(2020)</a> |
+    <a href="https://n.news.naver.com/mnews/article/421/0006350773" target="_blank" rel="noopener noreferrer">뉴스1(2022)</a> |
+    <a href="https://n.news.naver.com/mnews/article/629/0000245111" target="_blank" rel="noopener noreferrer">더팩트(2023)</a> |
+    <a href="https://n.news.naver.com/mnews/article/001/0012301537" target="_blank" rel="noopener noreferrer">연합뉴스(2021)</a> |
+    <a href="https://n.news.naver.com/mnews/article/001/0012248344" target="_blank" rel="noopener noreferrer">연합뉴스(2021)</a> |
+    <a href="https://v.daum.net/v/20250829103635661" target="_blank" rel="noopener noreferrer">경북매일(2025)</a>
+  </div>
+</div>
+
+<div id="usedship-background" class="usedship-tab-panel">
+  <h3>추진배경 및 분석</h3>
+  <p class="note">아래 내용은 부관훼리 관점에서 정부·금융기관 설득 논리를 실무형으로 정리한 안입니다.</p>
+
+  <div style="border: 2px solid #9b111e; border-radius: 8px; background: #fff8f8; padding: 12px; margin-top: 10px;">
+    <div style="font-weight:700; color:#7a0e18; margin-bottom: 8px;">우려사항에 대한 해답 (발표용 요약)</div>
+    <div style="line-height: 1.7; word-break: keep-all;">
+      “이미 정부 펀드가 투입된 선박을 인수하고, 다시 정부 지원(이차보전·녹색금융)을 받는 것이 가능한가?”에 대한 답은<br>
+      <strong>‘원칙적으로 가능하나, 전제조건을 충족해야 한다’</strong>입니다.<br><br>
+      ① <strong>소유권 이전 가능성:</strong> 전매 제한 및 채권자/정책금융기관 동의 요건을 충족하고, 공익 목적(항로 안정·자산 활용) 논리를 제시하면 승인 가능성이 존재<br>
+      ② <strong>중복지원 가능성:</strong> 단순 재운항이 아니라 국제선 전환·안전기준 상향·대규모 개조 투자로 구조화하면 ‘신규 투자’ 트랙으로 심사 가능<br>
+      ③ <strong>녹색금융 적합성:</strong> 에너지 절감·저탄소 설비 등 정량 KPI를 포함한 Green Retrofit 패키지로 설계하면 정책 정합성 확보 가능<br><br>
+      <strong>결론:</strong> “중고선 재매입+재지원” 자체가 금지 이슈라기보다, <strong>사업 구조·공익성·개조 투자 증빙</strong>을 어떻게 설계하느냐의 문제입니다.
+    </div>
+  </div>
+
+  <div style="border: 1px solid #d7deea; border-radius: 8px; background: #f7fbff; padding: 12px; margin-top: 12px;">
+    <div style="font-weight:700; color:#2c3e50; margin-bottom: 8px;">디젤 추진선 리스크와 정책지원 가능성 (추가 검토)</div>
+    <div style="line-height: 1.7; word-break: keep-all;">
+      - <strong>리스크 진단:</strong> 울릉썬플라워크루즈는 디젤 추진선으로, 국제항로 전환 시 EEXI/CII 등 탄소집약도 규제 대응 부담이 커집니다. IMO 기준상 국제항해 선박은 2023년부터 EEXI/CII 이행이 의무화되었고, CII가 D 3년 연속 또는 E 1년이면 시정계획 제출 의무가 발생합니다.<br>
+      - <strong>중요한 포인트:</strong> 따라서 “디젤이라 지원 불가”가 아니라, <strong>현 상태로는 불리</strong>하고 <strong>개조 투자 패키지로 전환해야 유리</strong>합니다.<br>
+      - <strong>이차보전 가능성:</strong> 해수부의 친환경 설비개량 이차보전사업은 기존선의 친환경 설비 설치 금융비용 완화를 목적으로 지속 공고되고 있어(정책 연속성 확인), 국제선 전환을 위한 배출저감·에너지효율 설비 투자와 결합하면 신청 논리 구성이 가능합니다.<br>
+      - <strong>녹색금융 가능성:</strong> 「환경친화적 선박의 개발 및 보급 촉진에 관한 법률」은 환경친화적 선박의 매입·개조·기자재 설치·교체 자금 지원 근거를 명시하고 있어, 핵심은 ‘선박 연료 종류’보다 <strong>개조 후 인증·성능 KPI 충족</strong>입니다.<br>
+      - <strong>설득 프레임:</strong> “정부 펀드 자산의 재활용 + 국제규제 선제 대응 + 한일 물류망 안정”을 한 묶음으로 제시하면, 단순 특혜 이슈보다 공공성과 정책효과(탄소·안전·수출물류) 중심 심사가 가능합니다.
+      <div style="margin-top:8px; font-size:12px; color:#4a5568;">
+        근거: <a href="https://www.imo.org/en/MediaCentre/HotTopics/Pages/EEXI-CII-FAQ.aspx" target="_blank" rel="noopener noreferrer">IMO EEXI/CII FAQ</a> |
+        <a href="https://www.mof.go.kr/doc/ko/selectDoc.do?docSeq=24776&amp;menuSeq=971&amp;bbsSeq=10" target="_blank" rel="noopener noreferrer">해수부(친환경 설비개량 이차보전 신설)</a> |
+        <a href="https://www.mof.go.kr/doc/ko/selectDoc.do?docSeq=63792&amp;menuSeq=375&amp;bbsSeq=9" target="_blank" rel="noopener noreferrer">해수부(2025 추가 공고)</a> |
+        <a href="https://law.go.kr/%EB%B2%95%EB%A0%B9/%ED%99%98%EA%B2%BD%EC%B9%9C%ED%99%94%EC%A0%81%EC%84%A0%EB%B0%95%EC%9D%98%EA%B0%9C%EB%B0%9C%EB%B0%8F%EB%B3%B4%EA%B8%89%EC%B4%89%EC%A7%84%EC%97%90%EA%B4%80%ED%95%9C%EB%B2%95%EB%A5%A0" target="_blank" rel="noopener noreferrer">친환경선박법</a>
+      </div>
+    </div>
+  </div>
+
+  <div style="border: 1px solid #d7deea; border-radius: 8px; background: #ffffff; padding: 12px; margin-top: 10px;">
+    <div style="font-weight:700; color:#2c3e50; margin-bottom: 8px;">1) 현대화 펀드 선박의 매입 가능성 (전매 제한 해제)</div>
+    <div style="line-height: 1.7; word-break: keep-all;">
+      - 원래 연안여객선 현대화 펀드로 지어진 선박은 일정 기간 매각 제한 또는 정부(세계로선박금융 등) 승인 요건이 존재합니다.<br>
+      - <strong>시나리오:</strong> 울릉썬플라워크루즈 운용사가 경영상 사유로 정상 운항이 어렵다면, 정부도 펀드 자금 회수 및 선박의 효율적 활용을 위해 건실한 선사(부관훼리)로의 소유권 이전을 긍정 검토할 여지가 큽니다.<br>
+      - <strong>핵심 명분:</strong> 단순 매매가 아니라, “정부 펀드로 만든 우수한 국산 선박을 사장시키지 않고 국제 노선(한일 항로)으로 확장해 국익에 기여한다”는 프레임으로 접근해야 합니다.
+    </div>
+  </div>
+
+  <div style="border: 1px solid #d7deea; border-radius: 8px; background: #f9fbff; padding: 12px; margin-top: 12px;">
+    <div style="font-weight:700; color:#2c3e50; margin-bottom: 8px;">2) 이차보전 및 녹색금융 중복 지원 가능성</div>
+    <div style="line-height: 1.7; word-break: keep-all;">
+      - 기존 혜택 선박의 재지원은 특혜 논란이 있을 수 있으나, 사업 성격이 바뀌면 정책금융 적용 여지가 생깁니다.<br>
+      - <strong>용도 변경 지원:</strong> “연안 여객”에서 “국제 카페리”로 목적이 변경되고, 이를 위한 대규모 개조(Retrofit)가 수반되면 신규 투자로 분류될 수 있습니다.<br>
+      - <strong>친환경 개조(Green Retrofit):</strong> 썬플라워크루즈에 성희호 대비 최신 저탄소 기술(에너지 절감 장치 등)을 추가하는 조건으로 녹색금융 신청이 가능합니다. 정부는 신조뿐 아니라 기존 선박 친환경 전환 공사 지원도 확대하는 흐름입니다.
+    </div>
+  </div>
+
+  <div style="border: 1px solid #d7deea; border-radius: 8px; background: #ffffff; padding: 12px; margin-top: 12px;">
+    <div style="font-weight:700; color:#2c3e50; margin-bottom: 8px;">3) 부관훼리만의 강력한 설득 카드</div>
+    <div style="line-height: 1.7; word-break: keep-all;">
+      - <strong>수출 전초기지 보호:</strong> 부산-시모노세키 노선은 단순 여객이 아니라 대일본 수출 핵심 물류망이며, 성희호 퇴역 시 대체선 부재로 물류 차질 리스크가 커집니다.<br>
+      - <strong>국산 선박 자부심:</strong> “일본 중고선 도입” 대신 “대선조선 기반 국산 현대화 펀드 선박을 개조해 국제 항로 투입”하는 논리는 해양수산부 정책 방향(K-조선, K-해운)과 정합성이 높습니다.
+    </div>
+  </div>
+
+  <div style="border: 1px solid #c9d7f2; border-radius: 8px; background: #eef4ff; padding: 12px; margin-top: 12px;">
+    <div style="font-weight:700; color:#1f3b73; margin-bottom: 8px;">💡 실무적인 접근 순서 (Next Step)</div>
+    <div style="line-height: 1.7; word-break: keep-all;">
+      ① <strong>대선조선 협의:</strong> 국제선(SOLAS) 기준 개조 시 필요한 정확한 기술 리포트(공정·기간·비용)를 우선 확보<br>
+      ② <strong>해수부/선박금융기관 타진:</strong> “울릉 노선 고전 중인 펀드 선박을 인수해 한일 노선 현대화에 활용” 의사를 비공식 공유<br>
+      ③ <strong>금융 구조 설계:</strong> 매입 자금(일반 금융)과 개조 비용(약 200억 내외, 친환경 개조·이차보전) 분리 신청 시나리오 수립<br><br>
+      최종 기안 타이틀은 <strong>“국가 자산(현대화 펀드 선박)의 고부가가치 전환 및 한일 물류 안보 확보”</strong>로 설정하는 방안을 권고합니다.
+    </div>
+  </div>
+</div>
+
+<div id="usedship-market" class="usedship-tab-panel">
+  <h3>시장분석</h3>
+  <p class="note">수요는 관광·생활물류·정책환경이 동시에 좌우합니다. 단순 여객수보다 "점유율 변화 시나리오"가 중요합니다.</p>
+  <ul>
+    <li>울릉공항 변수: 개항 이후 단거리 여객 일부가 항공으로 이동할 가능성</li>
+    <li>경쟁선 변수: 뉴씨다오펄호(포항)와의 서비스/운임 직접 경쟁 심화</li>
+    <li>원가 변수: 유류비·정비비·항만비와 탄소 관련 비용의 중기 상승 가능성</li>
+    <li>핵심 KPI: 연간 탑승객, 차량적재율, 결항일수, 평균운임, 좌석점유율, BEP 달성월</li>
+  </ul>
+</div>
+
+<div id="usedship-growth" class="usedship-tab-panel">
+  <h3>미래성장</h3>
+  <p class="note">📋 부관훼리 지속가능 성장을 위한 전략 제안서</p>
+
+  <div style="border: 1px solid #d7deea; border-radius: 8px; background: #ffffff; padding: 12px; margin-top: 10px;">
+    <div style="font-weight:700; color:#2c3e50; margin-bottom: 8px;">1. 전략 배경: "신조(New-build)의 굴레를 벗고 효율에 집중"</div>
+    <div style="line-height: 1.7; word-break: keep-all;">
+      현재 해운 시장의 고금리와 선가 상승으로 인한 신조 부담을 지양하고, 검증된 중고선 도입 후 리모델링을 통해 재무 건전성을 확보합니다.
+      확보된 여력은 미래 먹거리인 물류 안전성과 고객 경험에 재투자합니다.
+    </div>
+  </div>
+
+  <div style="border: 1px solid #d7deea; border-radius: 8px; background: #f9fbff; padding: 12px; margin-top: 12px;">
+    <div style="font-weight:700; color:#2c3e50; margin-bottom: 8px;">2. 핵심 전략 및 설득 논리</div>
+    <div style="line-height: 1.7; word-break: keep-all;">
+      <strong>① 선박의 서비스화 (Vessel as a Service)</strong><br>
+      - 논리: 단순 운송에서 체류형 관광 플랫폼으로 전환<br>
+      - 실행: 대아·에이치라인의 성공 모델(선박+리조트 연계)을 벤치마킹하여 시모노세키 지역 관광 상품과 결합<br>
+      - DX 도입: 뉴씨다오펄호의 객실 주문 시스템을 이식해 인건비를 낮추고, 야간 운항 중 부대 매출(식음료·면세)을 극대화<br><br>
+
+      <strong>② 전고체 배터리 상용화와 Safety First 물류</strong><br>
+      - 논리: 선사들이 전기차 화재 위험(열폭주)으로 수송을 꺼리는 시점이 기회<br>
+      - 차별화: 중고선 도입 시 전기차 특화 소화 설비 및 전용 구역을 선제 구축<br>
+      - 포지셔닝: 한일 간 가장 안전한 EV 및 배터리 전용 통로(Green Corridor) 지위 선점<br><br>
+
+      <strong>③ 현대차 및 첨단 산업 틈새 물량 공략</strong><br>
+      - 대형선(글로비스)과의 공생: 글로비스가 담지 못하는 Daily 출항 강점 활용<br>
+      - 신차: 현대차 일본 온라인 판매분 실시간 개별 배송(JIT)<br>
+      - 중고차: 한일 간 급증할 중고 전기차 수출입 물량의 검수·운송 허브화<br>
+      - 정밀화물: 삼성SDI·LG엔솔 배터리 및 반도체 장비 등 고부가가치 무진동 화물 유치
+    </div>
+  </div>
+
+  <div style="border: 1px solid #d7deea; border-radius: 8px; background: #ffffff; padding: 12px; margin-top: 12px;">
+    <div style="font-weight:700; color:#2c3e50; margin-bottom: 8px;">3. 기대 효과 (예상 시나리오)</div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; min-width:720px;">
+        <thead>
+          <tr style="background:#f6f8fb;">
+            <th style="text-align:left; border:1px solid #d7deea; padding:8px;">구분</th>
+            <th style="text-align:left; border:1px solid #d7deea; padding:8px;">현재 (전통적 방식)</th>
+            <th style="text-align:left; border:1px solid #d7deea; padding:8px;">미래 (제안 전략 도입 시)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border:1px solid #d7deea; padding:8px;"><strong>재무 리스크</strong></td>
+            <td style="border:1px solid #d7deea; padding:8px;">신조선 도입에 따른 막대한 부채</td>
+            <td style="border:1px solid #d7deea; padding:8px;">중고선 도입으로 초기 자본 지출(CAPEX) 절감</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #d7deea; padding:8px;"><strong>여객 수익</strong></td>
+            <td style="border:1px solid #d7deea; padding:8px;">단순 티켓 판매 의존</td>
+            <td style="border:1px solid #d7deea; padding:8px;">리조트 연계 및 선내 스마트 주문을 통한 부대수익</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #d7deea; padding:8px;"><strong>화물 구성</strong></td>
+            <td style="border:1px solid #d7deea; padding:8px;">일반 컨테이너 및 벌크 화물</td>
+            <td style="border:1px solid #d7deea; padding:8px;">전고체 배터리, EV, 반도체 장비 등 고단가 화물</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #d7deea; padding:8px;"><strong>시장 지위</strong></td>
+            <td style="border:1px solid #d7deea; padding:8px;">가격 경쟁 중심의 레드오션</td>
+            <td style="border:1px solid #d7deea; padding:8px;">안전 특화형 니치 마켓(Niche Market) 선점</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="border: 2px solid #9b111e; border-radius: 8px; background: #fff8f8; padding: 12px; margin-top: 12px;">
+    <div style="font-weight:700; color:#7a0e18; margin-bottom: 8px;">4. 설득을 위한 최종 결론</div>
+    <div style="line-height: 1.7; word-break: keep-all;">
+      전고체 배터리로의 패러다임 변화는 단순히 배터리가 바뀌는 것이 아니라, 해상 물류의 안전 기준이 재편되는 사건입니다.
+      부관훼리가 중고선의 경제성, 스마트 운영 시스템, EV 특화 물류라는 삼박자를 갖춘다면,
+      현대글로비스와 같은 거대 기업이 선점하지 못한 고부가가치 정밀 물류 시장의 주도권을 확보할 수 있습니다.
+    </div>
+  </div>
+</div>
+
+<div id="usedship-korea-ferry-list" class="usedship-tab-panel">
+  <h3>대한민국 화객선목록</h3>
+  <p class="note">광고/동적 블록을 제거하고, 핵심 목록만 정적 표로 재구성했습니다.</p>
+  <div class="korea-ferry-embed">
+    <div style="border:2px solid #004d98; border-radius:8px; overflow:hidden;">
+      <div style="background:#004d98; color:#fff; padding:10px 12px; font-weight:700;">대한민국 화객선 목록</div>
+
+      <details open style="border-top:1px solid #d7deea;">
+        <summary style="padding:10px 12px; background:#eef4ff;">연안 화객선 목록</summary>
+        <table style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr style="background:#f6f8fb;">
+              <th style="text-align:left;">권역</th>
+              <th style="text-align:left;">출발지</th>
+              <th style="text-align:left;">선박</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>제주도</td><td>목포</td><td><a href="https://namu.wiki/w/%ED%80%B8%EC%A0%9C%EB%88%84%EB%B9%84%EC%95%84" target="_blank" rel="noopener noreferrer">퀸제누비아</a> · <a href="https://namu.wiki/w/%ED%80%B8%EC%A0%9C%EB%88%84%EB%B9%84%EC%95%842" target="_blank" rel="noopener noreferrer">퀸제누비아2</a></td></tr>
+            <tr><td>제주도</td><td>진도</td><td><a href="https://namu.wiki/w/%EC%82%B0%ED%83%80%EB%AA%A8%EB%8B%88%EC%B9%B4(%EC%84%A0%EB%B0%95)" target="_blank" rel="noopener noreferrer">산타모니카</a>(추자 경유)</td></tr>
+            <tr><td>제주도</td><td>완도</td><td><a href="https://namu.wiki/w/%EC%86%A1%EB%A6%BC%EB%B8%94%EB%A3%A8%EC%98%A4%EC%85%98" target="_blank" rel="noopener noreferrer">송림블루오션</a> · <a href="https://namu.wiki/w/%EC%8B%A4%EB%B2%84%ED%81%B4%EB%9D%BC%EC%9A%B0%EB%93%9C" target="_blank" rel="noopener noreferrer">실버클라우드</a> · <a href="https://namu.wiki/w/%EA%B3%A8%EB%93%9C%EC%8A%A4%ED%85%94%EB%9D%BC" target="_blank" rel="noopener noreferrer">한일 골드스텔라</a></td></tr>
+            <tr><td>제주도</td><td>고흥(녹동)</td><td><a href="https://namu.wiki/w/%EC%95%84%EB%A6%AC%EC%98%A8%EC%A0%9C%EC%A3%BC" target="_blank" rel="noopener noreferrer">아리온제주</a></td></tr>
+            <tr><td>제주도</td><td>삼천포</td><td><a href="https://namu.wiki/w/%EC%98%A4%EC%85%98%20%EB%B9%84%EC%8A%A4%ED%83%80%20%EC%A0%9C%EC%A3%BC" target="_blank" rel="noopener noreferrer">오션 비스타 제주</a></td></tr>
+            <tr><td>울릉도</td><td>포항(영일만)</td><td><a href="https://namu.wiki/w/%EB%89%B4%EC%94%A8%EB%8B%A4%EC%98%A4%ED%8E%84" target="_blank" rel="noopener noreferrer">뉴씨다오펄</a></td></tr>
+            <tr><td>울릉도</td><td>울진(후포)</td><td><a href="https://namu.wiki/w/%EC%9A%B8%EB%A6%89%EC%8D%AC%ED%94%8C%EB%9D%BC%EC%9B%8C%ED%81%AC%EB%A3%A8%EC%A6%88" target="_blank" rel="noopener noreferrer">울릉썬플라워크루즈</a>(운휴)</td></tr>
+            <tr><td>흑산도</td><td>신안(압해도)</td><td><a href="https://namu.wiki/w/%EB%89%B4%EB%93%9C%EB%A6%BC" target="_blank" rel="noopener noreferrer">뉴드림</a></td></tr>
+            <tr><td>덕적도</td><td>인천</td><td><a href="https://namu.wiki/w/%EC%BD%94%EB%A6%AC%EC%95%84%EC%9D%B5%EC%8A%A4%ED%94%84%EB%A0%88%EC%8A%A4" target="_blank" rel="noopener noreferrer">코리아익스프레스</a></td></tr>
+          </tbody>
+        </table>
+      </details>
+
+      <details open style="border-top:1px solid #d7deea;">
+        <summary style="padding:10px 12px; background:#eef4ff;">국제 화객선 목록</summary>
+        <table style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr style="background:#f6f8fb;">
+              <th style="text-align:left;">출발항</th>
+              <th style="text-align:left;">도착권역</th>
+              <th style="text-align:left;">선박</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>인천</td><td>중국(잉커우/친황다오/옌타이/다롄/웨이하이/스다오/단둥/칭다오/톈진/롄윈강)</td><td><a href="https://www.marinetraffic.com/en/ais/home/centerx:126.9787/centery:37.5665/zoom:6" target="_blank" rel="noopener noreferrer">ARAFURA LILY</a> · <a href="https://www.marinetraffic.com/en/ais/home/centerx:126.9787/centery:37.5665/zoom:6" target="_blank" rel="noopener noreferrer">XIN YU JIN XIANG</a> · <a href="https://www.marinetraffic.com/en/ais/home/centerx:126.9787/centery:37.5665/zoom:6" target="_blank" rel="noopener noreferrer">XIN XIANG XUE LAN</a> 등</td></tr>
+            <tr><td>평택</td><td>중국(옌타이/룽청/롄윈강/르자오/웨이하이)</td><td><a href="https://www.marinetraffic.com/en/ais/home/centerx:126.9787/centery:37.5665/zoom:6" target="_blank" rel="noopener noreferrer">OCEAN BLUE WHALE</a> · <a href="https://www.marinetraffic.com/en/ais/home/centerx:126.9787/centery:37.5665/zoom:6" target="_blank" rel="noopener noreferrer">NEW GRAND PEACE</a> 등</td></tr>
+            <tr><td>군산</td><td>중국 웨이하이</td><td><a href="https://namu.wiki/w/%EA%B5%B0%EC%82%B0%ED%8E%84" target="_blank" rel="noopener noreferrer">군산펄</a></td></tr>
+            <tr><td>속초</td><td>러시아 블라디보스토크</td><td><a href="https://www.marinetraffic.com/en/ais/home/centerx:128.5912/centery:38.2070/zoom:7" target="_blank" rel="noopener noreferrer">GNL GRACE</a></td></tr>
+            <tr><td>동해</td><td>러시아 블라디보스토크 / 일본 사카이미나토</td><td><a href="https://www.marinetraffic.com/en/ais/home/centerx:129.1145/centery:37.5248/zoom:7" target="_blank" rel="noopener noreferrer">EASTERN DREAM</a></td></tr>
+            <tr><td>부산</td><td>일본 후쿠오카 / 시모노세키 / 오사카</td><td><a href="https://namu.wiki/w/%EB%89%B4%20%EC%B9%B4%EB%A9%9C%EB%A6%AC%EC%95%84" target="_blank" rel="noopener noreferrer">뉴 카멜리아</a> · <a href="https://www.marinetraffic.com/en/ais/details/ships/imo:9241700" target="_blank" rel="noopener noreferrer">성희호</a>·<a href="https://namu.wiki/w/%ED%95%98%EB%A7%88%EC%9C%A0" target="_blank" rel="noopener noreferrer">하마유호</a> · <a href="https://namu.wiki/w/%ED%8C%AC%EC%8A%A4%ED%83%80%20%EB%AF%B8%EB%9D%BC%ED%81%B4" target="_blank" rel="noopener noreferrer">팬스타 미라클</a></td></tr>
+          </tbody>
+        </table>
+      </details>
+
+      <div style="padding:12px; border-top:1px solid #d7deea; background:#ffffff;">
+        <table style="background-color:#fff; width:100%; border:2px solid #000; border-collapse:collapse;">
+          <tbody>
+            <tr>
+              <td style="text-align:center; padding:0;">
+                <div style="padding:5px 10px; background-image:linear-gradient(to right, #0047a0, #0047a0, #0047a0, #0047a0, #fe0000, #fe0000, #fe0000, #fe0000); color:#fff; font-weight:700;">
+                  🇰🇷 <a href="https://namu.wiki/w/%EB%8C%80%ED%95%9C%EB%AF%BC%EA%B5%AD" target="_blank" rel="noopener noreferrer" style="color:#fff; text-decoration:underline;">대한민국</a>
+                  한국 - 일본 간 선박편
+                  <a href="https://namu.wiki/w/%EC%9D%BC%EB%B3%B8" target="_blank" rel="noopener noreferrer" style="color:#fff; text-decoration:underline;">일본</a> 🇯🇵
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align:center; padding:0;">
+                <details open>
+                  <summary style="padding:10px 12px;">[ 펼치기 · 접기 ]</summary>
+                  <div style="margin:0;">
+                    <table style="width:100%; border-collapse:collapse;">
+                      <tbody>
+                        <tr>
+                          <td style="width:36%; text-align:center; border:1px solid #d7deea; padding:8px;">부산 - 후쿠오카</td>
+                          <td style="text-align:center; border:1px solid #d7deea; padding:8px;"><a href="https://namu.wiki/w/%EB%89%B4%EC%B9%B4%EB%A9%9C%EB%A6%AC%EC%95%84" target="_blank" rel="noopener noreferrer">뉴카멜리아</a> (카멜리아 라인)</td>
+                        </tr>
+                        <tr>
+                          <td style="text-align:center; border:1px solid #d7deea; padding:8px;">부산 - 히타카츠, 이즈하라</td>
+                          <td style="text-align:center; border:1px solid #d7deea; padding:8px;"><a href="https://namu.wiki/w/%EB%85%B8%EB%B0%94(%EC%BE%8C%EC%86%8D%EC%84%A0)" target="_blank" rel="noopener noreferrer">노바</a> (스타라인)<br><a href="https://namu.wiki/w/%ED%8C%AC%EC%8A%A4%ED%83%80%EC%93%B0%EC%8B%9C%EB%A7%88%EB%A7%81%ED%81%AC" target="_blank" rel="noopener noreferrer">팬스타쓰시마링크</a> (팬스타)<br>씨플라워 (<a href="https://namu.wiki/w/%EB%8C%80%EC%95%84%EA%B3%A0%EC%86%8D%ED%95%B4%EC%9A%B4" target="_blank" rel="noopener noreferrer">대아고속해운</a>)</td>
+                        </tr>
+                        <tr>
+                          <td style="text-align:center; border:1px solid #d7deea; padding:8px;">부산 - 시모노세키</td>
+                          <td style="text-align:center; border:1px solid #d7deea; padding:8px;"><a href="https://www.marinetraffic.com/en/ais/details/ships/imo:9241700" target="_blank" rel="noopener noreferrer">성희</a> (부관훼리)<br><a href="https://namu.wiki/w/%ED%95%98%EB%A7%88%EC%9C%A0" target="_blank" rel="noopener noreferrer">하마유</a> (칸푸 페리)</td>
+                        </tr>
+                        <tr>
+                          <td style="text-align:center; border:1px solid #d7deea; padding:8px;">부산 - 오사카</td>
+                          <td style="text-align:center; border:1px solid #d7deea; padding:8px;"><a href="https://namu.wiki/w/%ED%8C%AC%EC%8A%A4%ED%83%80%20%EB%AF%B8%EB%9D%BC%ED%81%B4" target="_blank" rel="noopener noreferrer">팬스타 미라클</a> (팬스타)</td>
+                        </tr>
+                        <tr>
+                          <td style="text-align:center; border:1px solid #d7deea; padding:8px;">동해 - 사카이미나토</td>
+                          <td style="text-align:center; border:1px solid #d7deea; padding:8px;"><a href="https://namu.wiki/w/%EC%9D%B4%EC%8A%A4%ED%84%B4%20%EB%93%9C%EB%A6%BC" target="_blank" rel="noopener noreferrer">이스턴 드림</a> (두원상선)</td>
+                        </tr>
+                        <tr>
+                          <td colspan="2" style="background-color:#000; text-align:center; padding:8px;">
+                            <a href="https://namu.wiki/w/%ED%8B%80:%ED%95%9C%EC%9D%BC%EA%B0%84%20%ED%95%AD%EA%B3%B5%ED%8E%B8" target="_blank" rel="noopener noreferrer" style="color:#fff; text-decoration:underline;">한국-일본 간 항공편 둘러보기</a>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </details>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="padding:10px 12px; font-size:12px; color:#4a5568; border-top:1px solid #d7deea; background:#fafbfc;">
+        ※ 원본 긴 마크업에서 광고성/동적 블록을 제거하고, 핵심 항로-선박 목록만 가독성 중심으로 정리했습니다.
+      </div>
+    </div>
+  </div>
+</div>
+</section>
 
 <!-- 여객선 -->
 <section id="ferry" class="panel">
@@ -2329,6 +2886,142 @@ document.querySelectorAll(".tabs button").forEach(btn=>{
     if(btn.dataset.tab === 'glamping') createScenarioTableSingle();
   }
 });
+
+function switchUsedShipTab(tabName) {
+  document.querySelectorAll('#usedship .usedship-tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  document.querySelectorAll('#usedship .usedship-tab-panel').forEach(panel => {
+    panel.classList.remove('active');
+  });
+
+  const activeBtn = document.querySelector(`#usedship .usedship-tab-btn[data-usedship-tab="${tabName}"]`);
+  const activePanel = document.getElementById(`usedship-${tabName}`);
+
+  if (activeBtn) activeBtn.classList.add('active');
+  if (activePanel) activePanel.classList.add('active');
+}
+
+function renderNewSeaTables() {
+  const grid = document.getElementById('newSeaTableGrid');
+  const template = document.getElementById('newSeaTableTemplate');
+  if (!grid || !template) return;
+
+  grid.innerHTML = '';
+  const shipRows = [
+    {
+      name: '성희호',
+      subtitle: 'SEONG HEE (IMO 9241700)',
+      image: './img/newship/seonghee.webp',
+      sourceUrl: 'https://www.pukwan.co.kr/WEB/003001/webpassenger/mb012',
+      type: '국제 카페리 화객선',
+      route: '부산항국제여객터미널 ~ 시모노세키항국제터미널',
+      shipClass: '공식 공개자료 미표기',
+      builder: '현대미포조선',
+      launch: '공식 공개자료 미표기',
+      commission: '2002년 5월 22일',
+      pax: '승객 562명 (적재능력 기준 여객 606인)',
+      capacity: '승용차 30대 / 컨테이너 136TEU / 승무원 44인',
+      operator: '부관훼리',
+      length: '162m',
+      beam: '23.6m',
+      draft: '5.6m',
+      power: 'DAIHATSU 8DLM-40A, 4,413kW × 2',
+      speed: '12.5 knot',
+      tonnage: '국제 16,875톤 / 국내 8,076톤'
+    },
+    {
+      name: '울릉썬플라워크루즈',
+      subtitle: 'Ulleung Sunflower Cruise',
+      image: './img/newship/sunflower.jpg',
+      sourceUrl: 'https://namu.wiki/w/%EC%9A%B8%EB%A6%89%EC%8D%AC%ED%94%8C%EB%9D%BC%EC%9B%8C%ED%81%AC%EB%A3%A8%EC%A6%88',
+      type: '대형 카페리 여객선',
+      route: '울진 후포항 ~ 울릉 사동항',
+      shipClass: 'KRS0C / KRM0C',
+      builder: '대선조선',
+      launch: '2020년 2월 14일',
+      commission: '2020년 7월 16일',
+      pax: '628명',
+      capacity: '차량 271대',
+      operator: '에이치해운',
+      length: '143m',
+      beam: '22m',
+      draft: '5.8m',
+      power: '13,920kW',
+      speed: '21kts',
+      tonnage: '14,919톤'
+    },
+    {
+      name: '뉴씨다오',
+      subtitle: '新石島明珠 / New Shidao Pearl',
+      image: './img/newship/newshidao.webp',
+      sourceUrl: 'https://namu.wiki/w/%EB%89%B4%EC%94%A8%EB%8B%A4%EC%98%A4%ED%8E%84',
+      type: '대형 카페리 여객선',
+      route: '포항 영일만항 ~ 울릉 사동항',
+      shipClass: 'KRS0C / KRM0C',
+      builder: '중국 황해조선유한공사',
+      launch: '2017년 7월 2일',
+      commission: '2018년 4월 9일',
+      pax: '1,200명',
+      capacity: '차량 170대 / 컨테이너 335TEU',
+      operator: '울릉크루즈(주)',
+      length: '170m',
+      beam: '26.2m',
+      draft: '6.3m',
+      power: '18,560HP',
+      speed: '22.5kts (시속 약 40km)',
+      tonnage: '19,988톤'
+    },
+    {
+      name: '엘도라도 익스프레스호',
+      subtitle: 'Eldorado Express',
+      image: './img/newship/eldorado.webp',
+      sourceUrl: 'https://namu.wiki/w/%EC%97%98%EB%8F%84%EB%9D%BC%EB%8F%84%20%EC%9D%B5%EC%8A%A4%ED%94%84%EB%A0%88%EC%8A%A4',
+      type: '쌍동 초쾌속 여객선',
+      route: '포항항 ~ 울릉 도동항',
+      shipClass: 'KRS0C / KRM0C',
+      builder: 'Incat Tasmania (호주)',
+      launch: '2023년 2월 18일',
+      commission: '2023년 7월 8일',
+      pax: '970명',
+      capacity: '248㎡',
+      operator: '(주)대저페리',
+      length: '76.7m',
+      beam: '20.6m',
+      draft: '2.35m',
+      power: 'Caterpillar C280-16 4기 (6000kWh × 4)',
+      speed: '45kts (최고 50.2kts)',
+      tonnage: '3,158톤'
+    }
+  ];
+
+  shipRows.forEach((ship) => {
+    const tableHtml = template.innerHTML
+      .replaceAll('__SHIP_NAME__', ship.name)
+      .replaceAll('__SHIP_SUBTITLE__', ship.subtitle)
+      .replaceAll('__SHIP_IMAGE__', ship.image)
+      .replaceAll('__SOURCE_URL__', ship.sourceUrl)
+      .replaceAll('__TYPE__', ship.type)
+      .replaceAll('__ROUTE__', ship.route)
+      .replaceAll('__CLASS__', ship.shipClass)
+      .replaceAll('__BUILDER__', ship.builder)
+      .replaceAll('__LAUNCH__', ship.launch)
+      .replaceAll('__COMMISSION__', ship.commission)
+      .replaceAll('__PAX__', ship.pax)
+      .replaceAll('__CAPACITY__', ship.capacity)
+      .replaceAll('__OPERATOR__', ship.operator)
+      .replaceAll('__LENGTH__', ship.length)
+      .replaceAll('__BEAM__', ship.beam)
+      .replaceAll('__DRAFT__', ship.draft)
+      .replaceAll('__POWER__', ship.power)
+      .replaceAll('__SPEED__', ship.speed)
+      .replaceAll('__TONNAGE__', ship.tonnage);
+
+    grid.insertAdjacentHTML('beforeend', tableHtml);
+  });
+}
+
+renderNewSeaTables();
 
 /* DOM references */
 const fare = document.getElementById('fare');
