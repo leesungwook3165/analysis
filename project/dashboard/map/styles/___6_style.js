@@ -12,7 +12,7 @@ function categories____6(feature, value, size, resolution, labelText,
                               bufferWidth)
     })];
                     break;
-case '(강지해변 배후지)':
+case '(감지해변 배후지)':
                     return [ new ol.style.Style({
         stroke: new ol.style.Stroke({color: 'rgba(255,251,0,0.3)', lineDash: [19.0,3.8], lineCap: 'butt', lineJoin: 'miter', width: 3.8}),fill: new ol.style.Fill({color: 'rgba(253,232,6,0.3)'}),
         text: createTextStyle(feature, resolution, labelText, labelFont,
