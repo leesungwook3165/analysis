@@ -8,7 +8,7 @@ var wms_layers = [];
             
             source: new ol.source.XYZ({
             attributions: ' ',
-                url: 'https://xdworld.vworld.kr/2d/Satellite/201710/{z}/{x}/{y}.jpeg'
+                url: 'http://xdworld.vworld.kr:8080/2d/Satellite/201710/{z}/{x}/{y}.jpeg'
             })
         });
 var format___1 = new ol.format.GeoJSON();
@@ -115,7 +115,7 @@ var lyr____6 = new ol.layer.Vector({
                 interactive: true,
     title: '영도_중리산권_관광벨트<br />\
     <img src="styles/legend/___6_0.png" /> <br />\
-    <img src="styles/legend/___6_1.png" /> (감지해변 배후지)<br />\
+    <img src="styles/legend/___6_1.png" /> (강지해변 배후지)<br />\
     <img src="styles/legend/___6_2.png" /> (예비군 훈련장 이전적지)<br />\
     <img src="styles/legend/___6_3.png" /> (중리해변 배후지)<br />' });
 var format____7 = new ol.format.GeoJSON();
