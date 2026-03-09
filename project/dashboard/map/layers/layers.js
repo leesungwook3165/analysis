@@ -8,7 +8,7 @@ var wms_layers = [];
             
             source: new ol.source.XYZ({
             attributions: ' ',
-                url: 'https://xdworld.vworld.kr/2d/Satellite/201710/{z}/{x}/{y}.jpeg'
+                url: 'http://xdworld.vworld.kr:8080/2d/Satellite/201710/{z}/{x}/{y}.jpeg'
             })
         });
 var format___1 = new ol.format.GeoJSON();
@@ -149,7 +149,7 @@ lyr____7.set('fieldImages', {'id': 'TextEdit', 'name': 'TextEdit', });
 lyr___1.set('fieldLabels', {'fid': 'no label', 'EMD_CD': 'no label', 'COL_ADM_SE': 'no label', 'EMD_NM': 'no label', 'SGG_OID': 'no label', });
 lyr__2.set('fieldLabels', {'콘텐츠ID': 'no label', '콘텐츠명': 'inline label - always visible', '구군': 'no label', '위도': 'no label', '경도': 'no label', '여행지': 'no label', '제목': 'no label', '부제목': 'no label', '주소': 'no label', '연락처': 'no label', '홈페이지': 'no label', '교통정보': 'no label', '운영일': 'no label', '휴무일': 'header label - always visible', '운영 및 시간': 'no label', '이용요금': 'no label', '편의시설': 'no label', '이미지URL': 'no label', '썸네일이미지URL': 'no label', '상세내용': 'no label', });
 lyr__4.set('fieldLabels', {'id': 'no label', 'nm': 'inline label - always visible', 'x': 'no label', 'y': 'no label', 'url': 'header label - always visible', });
-lyr____6.set('fieldLabels', {'id': 'no label', 'name': 'no label', });
+lyr____6.set('fieldLabels', {'id': 'hidden field', 'name': 'no label', });
 lyr____7.set('fieldLabels', {'id': 'no label', 'name': 'no label', });
 lyr____7.on('precompose', function(evt) {
     evt.context.globalCompositeOperation = 'normal';
