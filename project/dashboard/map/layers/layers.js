@@ -8,7 +8,7 @@ var wms_layers = [];
             
             source: new ol.source.XYZ({
             attributions: ' ',
-                url: 'http://xdworld.vworld.kr:8080/2d/Satellite/201710/{z}/{x}/{y}.jpeg'
+                url: '//xdworld.vworld.kr:8080/2d/Satellite/201710/{z}/{x}/{y}.jpeg'
             })
         });
 var format___1 = new ol.format.GeoJSON();
