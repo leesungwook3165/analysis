@@ -8,7 +8,7 @@ var style___3 = function(feature, resolution){
     };
     
     var labelText = ""; 
-    var value = feature.get("''");
+    var value = feature.get("");
     var labelFont = "10px, sans-serif";
     var labelFill = "#000000";
     var bufferColor = "";
@@ -20,11 +20,19 @@ var style___3 = function(feature, resolution){
     if ("" !== null) {
         labelText = String("");
     }
-    
     var style = [ new ol.style.Style({
+        image: new ol.style.RegularShape({radius: 6.0 + size, points: 6,
+            displacement: [0, 0], stroke: new ol.style.Stroke({color: 'rgba(250,139,57,1.0)', lineDash: null, lineCap: 'butt', lineJoin: 'miter', width: 3.8}), fill: new ol.style.Fill({color: 'rgba(255,255,255,1.0)'})}),
         text: createTextStyle(feature, resolution, labelText, labelFont,
-                              labelFill, placement, bufferColor, bufferWidth)
-    })];;
+                              labelFill, placement, bufferColor,
+                              bufferWidth)
+    }),new ol.style.Style({
+        image: new ol.style.RegularShape({radius: 2.454545454545454 + size, points: 6,
+            displacement: [0, 0], stroke: new ol.style.Stroke({color: 'rgba(250,176,124,1.0)', lineDash: null, lineCap: 'butt', lineJoin: 'miter', width: 0.76}), fill: new ol.style.Fill({color: 'rgba(250,176,124,1.0)'})}),
+        text: createTextStyle(feature, resolution, labelText, labelFont,
+                              labelFill, placement, bufferColor,
+                              bufferWidth)
+    })];
 
     return style;
 };

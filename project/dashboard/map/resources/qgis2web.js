@@ -148,7 +148,7 @@ var featureOverlay = new ol.layer.Vector({
 });
 
 var doHighlight = true;
-var doHover = true;
+var doHover = false;
 
 function createPopupField(currentFeature, currentFeatureKeys, layer) {
     var popupText = '';
@@ -182,11 +182,14 @@ function createPopupField(currentFeature, currentFeatureKeys, layer) {
 			} else {
 				var fieldValue = currentFeature.get(currentFeatureKeys[i]);
 				if (/\.(gif|jpg|jpeg|tif|tiff|png|avif|webp|svg)$/i.test(fieldValue)) {
-					popupField += (fieldValue != null ? '<img src="images/' + fieldValue.replace(/[\\\/:]/g, '_').trim() + '" /></td>' : '');
+					var imagePath = fieldValue.startsWith('../') ? fieldValue : 'images/' + fieldValue.replace(/[\\\/:]/g, '_').trim();
+					popupField += (fieldValue != null ? '<img src="' + imagePath + '" /></td>' : '');
 				} else if (/\.(mp4|webm|ogg|avi|mov|flv)$/i.test(fieldValue)) {
-					popupField += (fieldValue != null ? '<video controls><source src="images/' + fieldValue.replace(/[\\\/:]/g, '_').trim() + '" type="video/mp4">Il tuo browser non supporta il tag video.</video></td>' : '');
+					var videoPath = fieldValue.startsWith('../') ? fieldValue : 'images/' + fieldValue.replace(/[\\\/:]/g, '_').trim();
+					popupField += (fieldValue != null ? '<video controls><source src="' + videoPath + '" type="video/mp4">Il tuo browser non supporta il tag video.</video></td>' : '');
 				} else if (/\.(mp3|wav|ogg|aac|flac)$/i.test(fieldValue)) {
-                    popupField += (fieldValue != null ? '<audio controls><source src="images/' + fieldValue.replace(/[\\\/:]/g, '_').trim() + '" type="audio/mpeg">Il tuo browser non supporta il tag audio.</audio></td>' : '');
+                    var audioPath = fieldValue.startsWith('../') ? fieldValue : 'images/' + fieldValue.replace(/[\\\/:]/g, '_').trim();
+                    popupField += (fieldValue != null ? '<audio controls><source src="' + audioPath + '" type="audio/mpeg">Il tuo browser non supporta il tag audio.</audio></td>' : '');
                 } else {
 					popupField += (fieldValue != null ? autolinker.link(fieldValue.toLocaleString()) + '</td>' : '');
 				}

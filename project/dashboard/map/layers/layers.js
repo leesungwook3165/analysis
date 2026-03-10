@@ -8,7 +8,7 @@ var wms_layers = [];
             
             source: new ol.source.XYZ({
             attributions: ' ',
-                url: 'https://xdworld.vworld.kr/2d/Satellite/201710/{z}/{x}/{y}.jpeg'
+                url: 'http://xdworld.vworld.kr:8080/2d/Satellite/201710/{z}/{x}/{y}.jpeg'
             })
         });
 var format___1 = new ol.format.GeoJSON();
@@ -23,7 +23,7 @@ var lyr___1 = new ol.layer.Vector({
                 source:jsonSource___1, 
                 style: style___1,
                 popuplayertitle: '영도_행정구역선',
-                interactive: true,
+                interactive: false,
                 title: '<img src="styles/legend/__1.png" /> 영도_행정구역선'
             });
 var format__2 = new ol.format.GeoJSON();
@@ -50,9 +50,24 @@ var jsonSource___3 = new ol.source.Vector({
     attributions: ' ',
 });
 jsonSource___3.addFeatures(features___3);
-var lyr___3 = new ol.layer.Heatmap({
+var lyr___3 = new ol.layer.Vector({
                 declutter: false,
                 source:jsonSource___3, 
+                style: style___3,
+                popuplayertitle: '영도_추천관광지',
+                interactive: true,
+                title: '<img src="styles/legend/__3.png" /> 영도_추천관광지'
+            });
+var format___4 = new ol.format.GeoJSON();
+var features___4 = format___4.readFeatures(json___4, 
+            {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
+var jsonSource___4 = new ol.source.Vector({
+    attributions: ' ',
+});
+jsonSource___4.addFeatures(features___4);
+var lyr___4 = new ol.layer.Heatmap({
+                declutter: false,
+                source:jsonSource___4, 
                 radius: 10 * 2,
                 gradient: ['#f7fcf5', '#e5f5e0', '#c6ebbe', '#9dde96', '#74c476', '#41ab5d', '#238b45', '#006d2c', '#00441b'],
                 blur: 15,
@@ -66,21 +81,6 @@ var lyr___3 = new ol.layer.Heatmap({
     },
                 title: '영도_지역별 방문자 수(열지도)'
             });
-var format__4 = new ol.format.GeoJSON();
-var features__4 = format__4.readFeatures(json__4, 
-            {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
-var jsonSource__4 = new ol.source.Vector({
-    attributions: ' ',
-});
-jsonSource__4.addFeatures(features__4);
-var lyr__4 = new ol.layer.Vector({
-                declutter: false,
-                source:jsonSource__4, 
-                style: style__4,
-                popuplayertitle: '글램핑후보지',
-                interactive: true,
-                title: '<img src="styles/legend/_4.png" /> 글램핑후보지'
-            });
 var format__5 = new ol.format.GeoJSON();
 var features__5 = format__5.readFeatures(json__5, 
             {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
@@ -88,9 +88,24 @@ var jsonSource__5 = new ol.source.Vector({
     attributions: ' ',
 });
 jsonSource__5.addFeatures(features__5);
-var lyr__5 = new ol.layer.Heatmap({
+var lyr__5 = new ol.layer.Vector({
                 declutter: false,
-                source:jsonSource__5,
+                source:jsonSource__5, 
+                style: style__5,
+                popuplayertitle: '글램핑후보지',
+                interactive: false,
+                title: '<img src="styles/legend/_5.png" /> 글램핑후보지'
+            });
+var format__6 = new ol.format.GeoJSON();
+var features__6 = format__6.readFeatures(json__6, 
+            {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
+var jsonSource__6 = new ol.source.Vector({
+    attributions: ' ',
+});
+jsonSource__6.addFeatures(features__6);
+var lyr__6 = new ol.layer.Heatmap({
+                declutter: false,
+                source:jsonSource__6,
 maxResolution:140.0223307613098,
  minResolution:7.029121004217753,
 
@@ -100,24 +115,6 @@ maxResolution:140.0223307613098,
                 shadow: 250,
                 title: '영도 운영중인 숙박업체(열지도)'
             });
-var format____6 = new ol.format.GeoJSON();
-var features____6 = format____6.readFeatures(json____6, 
-            {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
-var jsonSource____6 = new ol.source.Vector({
-    attributions: ' ',
-});
-jsonSource____6.addFeatures(features____6);
-var lyr____6 = new ol.layer.Vector({
-                declutter: false,
-                source:jsonSource____6, 
-                style: style____6,
-                popuplayertitle: '영도_중리산권_관광벨트',
-                interactive: true,
-    title: '영도_중리산권_관광벨트<br />\
-    <img src="styles/legend/___6_0.png" /> <br />\
-    <img src="styles/legend/___6_1.png" /> (감지해변 배후지)<br />\
-    <img src="styles/legend/___6_2.png" /> (예비군 훈련장 이전적지)<br />\
-    <img src="styles/legend/___6_3.png" /> (중리해변 배후지)<br />' });
 var format____7 = new ol.format.GeoJSON();
 var features____7 = format____7.readFeatures(json____7, 
             {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
@@ -129,28 +126,49 @@ var lyr____7 = new ol.layer.Vector({
                 declutter: false,
                 source:jsonSource____7, 
                 style: style____7,
+                popuplayertitle: '영도_중리산권_관광벨트',
+                interactive: false,
+    title: '영도_중리산권_관광벨트<br />\
+    <img src="styles/legend/___7_0.png" /> <br />\
+    <img src="styles/legend/___7_1.png" /> (감지해변 배후지)<br />\
+    <img src="styles/legend/___7_2.png" /> (예비군 훈련장 이전적지)<br />\
+    <img src="styles/legend/___7_3.png" /> (중리해변 배후지)<br />' });
+var format____8 = new ol.format.GeoJSON();
+var features____8 = format____8.readFeatures(json____8, 
+            {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
+var jsonSource____8 = new ol.source.Vector({
+    attributions: ' ',
+});
+jsonSource____8.addFeatures(features____8);
+var lyr____8 = new ol.layer.Vector({
+                declutter: false,
+                source:jsonSource____8, 
+                style: style____8,
                 popuplayertitle: '영도_중리산권_부산남고',
-                interactive: true,
+                interactive: false,
     title: '영도_중리산권_부산남고<br />\
-    <img src="styles/legend/___7_0.png" /> <br />' });
+    <img src="styles/legend/___8_0.png" /> <br />' });
 
-lyr_vworldsat_0.setVisible(true);lyr___1.setVisible(true);lyr__2.setVisible(true);lyr___3.setVisible(true);lyr__4.setVisible(true);lyr__5.setVisible(true);lyr____6.setVisible(true);lyr____7.setVisible(true);
-var layersList = [lyr_vworldsat_0,lyr___1,lyr__2,lyr___3,lyr__4,lyr__5,lyr____6,lyr____7];
+lyr_vworldsat_0.setVisible(true);lyr___1.setVisible(true);lyr__2.setVisible(true);lyr___3.setVisible(true);lyr___4.setVisible(true);lyr__5.setVisible(true);lyr__6.setVisible(true);lyr____7.setVisible(true);lyr____8.setVisible(true);
+var layersList = [lyr_vworldsat_0,lyr___1,lyr__2,lyr___3,lyr___4,lyr__5,lyr__6,lyr____7,lyr____8];
 lyr___1.set('fieldAliases', {'fid': 'fid', 'EMD_CD': 'EMD_CD', 'COL_ADM_SE': 'COL_ADM_SE', 'EMD_NM': 'EMD_NM', 'SGG_OID': 'SGG_OID', });
 lyr__2.set('fieldAliases', {'콘텐츠ID': '콘텐츠ID', '콘텐츠명': '콘텐츠명', '구군': '구군', '위도': '위도', '경도': '경도', '여행지': '여행지', '제목': '제목', '부제목': '부제목', '주소': '주소', '연락처': '연락처', '홈페이지': '홈페이지', '교통정보': '교통정보', '운영일': '운영일', '휴무일': '휴무일', '운영 및 시간': '운영 및 시간', '이용요금': '이용요금', '편의시설': '편의시설', '이미지URL': '이미지URL', '썸네일이미지URL': '썸네일이미지URL', '상세내용': '상세내용', });
-lyr__4.set('fieldAliases', {'id': 'id', 'nm': 'nm', 'x': 'x', 'y': 'y', 'url': 'url', });
-lyr____6.set('fieldAliases', {'id': 'id', 'name': 'name', });
+lyr___3.set('fieldAliases', {'id': 'id', 'name': 'name', 'url': 'url', 'photo_path': 'photo_path', });
+lyr__5.set('fieldAliases', {'id': 'id', 'nm': 'nm', 'x': 'x', 'y': 'y', 'url': 'url', });
 lyr____7.set('fieldAliases', {'id': 'id', 'name': 'name', });
+lyr____8.set('fieldAliases', {'id': 'id', 'name': 'name', });
 lyr___1.set('fieldImages', {'fid': 'TextEdit', 'EMD_CD': 'TextEdit', 'COL_ADM_SE': 'TextEdit', 'EMD_NM': 'TextEdit', 'SGG_OID': 'Range', });
 lyr__2.set('fieldImages', {'콘텐츠ID': 'Range', '콘텐츠명': 'TextEdit', '구군': 'TextEdit', '위도': 'TextEdit', '경도': 'TextEdit', '여행지': 'TextEdit', '제목': 'TextEdit', '부제목': 'TextEdit', '주소': 'TextEdit', '연락처': 'TextEdit', '홈페이지': 'TextEdit', '교통정보': 'TextEdit', '운영일': 'TextEdit', '휴무일': 'TextEdit', '운영 및 시간': 'TextEdit', '이용요금': 'TextEdit', '편의시설': 'TextEdit', '이미지URL': 'TextEdit', '썸네일이미지URL': 'TextEdit', '상세내용': 'TextEdit', });
-lyr__4.set('fieldImages', {'id': 'TextEdit', 'nm': 'TextEdit', 'x': 'TextEdit', 'y': 'TextEdit', 'url': 'TextEdit', });
-lyr____6.set('fieldImages', {'id': 'TextEdit', 'name': 'TextEdit', });
+lyr___3.set('fieldImages', {'id': 'TextEdit', 'name': 'TextEdit', 'url': 'ExternalResource', 'photo_path': 'ExternalResource', });
+lyr__5.set('fieldImages', {'id': 'TextEdit', 'nm': 'TextEdit', 'x': 'TextEdit', 'y': 'TextEdit', 'url': 'TextEdit', });
 lyr____7.set('fieldImages', {'id': 'TextEdit', 'name': 'TextEdit', });
+lyr____8.set('fieldImages', {'id': 'TextEdit', 'name': 'TextEdit', });
 lyr___1.set('fieldLabels', {'fid': 'no label', 'EMD_CD': 'no label', 'COL_ADM_SE': 'no label', 'EMD_NM': 'no label', 'SGG_OID': 'no label', });
-lyr__2.set('fieldLabels', {'콘텐츠ID': 'no label', '콘텐츠명': 'inline label - always visible', '구군': 'no label', '위도': 'no label', '경도': 'no label', '여행지': 'no label', '제목': 'no label', '부제목': 'no label', '주소': 'no label', '연락처': 'no label', '홈페이지': 'no label', '교통정보': 'no label', '운영일': 'no label', '휴무일': 'header label - always visible', '운영 및 시간': 'no label', '이용요금': 'no label', '편의시설': 'no label', '이미지URL': 'no label', '썸네일이미지URL': 'no label', '상세내용': 'no label', });
-lyr__4.set('fieldLabels', {'id': 'no label', 'nm': 'inline label - always visible', 'x': 'no label', 'y': 'no label', 'url': 'header label - always visible', });
-lyr____6.set('fieldLabels', {'id': 'hidden field', 'name': 'no label', });
+lyr__2.set('fieldLabels', {'콘텐츠ID': 'no label', '콘텐츠명': 'inline label - visible with data', '구군': 'no label', '위도': 'no label', '경도': 'no label', '여행지': 'no label', '제목': 'no label', '부제목': 'no label', '주소': 'no label', '연락처': 'no label', '홈페이지': 'no label', '교통정보': 'no label', '운영일': 'no label', '휴무일': 'header label - always visible', '운영 및 시간': 'no label', '이용요금': 'no label', '편의시설': 'no label', '이미지URL': 'no label', '썸네일이미지URL': 'no label', '상세내용': 'no label', });
+lyr___3.set('fieldLabels', {'id': 'hidden field', 'name': 'header label - always visible', 'url': 'inline label - visible with data', 'photo_path': 'no label', });
+lyr__5.set('fieldLabels', {'id': 'no label', 'nm': 'inline label - always visible', 'x': 'no label', 'y': 'no label', 'url': 'header label - always visible', });
 lyr____7.set('fieldLabels', {'id': 'no label', 'name': 'no label', });
-lyr____7.on('precompose', function(evt) {
+lyr____8.set('fieldLabels', {'id': 'no label', 'name': 'no label', });
+lyr____8.on('precompose', function(evt) {
     evt.context.globalCompositeOperation = 'normal';
 });

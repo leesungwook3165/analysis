@@ -1300,7 +1300,7 @@ IRR = 23.6%</div>
         <tr><td style="text-align:center;"><strong>흘수</strong></td><td>__DRAFT__</td></tr>
         <tr><td style="text-align:center;"><strong>추진력</strong></td><td>__POWER__</td></tr>
         <tr><td style="text-align:center;"><strong>서비스 속도</strong></td><td>__SPEED__</td></tr>
-        <tr><td style="text-align:center;"><strong>총톤수</strong></td><td>__TONNAGE__</td></tr>
+          <tr><td style="text-align:center;"><strong>총톤수(국제/국내)</strong></td><td>__TONNAGE__</td></tr>
       </tbody>
     </table>
   </template>
@@ -2942,7 +2942,7 @@ function renderNewSeaTables() {
       draft: '5.8m',
       power: '13,920kW',
       speed: '21kts',
-      tonnage: '14,919톤'
+      tonnage: '국내 14,919톤'
     },
     {
       name: '뉴씨다오',
@@ -2964,7 +2964,7 @@ function renderNewSeaTables() {
       draft: '6.3m',
       power: '18,560HP',
       speed: '22.5kts (시속 약 40km)',
-      tonnage: '19,988톤'
+      tonnage: '국내 19,988톤'
     },
     {
       name: '퀸제누비아2호',
@@ -2986,7 +2986,7 @@ function renderNewSeaTables() {
       draft: '6.51m',
       power: '22,500kW (약 30,000마력)',
       speed: '24kts (시속 약 44.4km)',
-      tonnage: '26,546톤'
+      tonnage: '국내 26,546톤'
     }
   ];
 
@@ -4541,8 +4541,9 @@ function updatePricePerM2Summary() {
 
   const totalUnitPrice = usedPrices.reduce((sum, v) => sum + v, 0);
   const avg = totalArea > 0 ? (totalPrice / totalArea) : (totalUnitPrice / usedPrices.length);
-  const avgPerPyeong = avg * 3.3;
-  const totalAreaPyeong = totalArea / 3.3;
+  const M2_TO_PYEONG = 0.3025;
+  const avgPerPyeong = avg / M2_TO_PYEONG;
+  const totalAreaPyeong = totalArea * M2_TO_PYEONG;
   const outlierText = includeOutliersToggle.checked ? '이상치 포함' : '이상치 제외';
 
   summaryEl.innerHTML = `
