@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ko">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>카카오 로드뷰</title>
+        <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #dfe8ee 0%, #c4d6e1 100%);
+        }
+        .roadview-page {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+        }
+        .roadview-page__header {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(24, 53, 73, 0.14);
+            background: rgba(255, 255, 255, 0.94);
+            color: #183549;
+        }
+        .roadview-page__title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .roadview-page__meta {
+            margin-top: 6px;
+            font-size: 12px;
+            color: #4b6878;
+        }
+        .roadview-page__status {
+            padding: 10px 16px;
+            font-size: 12px;
+            color: #355566;
+            background: rgba(255, 255, 255, 0.72);
+            border-bottom: 1px solid rgba(24, 53, 73, 0.08);
+        }
+        .roadview-page__canvas {
+            flex: 1;
+            min-height: 320px;
+            background: #eff4f7;
+        }
+        .roadview-page__actions {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            border-top: 1px solid rgba(24, 53, 73, 0.08);
+            background: rgba(255, 255, 255, 0.92);
+        }
+        .roadview-page__button {
+            padding: 9px 12px;
+            border: 0;
+            border-radius: 10px;
+            background: #1b5e7b;
+            color: #fff;
+            cursor: pointer;
+        }
+        .roadview-page__button--subtle {
+            background: #d5e3ea;
+            color: #183549;
+        }
+        </style>
+    </head>
+    <body>
+        <div class="roadview-page">
+            <div class="roadview-page__header">
+                <div class="roadview-page__title">카카오 로드뷰</div>
+                <div id="roadviewMeta" class="roadview-page__meta"></div>
+            </div>
+            <div id="roadviewStatus" class="roadview-page__status">로드뷰를 준비 중입니다.</div>
+            <div id="roadviewCanvas" class="roadview-page__canvas"></div>
+            <div class="roadview-page__actions">
+                <button id="externalRoadviewButton" class="roadview-page__button" type="button">카카오맵에서 열기</button>
+                <button id="closeWindowButton" class="roadview-page__button roadview-page__button--subtle" type="button">닫기</button>
+            </div>
+        </div>
+
+        <script src="./map-integration.config.js"></script>
+        <script src="./map-roadview.js"></script>
+    </body>
+</html>

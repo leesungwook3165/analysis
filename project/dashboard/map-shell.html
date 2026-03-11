@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ko">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>지도 뷰어</title>
+        <link rel="stylesheet" href="./map-shell.css">
+    </head>
+    <body>
+        <div class="map-shell">
+            <iframe id="mapFrame" class="map-shell__frame" title="QGIS 지도"></iframe>
+
+            <section id="mapStatus" class="map-shell__status" aria-live="polite">
+                <div class="map-shell__status-header">
+                    <div>
+                        <div class="map-shell__status-title">좌표 안내</div>
+                        <div class="map-shell__status-subtitle">클릭 좌표와 로드뷰 연결</div>
+                    </div>
+                    <button id="toggleStatusButton" class="map-shell__icon-button" type="button" aria-expanded="true" aria-controls="mapStatusBody">접기</button>
+                </div>
+                <div id="mapStatusBody" class="map-shell__status-body">
+                    <div id="coordDisplay" class="map-shell__coord map-shell__coord--empty">지도를 클릭하면 좌표가 표시됩니다.</div>
+                    <div class="map-shell__hint">우클릭 메뉴에서 카카오 로드뷰 팝업을 열 수 있습니다.</div>
+                    <button id="copyCoordsButton" class="map-shell__button" type="button" disabled>좌표 복사</button>
+                </div>
+            </section>
+
+            <div id="contextMenu" class="map-shell__menu" hidden>
+                <button id="openRoadviewButton" class="map-shell__menu-item" type="button">로드뷰 보기</button>
+                <button id="copyMenuCoordsButton" class="map-shell__menu-item" type="button">이 좌표 복사</button>
+            </div>
+        </div>
+
+        <script src="./map-integration.config.js"></script>
+        <script src="./map-openlayers-tools.js"></script>
+        <script src="./map-shell.js"></script>
+    </body>
+</html>
